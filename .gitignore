@@ -1,0 +1,12 @@
+@"
+node_modules/
+venv/
+.env
+ailords/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+*.swp
+"@ | Out-File -FilePath .gitignore -Encoding utf8
