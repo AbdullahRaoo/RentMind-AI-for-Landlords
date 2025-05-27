@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import "./Chatbot.css";
 
 const WS_URL = "ws://localhost:8000/ws/chat/";
@@ -20,8 +21,13 @@ export default function Chatbot() {
           ...msgs,
           {
             sender: "bot",
-            text: `\n🎯 Predicted Rent: £${data.predicted_rent}\n💡 Rent Range: £${data.lower_rent}–£${data.upper_rent}\n🔒 Confidence: ${data.confidence_percentage}%\n📝 ${data.explanation}`,
+            text: data.explanation || `\n🎯 Predicted Rent: £${data.predicted_rent}\n💡 Rent Range: £${data.lower_rent}–£${data.upper_rent}\n🔒 Confidence: ${data.confidence_percentage}%\n📝 ${data.explanation}`,
           },
+        ]);
+      } else if (data.type === "bot_response") {
+        setMessages((msgs) => [
+          ...msgs,
+          { sender: "bot", text: data.message }
         ]);
       } else if (data.type === "echo") {
         setMessages((msgs) => [...msgs, { sender: "bot", text: data.message }]);
@@ -30,7 +36,7 @@ export default function Chatbot() {
       }
     };
     ws.current.onclose = () => {
-      setMessages((msgs) => [...msgs, { sender: "bot", text: "Connection closed." }]);
+    //   setMessages((msgs) => [...msgs, { sender: "bot", text: "Connection closed." }]);
     };
     return () => ws.current && ws.current.close();
   }, []);
@@ -73,17 +79,20 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="chatbot-container">
+    <div className="chatbot-container" style={{ minHeight: '85vh', height: '80dvh', display: 'flex', flexDirection: 'column' }}>
       <div className="chatbot-header">AI for Landlords</div>
-      <div className="chatbot-messages">
+      <div className="chatbot-messages" style={{ flex: 1, overflowY: 'auto' }}>
         {messages.map((msg, idx) => (
           <div
             key={idx}
             className={`chatbot-message chatbot-message-${msg.sender}`}
+            style={{ textAlign: 'left' }}
           >
-            {msg.text.split("\n").map((line, i) => (
-              <div key={i}>{line}</div>
-            ))}
+            {msg.sender === "bot" ? (
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
+            ) : (
+              msg.text.split("\n").map((line, i) => <div key={i}>{line}</div>)
+            )}
           </div>
         ))}
         <div ref={chatEndRef} />
