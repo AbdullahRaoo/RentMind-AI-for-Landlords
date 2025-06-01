@@ -2,6 +2,13 @@ id like to do tennet screening
 
 tallal Ahmed, he's 23 yo, he's employed and earns 5000 a month with credit score of 750 and has clear rental history
 
+can you look into a tenant for me?
 
 waleed sheikh, his rentt is 300, he's unemployed and earns 50 a month with credit score of 250 and has clear rental history
 
+can you do rent estimation for me?
+
+a 700 sq foot flat, located at Holland Road, Kensington with code W14 having 2 bedrooms and 1 bathroom 3 near stations with 0.4 avg distance from them
+
+  
+daphne backend.asgi:application

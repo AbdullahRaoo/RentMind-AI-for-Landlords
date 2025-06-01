@@ -47,7 +47,7 @@ def predict_rent(input_data):
 
 def generate_explanation_with_langchain(input_data, predicted_rent, lower_rent, upper_rent, confidence_percentage):
     # Initialize LangChain's ChatOpenAI
-    chat = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7, openai_api_key=openai_api_key)
+    chat = ChatOpenAI(model="gpt-4", temperature=0.7, openai_api_key=openai_api_key)
 
     # Define the prompt template
     prompt_template = PromptTemplate(
@@ -292,15 +292,27 @@ class RentPredictionHandler(BaseModuleHandler):
         print("[DEBUG] User fields (extracted from conversation):", fields)
         encoded_fields = self.encode_fields_for_model(fields)
         print("[DEBUG] Encoded fields for model:", encoded_fields)
-        # Only keep model fields
         MODEL_FIELDS = [
             "address", "subdistrict_code", "BEDROOMS", "BATHROOMS", "SIZE",
             "PROPERTY TYPE", "avg_distance_to_nearest_station", "nearest_station_count"
         ]
         model_input = {k: encoded_fields[k] for k in MODEL_FIELDS if k in encoded_fields}
         predicted_rent, lower_rent, upper_rent, confidence_percentage = predict_rent(model_input)
-        explanation = generate_explanation_with_langchain(model_input, predicted_rent, lower_rent, upper_rent, confidence_percentage)
-        return explanation
+        rounded_confidence_percentage = round(confidence_percentage, 2)
+        # Compose a concise, actionable markdown result
+        summary = (
+            f"- **Estimated Monthly Rent:** £{int(predicted_rent)}\n"
+            f"- **Suggested Range:** £{lower_rent}–£{upper_rent}\n"
+            f"- **Confidence Level:** {rounded_confidence_percentage}%\n"
+        )
+        # 1-line summary
+        one_liner = "\n_This estimate is based on your property's size, features, and location._\n"
+        # AI explanation of pricing logic
+        explanation = ("\n**How this was calculated:**\n"
+            "The suggested rent is determined by analyzing your property's size, number of bedrooms and bathrooms, type, and how close it is to public transport. "
+            "Properties with more space, more rooms, and better access to stations generally command higher rents. The confidence score reflects how closely your property matches similar listings in the area.\n"
+        )
+        return summary + one_liner + explanation
 
     def needs_confirmation(self, user_message):
         # Only treat as confirmation if the user is confirming the information, not to trigger the model
@@ -356,13 +368,20 @@ class TenantScreeningHandler(BaseModuleHandler):
     }
     def __init__(self):
         self.system_prompt = (
-            "You are LandlordBuddy, an expert and friendly AI assistant for landlords. "
+            "You are LandlordBuddy, an expert and professional AI assistant for landlords. "
             "You support rent pricing, tenant screening, and maintenance prediction. "
             "For tenant screening, your job is to gather all required info (credit score, income, rent, employment status, eviction record), confirm with the user, and then run the official tenant screening script. "
-            "NEVER provide your own evaluation or advice. If the script cannot be run (e.g., missing info), politely tell the user: 'Sorry, I couldn't run the tenant screening script because some required information is missing. Please provide all the details.' "
+            "NEVER provide your own evaluation, summary, or advice. "
+            "If the script cannot be run (e.g., missing info), politely say: 'Sorry, I couldn't run the tenant screening script because some required information is missing. Please provide all the details.' "
             "If the script runs, present its output in a user-friendly, markdown-formatted way, and elaborate only to clarify the script's result, not to add your own judgment. "
+            "You don't use words like script, model, or AI. "
+            "You are a friendly, professional assistant, not a chatbot. "
             "Be concise, professional, and interactive. "
-            "Never say 'please wait', 'processing', or imply that you will automatically proceed. Only ask for confirmation and wait for the user's explicit confirmation before running the script."
+            "Never say 'please wait', 'processing', or imply that you will automatically proceed. Only ask for confirmation and wait for the user's explicit confirmation before running the script. "
+            "Never mention or ask for tenant name, rental history, or any extra fields. "
+            "Only summarize the required fields and ask for confirmation. "
+            "When starting tenant screening, always ask for all required information at once, listing each required field (credit score, income, rent, employment status, eviction record) in a clear, markdown-formatted list. "
+            "Do not ask for fields one by one. If any are missing, ask for all missing fields together in a single message. "
         )
         self.chat = ChatOpenAI(model="gpt-4", temperature=0.7, openai_api_key=openai_api_key)
 
@@ -382,7 +401,7 @@ class TenantScreeningHandler(BaseModuleHandler):
         all_text = "\n".join([m["content"] for m in conversation_history if m["role"] in ("user", "assistant")])
         all_text += "\n" + user_message
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for landlords. Extract the following fields from the conversation and user message. If a field is missing, use 0, empty string, or False. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("system", "You are an expert assistant for landlords. Extract ONLY the following fields from the conversation and user message. If a field is missing, use 0, empty string, or False. Output only the JSON object as specified by the schema: {format_instructions}"),
             ("user", "Conversation so far:\n{conversation}\nUser message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
@@ -434,11 +453,39 @@ class TenantScreeningHandler(BaseModuleHandler):
                             value = any(word in value for word in ["yes", "true", "prior", "evict", "bad", "negative"])
                         fields[field] = value
                         break
-        return fields
+        # Only keep required fields and ensure correct types
+        clean_fields = {}
+        for k in self.required_fields:
+            v = fields.get(k, 0 if k in ["credit_score", "income", "rent"] else (False if k == "eviction_record" else ""))
+            # Special handling for income: if string like '50 a month', extract number
+            if k == "income" and isinstance(v, str):
+                import re
+                match = re.search(r"(\d+(?:\.\d+)?)", v)
+                if match:
+                    v = float(match.group(1))
+                else:
+                    v = 0.0
+            # Ensure correct types
+            if k in ["credit_score", "rent"]:
+                try:
+                    v = int(float(v))
+                except Exception:
+                    v = 0
+            if k == "income":
+                try:
+                    v = float(v)
+                except Exception:
+                    v = 0.0
+            if k == "eviction_record":
+                v = bool(v)
+            if k == "employment_status":
+                v = str(v)
+            clean_fields[k] = v
+        return clean_fields
 
     def summarize_fields(self, fields):
         summary = "**Tenant Screening Details:**\n\n"
-        for k in self.required_fields:
+        for k in fields:
             v = fields.get(k, "[missing]")
             if k == "eviction_record":
                 v = "Yes" if v is True else ("No" if v is False else v)
@@ -447,14 +494,25 @@ class TenantScreeningHandler(BaseModuleHandler):
         return summary
 
     def run_model(self, fields):
-        from .tenant_screening import screen_tenant
+        from tenant_screening import screen_tenant  # Absolute import for script/module compatibility
         credit_score = int(fields.get("credit_score", 0) or 0)
         income = float(fields.get("income", 0) or 0)
         rent = float(fields.get("rent", 0) or 0)
         employment_status = str(fields.get("employment_status", "")).strip() or "unknown"
         eviction_record = bool(fields.get("eviction_record", False))
+        print("Starting script with fields:", fields)
+        print(f"Credit Score: {credit_score}, Income: {income}, Rent: {rent}, Employment Status: {employment_status}, Eviction Record: {eviction_record}")
         result = screen_tenant(credit_score, income, rent, employment_status, eviction_record)
-        md = f"**Tenant Screening Result:**\n\n"
+        print("DOne with script")
+        # Compose a brief summary based on recommendation
+        summary = ""
+        if result['recommendation'].lower() == 'approve':
+            summary = "✅ **Tenant Approved:** This applicant meets the screening criteria."
+        elif result['recommendation'].lower() == 'review':
+            summary = "⚠️ **Tenant Requires Further Review:** Some risk factors were detected."
+        else:
+            summary = "❌ **Tenant Rejected:** This applicant does not meet the screening criteria."
+        md = f"{summary}\n\n**Tenant Screening Result:**\n\n"
         md += f"- **Recommendation:** {result['recommendation']}\n"
         md += f"- **Risk Score:** {result['risk_score']}\n"
         md += f"- **Details:**\n"
@@ -463,15 +521,28 @@ class TenantScreeningHandler(BaseModuleHandler):
         return md
 
     def handle(self, conversation_history, user_message, last_candidate_fields=None):
-        candidate_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
-        tenant_fields = {k: v for k, v in (candidate_fields if any(candidate_fields.values()) else (last_candidate_fields or {})).items() if k in self.required_fields}
-        if self.needs_confirmation(user_message) and self.should_run_model(conversation_history, tenant_fields):
-            fields = tenant_fields
-            if all(f in fields and fields[f] not in (None, '', 0, 0.0, False) for f in self.required_fields):
-                result = self.run_model(fields)
-                return {"response": result, "action": "screen_tenant", "fields": fields}
+        # Always merge new extracted fields with last candidate fields, only for required fields
+        new_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
+        merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+        for k in self.required_fields:
+            v = new_fields.get(k, None)
+            if v not in (None, '', 0, 0.0, False):
+                merged_fields[k] = v
+        # Only keep required fields
+        tenant_fields = {k: merged_fields.get(k, 0 if k in ["credit_score", "income", "rent"] else (False if k == "eviction_record" else "")) for k in self.required_fields}
+        filtered_fields = {k: tenant_fields[k] for k in self.required_fields}
+        # --- After user confirmation, always run the script if all required fields are present ---
+        if self.needs_confirmation(user_message):
+            if all(self._is_field_filled(k, filtered_fields.get(k)) for k in self.required_fields):
+                result = self.run_model(filtered_fields)
+                return {"response": result, "action": "screen_tenant", "fields": filtered_fields}
             else:
-                return {"response": "Sorry, I couldn't run the tenant screening script because some required information is missing. Please provide all the details (credit score, income, rent, employment status, and eviction record).", "action": "ask_for_info", "fields": fields}
+                return {
+                    "response": "Sorry, I couldn't run the tenant screening script because some required information is missing. Please provide all the details (credit score, income, rent, employment status, and eviction record).",
+                    "action": "ask_for_info",
+                    "fields": filtered_fields
+                }
+        # Otherwise, continue the LLM-driven flow
         messages = [
             {"role": "system", "content": self.system_prompt}
         ]
@@ -480,11 +551,31 @@ class TenantScreeningHandler(BaseModuleHandler):
         messages.append({"role": "user", "content": user_message})
         response = self.chat.invoke([HumanMessage(content=m["content"]) for m in messages])
         reply = response.content.strip()
-        # Remove any 'please wait' or 'processing' phrases from the reply
-        for phrase in ["please wait", "processing", "hold on", "one moment", "I'll process", "wait a moment"]:
-            reply = reply.replace(phrase, "").replace(phrase.capitalize(), "")
-        extracted = self.extract_fields(reply, conversation_history, candidate_fields)
-        return {"response": reply, "action": "chat", "fields": extracted}
+        # Remove any LLM advice/summary or extra fields
+        for phrase in [
+            "please wait", "processing", "hold on", "one moment", "I'll process", "wait a moment",
+            "it's important to exercise caution", "you may wish to consider", "you may want to explore",
+            "consider requesting a guarantor", "By considering these factors", "Tips for Landlord",
+            "Based on the information provided", "Summary:"
+        ]:
+            reply = reply.replace(phrase, "")
+            reply = reply.replace(phrase.capitalize(), "")
+        # Remove lines with extra fields
+        lines = reply.split('\n')
+        filtered_lines = []
+        for line in lines:
+            if any(field in line.lower() for field in ["full name", "rental history", "name:", "history:", "annual income", "tenant's name"]):
+                continue
+            filtered_lines.append(line)
+        reply = '\n'.join(filtered_lines)
+        # Extract fields from reply and merge again
+        reply_fields = self.extract_fields(reply, conversation_history, tenant_fields)
+        for k in self.required_fields:
+            v = reply_fields.get(k, None)
+            if v not in (None, '', 0, 0.0, False):
+                tenant_fields[k] = v
+        # Always return only required fields
+        return {"response": reply, "action": "chat", "fields": {k: tenant_fields[k] for k in self.required_fields}}
 
     def should_run_model(self, conversation_history, candidate_fields):
         if not candidate_fields or not all(f in candidate_fields and candidate_fields[f] not in (None, '', 0, 0.0, False) for f in self.required_fields):
@@ -499,6 +590,14 @@ class TenantScreeningHandler(BaseModuleHandler):
         ]
         return any(kw in last_assistant["content"].lower() for kw in confirmation_keywords)
 
+    def _is_field_filled(self, k, v):
+        # For eviction_record, False is a valid value (means no eviction)
+        if k == "eviction_record":
+            return v is not None
+        if k in ["credit_score", "income", "rent"]:
+            return v not in (None, '', 0, 0.0)
+        return v not in (None, '', False)
+
 # --- Intent Detection ---
 def detect_intent(user_message, conversation_history=None):
     msg = user_message.lower()
@@ -508,22 +607,106 @@ def detect_intent(user_message, conversation_history=None):
         return "tenant_screening"
     if any(word in msg for word in ["maintenance", "repair", "fix", "upkeep"]):
         return "maintenance_prediction"
-    # Default to rent prediction for now
-    return "rent_prediction"
+    # If no intent is detected, return None
+    return None
+
+# --- LLM-based Intent Detection ---
+def llm_detect_intent(conversation_history, user_message):
+    """
+    Use the LLM to robustly detect the user's intent, using the last 4-5 messages for context.
+    Returns: 'rent_prediction', 'tenant_screening', 'maintenance_prediction', or None
+    """
+    from langchain_openai import ChatOpenAI
+    chat = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key=openai_api_key)
+    # Use last 4-5 messages for context
+    history = conversation_history[-5:] if len(conversation_history) > 5 else conversation_history
+    context = "\n".join([f"{m['role']}: {m['content']}" for m in history])
+    prompt = (
+        "You are an expert assistant for landlords. "
+        "Given the following conversation, classify the user's current intent as one of: 'rent_prediction', 'tenant_screening', 'maintenance_prediction', or 'other'. "
+        "Only output the intent keyword.\n"
+        f"Conversation:\n{context}\nUser message:\n{user_message}\nIntent:"
+    )
+    response = chat.invoke([HumanMessage(content=prompt)])
+    intent = response.content.strip().lower()
+    if "rent" in intent:
+        return "rent_prediction"
+    if "tenant" in intent or "screen" in intent:
+        return "tenant_screening"
+    if "maintenance" in intent or "repair" in intent:
+        return "maintenance_prediction"
+    return None
+
+# --- Explicit Intent Switch Detection ---
+def user_requests_intent_switch(user_message):
+    msg = user_message.lower()
+    switch_phrases = [
+        "forget it", "let's do", "i want to do", "switch to", "change to", "do rent instead", "do tenant instead", "do maintenance instead", "not this", "wrong task", "that's not what i meant", "i want rent", "i want tenant", "i want maintenance"
+    ]
+    return any(phrase in msg for phrase in switch_phrases)
 
 # --- Main Conversational Engine ---
-def conversational_engine(conversation_history, user_message, last_candidate_fields=None):
+def conversational_engine(conversation_history, user_message, last_candidate_fields=None, last_intent=None, intent_completed=False):
     """
     Modular conversational engine for LandlordBuddy.
     Routes to the correct module handler based on detected intent.
     """
-    intent = detect_intent(user_message, conversation_history)
+    # If user requests to switch/cancel, re-detect intent
+    if user_requests_intent_switch(user_message):
+        intent = llm_detect_intent(conversation_history, user_message)
+        intent_completed = False
+    elif last_intent and not intent_completed:
+        # Persist the last intent until the flow is completed
+        intent = last_intent
+    else:
+        # No active intent or just completed, detect new intent
+        intent = llm_detect_intent(conversation_history, user_message)
+        intent_completed = False
+
+    confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
+    is_confirmation = user_message.strip().lower() in confirmation_phrases
+
+    # Handle each intent
     if intent == "rent_prediction":
         handler = RentPredictionHandler()
+        result = handler.handle(conversation_history, user_message, last_candidate_fields)
+        # If model was run, mark intent as completed
+        if result.get("action") == "screen_tenant" or result.get("action") == "rent_prediction":
+            intent_completed = True
+        return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
     elif intent == "tenant_screening":
         handler = TenantScreeningHandler()
+        result = handler.handle(conversation_history, user_message, last_candidate_fields)
+        if result.get("action") == "screen_tenant":
+            intent_completed = True
+        return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
     elif intent == "maintenance_prediction":
-        handler = MaintenancePredictionHandler()
+        return {
+            "response": (
+                "Maintenance prediction is a supported feature, but it is not yet implemented. "
+                "Currently, I can help you with:\n"
+                "- **Rent Prediction**: Estimate the rent for your property.\n"
+                "- **Tenant Screening**: Assess a tenant's suitability.\n\n"
+                "Please specify which of these you'd like help with, and provide any relevant details."
+            ),
+            "action": "not_implemented",
+            "fields": {},
+            "last_intent": None,
+            "intent_completed": True
+        }
     else:
-        handler = RentPredictionHandler()
-    return handler.handle(conversation_history, user_message, last_candidate_fields)
+        return {
+            "response": (
+                "I'm sorry, I couldn't clearly understand your request. "
+                "You may be using different wording or asking for something else.\n\n"
+                "Here are the tasks I can help you with:\n"
+                "- **Rent Prediction**: Estimate the rent for your property.\n"
+                "- **Tenant Screening**: Assess a tenant's suitability.\n"
+                "- **Maintenance Prediction**: Predict potential maintenance needs.\n\n"
+                "Please specify which of these you'd like help with, and provide any relevant details."
+            ),
+            "action": "clarify_intent",
+            "fields": {},
+            "last_intent": None,
+            "intent_completed": True
+        }
