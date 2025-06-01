@@ -13,7 +13,7 @@ load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 # Dynamically construct the absolute path to the model file
-current_dir = os.path.dirname(__file__)  # Directory of the current script
+current_dir = os.path.dirname(__file__)
 model_path = os.path.join(current_dir, "../Rent Pricing AI/rent_xgboost_model.json")
 
 # Load the trained model
@@ -44,67 +44,6 @@ def predict_rent(input_data):
     confidence_percentage = round(confidence * 100, 2)
 
     return predicted_rent, lower_rent, upper_rent, confidence_percentage
-
-def generate_explanation_with_langchain(input_data, predicted_rent, lower_rent, upper_rent, confidence_percentage):
-    # Initialize LangChain's ChatOpenAI
-    chat = ChatOpenAI(model="gpt-4", temperature=0.7, openai_api_key=openai_api_key)
-
-    # Define the prompt template
-    prompt_template = PromptTemplate(
-        input_variables=[
-            "address", "subdistrict_code", "bedrooms", "bathrooms", "size",
-            "property_type", "avg_distance", "station_count", "predicted_rent",
-            "lower_rent", "upper_rent", "confidence_percentage"
-        ],
-        template="""
-        You are LandlordBuddy, an expert and friendly AI assistant for landlords. 
-        Please explain the rent prediction below in a helpful, conversational, and reassuring tone. Use markdown formatting for clarity (bold, bullet points, etc). 
-        Make your response easy to read and actionable for a landlord who may not be an expert.
-
-        ---
-        **Property Details:**
-        - **Address (encoded):** {address}
-        - **Subdistrict Code:** {subdistrict_code}
-        - **Bedrooms:** {bedrooms}
-        - **Bathrooms:** {bathrooms}
-        - **Size:** {size} sq ft
-        - **Property Type (encoded):** {property_type}
-        - **Average Distance to Nearest Station:** {avg_distance} miles
-        - **Nearest Station Count:** {station_count}
-
-        **Predicted Rent:**
-        - **Estimated Monthly Rent:** £{predicted_rent}
-        - **Suggested Range:** £{lower_rent}–£{upper_rent}
-        - **Confidence Level:** {confidence_percentage}%
-
-        ---        Please provide:
-        - A concise, professional summary of the prediction (avoid casual or overly friendly language)
-        - What factors most influenced the price
-        - Any tips or next steps for the landlord
-        - Use markdown for formatting (bold, lists, etc)
-        """
-    )
-
-    # Format the prompt with input data
-    prompt = prompt_template.format(
-        address=input_data['address'],
-        subdistrict_code=input_data['subdistrict_code'],
-        bedrooms=input_data['BEDROOMS'],
-        bathrooms=input_data['BATHROOMS'],
-        size=input_data['SIZE'],
-        property_type=input_data['PROPERTY TYPE'],
-        avg_distance=input_data['avg_distance_to_nearest_station'],
-        station_count=input_data['nearest_station_count'],
-        predicted_rent=int(predicted_rent),
-        lower_rent=lower_rent,
-        upper_rent=upper_rent,
-        confidence_percentage=confidence_percentage
-    )
-
-    # Generate explanation using LangChain
-    response = chat.invoke([HumanMessage(content=prompt)])
-    explanation = response.content.strip()
-    return explanation
 
 # --- Modular Conversational Engine ---
 
@@ -299,15 +238,12 @@ class RentPredictionHandler(BaseModuleHandler):
         model_input = {k: encoded_fields[k] for k in MODEL_FIELDS if k in encoded_fields}
         predicted_rent, lower_rent, upper_rent, confidence_percentage = predict_rent(model_input)
         rounded_confidence_percentage = round(confidence_percentage, 2)
-        # Compose a concise, actionable markdown result
         summary = (
             f"- **Estimated Monthly Rent:** £{int(predicted_rent)}\n"
-            f"- **Suggested Range:** £{lower_rent}–£{upper_rent}\n"
-            f"- **Confidence Level:** {rounded_confidence_percentage}%\n"
+            f"- **Suggested Range:** £{int(lower_rent)}–£{int(upper_rent)}\n"
+            f"- **Confidence Level:** {round(float(confidence_percentage), 2)}%\n"
         )
-        # 1-line summary
         one_liner = "\n_This estimate is based on your property's size, features, and location._\n"
-        # AI explanation of pricing logic
         explanation = ("\n**How this was calculated:**\n"
             "The suggested rent is determined by analyzing your property's size, number of bedrooms and bathrooms, type, and how close it is to public transport. "
             "Properties with more space, more rooms, and better access to stations generally command higher rents. The confidence score reflects how closely your property matches similar listings in the area.\n"
@@ -328,7 +264,6 @@ class RentPredictionHandler(BaseModuleHandler):
         last_assistant = next((m for m in reversed(conversation_history) if m["role"] == "assistant"), None)
         if not last_assistant:
             return False
-        # Look for a confirmation request in the last assistant message
         confirmation_keywords = [
             "please confirm", "is this information correct", "is this correct", "can you confirm", "are these details correct"
         ]
@@ -578,6 +513,7 @@ class TenantScreeningHandler(BaseModuleHandler):
         return {"response": reply, "action": "chat", "fields": {k: tenant_fields[k] for k in self.required_fields}}
 
     def should_run_model(self, conversation_history, candidate_fields):
+        # Only run the model if all required fields are present and the last assistant message explicitly asks for confirmation
         if not candidate_fields or not all(f in candidate_fields and candidate_fields[f] not in (None, '', 0, 0.0, False) for f in self.required_fields):
             return False
         if not conversation_history:
@@ -589,14 +525,6 @@ class TenantScreeningHandler(BaseModuleHandler):
             "please confirm", "is this information correct", "is this correct", "can you confirm", "are these details correct", "please confirm so i can screen the tenant"
         ]
         return any(kw in last_assistant["content"].lower() for kw in confirmation_keywords)
-
-    def _is_field_filled(self, k, v):
-        # For eviction_record, False is a valid value (means no eviction)
-        if k == "eviction_record":
-            return v is not None
-        if k in ["credit_score", "income", "rent"]:
-            return v not in (None, '', 0, 0.0)
-        return v not in (None, '', False)
 
 # --- Intent Detection ---
 def detect_intent(user_message, conversation_history=None):

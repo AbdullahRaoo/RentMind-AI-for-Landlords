@@ -3,7 +3,7 @@ import os
 import json
 import numpy as np
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../AI Assistant')))
-from chatbot_integration import predict_rent, generate_explanation_with_langchain
+from chatbot_integration import predict_rent
 
 def to_native(val):
     if isinstance(val, (np.generic, np.floating, np.integer)):
@@ -30,14 +30,10 @@ def process_property_message(input_data):
     # Convert all input_data values to native types before passing to predict_rent
     input_data_native = {k: to_native(v) for k, v in input_data.items()}
     predicted_rent, lower_rent, upper_rent, confidence_percentage = predict_rent(input_data_native)
-    explanation = generate_explanation_with_langchain(
-        input_data_native, predicted_rent, lower_rent, upper_rent, confidence_percentage
-    )
     # Convert all outputs to native types
     return {
         'predicted_rent': int(float(to_native(predicted_rent))),
         'lower_rent': int(float(to_native(lower_rent))),
         'upper_rent': int(float(to_native(upper_rent))),
-        'confidence_percentage': float(to_native(confidence_percentage)),
-        'explanation': str(explanation)
+        'confidence_percentage': round(float(to_native(confidence_percentage)), 2),
     }
