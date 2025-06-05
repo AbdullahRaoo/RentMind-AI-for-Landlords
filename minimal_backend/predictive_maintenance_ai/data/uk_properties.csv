@@ -1,0 +1,151 @@
+property_id,address,age_years,construction_type,hvac_age,plumbing_age,roof_age,last_inspection_date
+1,"Studio 08
+Megan locks, London",86,Victorian Brick,13,17,12,2025-02-03
+2,"Studio 5
+Barker path, London",22,Victorian Brick,22,22,6,2024-02-24
+3,"776 Taylor prairie, London",8,Post-War Concrete,8,8,8,2024-06-24
+4,"640 Owen radial, Bristol",8,Post-War Concrete,8,8,8,2025-03-19
+5,"4 Whittaker alley, Manchester",58,Edwardian Stone,23,18,30,2023-08-17
+6,"274 Neil common, London",116,Post-War Concrete,18,20,13,2024-06-27
+7,"Studio 94
+Damian view, Manchester",24,Modern Timber Frame,8,12,17,2024-06-01
+8,"243 Smith ferry, Birmingham",17,Modern Timber Frame,17,17,17,2024-09-22
+9,"Studio 18
+Jeremy fort, Leeds",10,Victorian Brick,10,10,10,2023-07-18
+10,"0 Deborah bridge, Bristol",42,Modern Timber Frame,23,16,27,2024-07-12
+11,"627 Harding street, London",13,Post-War Concrete,13,12,12,2024-12-15
+12,"251 Sean street, London",115,Edwardian Stone,13,24,25,2023-08-27
+13,"Flat 4
+Briggs well, Birmingham",111,Post-War Concrete,16,21,11,2024-12-10
+14,"984 Parkin mill, Birmingham",90,Victorian Brick,24,30,10,2024-03-17
+15,"Flat 49j
+Malcolm fort, Manchester",73,Post-War Concrete,19,22,13,2024-07-25
+16,"Flat 81W
+Buckley path, Bristol",86,Post-War Concrete,15,36,29,2025-02-18
+17,"80 Beverley springs, London",104,Post-War Concrete,6,35,15,2024-05-11
+18,"Studio 6
+Jemma row, Birmingham",56,Victorian Brick,11,39,23,2025-02-23
+19,"372 Gemma roads, Birmingham",117,Post-War Concrete,25,25,17,2023-09-18
+20,"342 Smith islands, Leeds",118,Post-War Concrete,13,14,12,2024-10-17
+21,"Flat 40R
+Brown hills, Bristol",100,Modern Timber Frame,23,23,23,2024-09-10
+22,"Flat 56A
+Carter shoal, Birmingham",56,Post-War Concrete,9,26,20,2024-06-12
+23,"Studio 4
+Smith wall, London",16,Victorian Brick,9,16,10,2025-05-14
+24,"5 Mandy hollow, Leeds",106,Victorian Brick,17,22,24,2023-10-30
+25,"748 Howard camp, Bristol",64,Modern Timber Frame,22,37,5,2025-01-14
+26,"Flat 1
+Patel stravenue, London",92,Modern Timber Frame,25,20,8,2024-02-07
+27,"Studio 92
+Louise meadow, Leeds",42,Post-War Concrete,19,10,28,2025-02-27
+28,"61 Lewis burg, Birmingham",117,Post-War Concrete,21,39,8,2023-09-28
+29,"059 Mohammed parkway, Birmingham",116,Post-War Concrete,9,21,29,2024-03-10
+30,"29 Graham ville, Bristol",25,Victorian Brick,24,20,20,2024-10-25
+31,"Flat 16G
+Cox dam, London",7,Modern Timber Frame,7,7,6,2023-12-10
+32,"977 Patricia land, Bristol",35,Victorian Brick,7,33,20,2024-08-13
+33,"241 Spencer burg, London",109,Post-War Concrete,9,31,20,2024-11-11
+34,"853 Thomas river, Manchester",75,Modern Timber Frame,21,37,24,2024-08-06
+35,"51 Dominic mill, Manchester",59,Post-War Concrete,14,22,26,2023-10-19
+36,"Flat 65
+Darren islands, Birmingham",88,Edwardian Stone,21,24,8,2025-05-30
+37,"Flat 20
+Bruce ramp, Manchester",36,Victorian Brick,15,10,23,2024-06-09
+38,"412 Megan trail, Manchester",75,Post-War Concrete,5,12,27,2024-11-27
+39,"Flat 2
+Bryant cliffs, London",85,Post-War Concrete,7,38,6,2023-11-08
+40,"308 Hall branch, Birmingham",115,Victorian Brick,21,17,13,2023-08-19
+41,"Flat 69
+Jennifer hill, Leeds",90,Post-War Concrete,22,14,28,2024-04-08
+42,"Studio 68
+Guy spurs, Bristol",117,Edwardian Stone,12,35,20,2025-05-05
+43,"71 Parkinson land, Leeds",108,Post-War Concrete,8,13,26,2023-09-30
+44,"Studio 68x
+Farrell parkway, Birmingham",60,Edwardian Stone,18,24,28,2023-12-29
+45,"3 Richardson landing, London",11,Victorian Brick,11,11,11,2023-09-07
+46,"Flat 7
+Michael shores, London",107,Post-War Concrete,11,16,22,2025-01-17
+47,"578 Pearson stream, Manchester",62,Edwardian Stone,10,18,19,2024-05-21
+48,"77 Perkins port, London",36,Edwardian Stone,22,13,6,2024-06-14
+49,"Flat 03
+Ben fork, Bristol",88,Victorian Brick,7,39,29,2025-05-24
+50,"28 Johnson burgs, Manchester",113,Post-War Concrete,18,25,20,2024-12-24
+51,"Flat 65z
+Joanna circles, Leeds",32,Victorian Brick,10,22,5,2023-10-14
+52,"Studio 59z
+Singh lock, Birmingham",54,Edwardian Stone,14,23,27,2024-08-07
+53,"10 Cook dale, Bristol",98,Edwardian Stone,9,16,14,2023-11-13
+54,"55 Marilyn passage, London",32,Victorian Brick,15,11,6,2024-07-15
+55,"9 Dale rapids, Leeds",79,Post-War Concrete,6,40,21,2023-12-01
+56,"Flat 90
+Thompson shores, Manchester",15,Victorian Brick,15,12,15,2024-08-21
+57,"626 Jane island, Manchester",115,Edwardian Stone,8,40,23,2025-03-17
+58,"Flat 01s
+Adam cove, Bristol",36,Victorian Brick,24,12,18,2023-11-13
+59,"Studio 91H
+Mark green, Bristol",89,Modern Timber Frame,13,16,26,2023-08-11
+60,"70 Charlotte prairie, Birmingham",96,Post-War Concrete,13,22,9,2024-10-21
+61,"Flat 6
+Eric terrace, Birmingham",90,Edwardian Stone,15,39,29,2025-03-11
+62,"Studio 00
+Henderson turnpike, London",14,Edwardian Stone,14,14,8,2024-04-17
+63,"Studio 99
+White forges, Bristol",14,Post-War Concrete,14,14,9,2024-01-19
+64,"Flat 86
+Anderson radial, London",49,Post-War Concrete,16,19,10,2023-07-07
+65,"662 Parker flat, Bristol",61,Modern Timber Frame,24,35,25,2024-01-18
+66,"Flat 9
+Danny bridge, London",72,Modern Timber Frame,8,40,9,2025-01-17
+67,"413 Liam glens, London",38,Victorian Brick,22,14,13,2023-10-19
+68,"Studio 67t
+Kathryn view, Bristol",41,Post-War Concrete,15,16,26,2024-11-25
+69,"2 Morris curve, Birmingham",86,Edwardian Stone,13,38,6,2025-04-15
+70,"Flat 35X
+Cooper tunnel, Leeds",16,Modern Timber Frame,6,10,15,2024-10-16
+71,"Studio 57F
+Kate gardens, Manchester",103,Modern Timber Frame,10,33,19,2023-10-26
+72,"41 Wade divide, Leeds",75,Victorian Brick,8,12,27,2023-09-23
+73,"62 Clive coves, Manchester",120,Victorian Brick,16,28,22,2024-06-10
+74,"602 John route, Leeds",23,Post-War Concrete,6,19,16,2025-05-31
+75,"7 Roy village, London",120,Modern Timber Frame,11,31,12,2024-02-08
+76,"Studio 40a
+Chelsea view, London",90,Modern Timber Frame,22,38,18,2024-04-27
+77,"1 Joseph terrace, Manchester",84,Post-War Concrete,10,35,30,2023-10-10
+78,"8 Donald motorway, Leeds",27,Victorian Brick,10,27,15,2023-07-05
+79,"Flat 6
+Diane lakes, Leeds",105,Post-War Concrete,13,15,30,2024-06-16
+80,"Flat 15
+Daniel roads, London",94,Edwardian Stone,6,37,20,2024-03-01
+81,"9 Marshall summit, Manchester",33,Edwardian Stone,16,19,30,2024-09-28
+82,"0 Morris causeway, Manchester",116,Post-War Concrete,5,31,11,2023-11-08
+83,"47 Alison coves, Birmingham",56,Modern Timber Frame,7,40,29,2025-05-31
+84,"Flat 8
+Moore course, Birmingham",40,Edwardian Stone,22,20,5,2023-10-02
+85,"Studio 83
+Ali trail, Birmingham",19,Post-War Concrete,19,19,13,2024-11-20
+86,"07 White common, London",9,Edwardian Stone,9,9,9,2023-06-27
+87,"Flat 16d
+Nicholas lodge, Leeds",45,Victorian Brick,17,38,23,2023-09-29
+88,"21 Toby mountains, Birmingham",29,Victorian Brick,18,10,21,2023-08-03
+89,"4 Simmons crest, Bristol",108,Post-War Concrete,16,23,7,2023-10-19
+90,"Studio 07
+Hunter run, Birmingham",90,Modern Timber Frame,8,33,14,2024-03-19
+91,"Studio 7
+Ronald neck, Birmingham",69,Edwardian Stone,15,22,27,2025-04-23
+92,"Studio 11b
+Wayne stravenue, Bristol",42,Post-War Concrete,11,23,26,2024-06-23
+93,"Studio 66k
+Booth fall, Manchester",53,Modern Timber Frame,17,27,5,2023-09-08
+94,"6 Damian fields, Birmingham",43,Post-War Concrete,18,35,23,2025-02-01
+95,"Flat 9
+Stuart grove, Birmingham",82,Edwardian Stone,19,24,26,2024-05-17
+96,"Studio 03
+Yvonne station, Bristol",32,Edwardian Stone,10,31,7,2025-05-11
+97,"Flat 3
+Carl inlet, Bristol",41,Modern Timber Frame,7,36,29,2025-02-26
+98,"Studio 27A
+Howell drive, Birmingham",35,Post-War Concrete,11,14,5,2023-07-30
+99,"867 Campbell corners, Manchester",10,Edwardian Stone,10,10,10,2024-09-08
+100,"Studio 0
+Byrne valley, Leeds",14,Edwardian Stone,14,14,11,2024-01-28

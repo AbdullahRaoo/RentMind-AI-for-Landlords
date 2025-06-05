@@ -1,0 +1,1201 @@
+property_id,month,avg_temp_c,rainfall_mm,pest_alert,maintenance_risk_score
+1,January,19,2.6,Damp Woodlice,3
+1,February,6,4.1,Wasps,4
+1,March,19,2.9,None,3
+1,April,22,0.9,None,3
+1,May,8,0.7,Damp Woodlice,1
+1,June,8,4.1,None,2
+1,July,12,1.9,Wasps,2
+1,August,5,3.9,None,2
+1,September,8,2.3,Rodents,3
+1,October,14,2.6,None,3
+1,November,18,4.5,Rodents,4
+1,December,12,4.6,None,4
+2,January,9,3.8,Wasps,10
+2,February,20,3.7,None,2
+2,March,14,3.1,None,3
+2,April,17,4.8,None,4
+2,May,13,1.3,None,4
+2,June,19,5.0,Damp Woodlice,1
+2,July,4,4.8,None,1
+2,August,22,1.5,None,1
+2,September,16,2.2,None,4
+2,October,2,0.5,None,1
+2,November,10,2.9,Damp Woodlice,4
+2,December,7,1.0,None,5
+3,January,21,2.9,Rodents,3
+3,February,4,2.2,Wasps,2
+3,March,9,1.8,None,1
+3,April,22,3.9,None,6
+3,May,17,0.8,None,8
+3,June,15,3.4,Damp Woodlice,1
+3,July,3,1.5,None,4
+3,August,4,3.6,None,1
+3,September,12,0.6,Rodents,2
+3,October,14,4.7,None,2
+3,November,14,3.5,Rodents,4
+3,December,6,4.1,None,1
+4,January,13,0.7,None,1
+4,February,21,4.8,None,3
+4,March,10,4.0,None,2
+4,April,14,2.4,None,4
+4,May,21,1.8,None,1
+4,June,6,2.2,Rodents,2
+4,July,12,2.1,None,6
+4,August,10,1.0,None,6
+4,September,19,2.8,None,5
+4,October,4,3.2,None,4
+4,November,15,2.2,Wasps,7
+4,December,9,3.1,None,6
+5,January,10,1.9,None,1
+5,February,10,2.4,None,1
+5,March,9,3.7,None,2
+5,April,6,1.9,Damp Woodlice,3
+5,May,14,4.1,None,3
+5,June,22,4.9,None,6
+5,July,8,2.7,Wasps,6
+5,August,11,3.8,None,2
+5,September,10,4.2,Wasps,1
+5,October,8,3.2,Wasps,1
+5,November,16,4.7,Damp Woodlice,3
+5,December,4,4.2,None,4
+6,January,6,3.4,Rodents,2
+6,February,14,0.8,None,4
+6,March,19,2.8,None,4
+6,April,13,3.7,None,1
+6,May,9,3.5,None,1
+6,June,22,3.5,Wasps,3
+6,July,15,1.0,None,5
+6,August,18,3.0,None,2
+6,September,14,2.6,None,2
+6,October,2,2.7,None,1
+6,November,6,2.1,None,2
+6,December,13,2.6,None,4
+7,January,11,0.7,Damp Woodlice,1
+7,February,22,1.0,None,2
+7,March,19,1.2,None,4
+7,April,14,3.3,None,7
+7,May,2,3.8,None,4
+7,June,14,0.5,Rodents,3
+7,July,4,3.1,None,2
+7,August,8,2.6,None,4
+7,September,22,1.9,None,4
+7,October,13,2.1,Damp Woodlice,2
+7,November,11,4.6,None,2
+7,December,9,1.9,None,7
+8,January,14,2.4,None,6
+8,February,17,3.4,None,2
+8,March,17,1.8,None,6
+8,April,13,4.8,Damp Woodlice,2
+8,May,19,2.8,None,4
+8,June,16,2.7,Rodents,5
+8,July,9,1.8,None,3
+8,August,16,3.0,None,4
+8,September,5,3.1,None,3
+8,October,3,3.9,Wasps,2
+8,November,5,3.8,None,2
+8,December,3,2.5,None,1
+9,January,5,4.0,Damp Woodlice,3
+9,February,21,3.3,Rodents,5
+9,March,8,4.1,None,3
+9,April,7,2.0,None,3
+9,May,18,4.9,None,1
+9,June,15,4.6,Rodents,2
+9,July,6,1.6,Rodents,2
+9,August,14,2.7,None,3
+9,September,14,2.5,None,1
+9,October,10,3.6,Wasps,4
+9,November,12,3.1,Rodents,1
+9,December,16,3.4,Rodents,1
+10,January,14,1.5,None,2
+10,February,12,4.2,None,2
+10,March,17,4.0,None,1
+10,April,22,4.0,Wasps,1
+10,May,7,2.5,None,9
+10,June,6,4.5,None,3
+10,July,13,1.6,None,2
+10,August,22,1.9,None,2
+10,September,4,3.7,None,9
+10,October,20,1.5,None,1
+10,November,12,4.2,None,4
+10,December,17,0.8,None,1
+11,January,13,4.5,None,5
+11,February,6,0.8,None,2
+11,March,8,3.3,None,6
+11,April,16,4.4,None,5
+11,May,5,3.2,None,4
+11,June,6,1.6,None,2
+11,July,21,3.7,Damp Woodlice,1
+11,August,11,1.4,Rodents,2
+11,September,11,3.4,None,2
+11,October,5,1.6,None,1
+11,November,2,4.9,None,2
+11,December,20,2.4,Rodents,2
+12,January,4,0.6,None,6
+12,February,3,4.8,None,3
+12,March,18,4.0,None,4
+12,April,19,2.9,None,5
+12,May,18,4.6,None,2
+12,June,14,3.1,None,1
+12,July,15,3.8,None,1
+12,August,15,1.0,None,1
+12,September,7,1.0,None,1
+12,October,13,2.9,None,3
+12,November,6,3.9,Rodents,1
+12,December,2,2.0,None,1
+13,January,20,3.3,None,3
+13,February,20,1.3,Damp Woodlice,5
+13,March,5,1.5,Damp Woodlice,1
+13,April,2,1.6,Wasps,4
+13,May,7,4.7,None,4
+13,June,9,2.4,Damp Woodlice,3
+13,July,20,2.2,None,1
+13,August,18,4.9,Damp Woodlice,1
+13,September,11,4.0,None,1
+13,October,2,2.2,Rodents,3
+13,November,9,2.6,Wasps,4
+13,December,8,3.8,None,2
+14,January,15,0.6,Wasps,1
+14,February,2,3.9,None,3
+14,March,18,4.9,Wasps,1
+14,April,6,3.7,Damp Woodlice,5
+14,May,18,2.4,Wasps,4
+14,June,4,3.1,None,4
+14,July,20,0.8,None,2
+14,August,10,4.3,Rodents,4
+14,September,12,1.9,Wasps,1
+14,October,6,4.0,None,2
+14,November,16,2.6,Wasps,3
+14,December,8,2.5,None,1
+15,January,11,4.2,None,1
+15,February,12,1.2,None,3
+15,March,3,3.5,None,2
+15,April,14,4.3,None,2
+15,May,5,4.1,None,5
+15,June,9,1.1,None,3
+15,July,22,0.9,None,1
+15,August,4,1.4,None,2
+15,September,12,1.1,None,1
+15,October,20,2.4,None,4
+15,November,15,1.3,None,2
+15,December,16,4.5,None,10
+16,January,22,1.8,None,4
+16,February,10,2.2,None,2
+16,March,19,4.1,None,3
+16,April,17,2.0,None,3
+16,May,7,0.6,Damp Woodlice,1
+16,June,10,0.8,Rodents,3
+16,July,9,4.9,None,7
+16,August,19,4.2,Rodents,1
+16,September,9,3.1,None,4
+16,October,7,1.3,Wasps,3
+16,November,2,3.7,None,2
+16,December,8,4.3,None,4
+17,January,7,2.7,None,5
+17,February,2,2.9,None,10
+17,March,6,2.0,None,6
+17,April,6,3.1,Damp Woodlice,1
+17,May,13,4.8,None,4
+17,June,12,1.9,Rodents,5
+17,July,15,4.1,None,3
+17,August,19,3.6,None,3
+17,September,20,4.2,None,3
+17,October,2,4.8,Damp Woodlice,4
+17,November,20,0.6,None,2
+17,December,5,4.7,None,7
+18,January,13,4.9,Damp Woodlice,5
+18,February,22,3.8,None,1
+18,March,9,3.6,Rodents,1
+18,April,3,2.2,Damp Woodlice,2
+18,May,17,4.5,None,4
+18,June,17,4.0,None,2
+18,July,4,4.1,None,8
+18,August,5,0.8,None,6
+18,September,4,3.0,None,1
+18,October,21,4.5,Wasps,4
+18,November,7,3.2,None,1
+18,December,8,4.9,None,3
+19,January,11,1.6,None,10
+19,February,17,1.2,None,4
+19,March,22,3.2,None,5
+19,April,22,1.8,None,5
+19,May,14,2.6,None,3
+19,June,19,2.2,None,4
+19,July,16,0.7,None,3
+19,August,10,3.0,None,7
+19,September,4,3.5,Wasps,4
+19,October,20,1.5,Damp Woodlice,6
+19,November,15,4.8,None,4
+19,December,9,2.6,None,7
+20,January,20,4.6,None,2
+20,February,16,1.3,Damp Woodlice,2
+20,March,6,0.7,None,7
+20,April,22,1.2,Wasps,3
+20,May,4,0.9,Damp Woodlice,3
+20,June,18,2.6,None,4
+20,July,6,1.2,Wasps,1
+20,August,20,4.0,Damp Woodlice,3
+20,September,10,2.2,None,4
+20,October,10,2.3,None,4
+20,November,12,3.6,Wasps,9
+20,December,13,0.6,None,3
+21,January,17,4.4,None,2
+21,February,16,4.0,None,4
+21,March,4,1.3,Rodents,4
+21,April,18,4.4,None,2
+21,May,18,2.3,None,1
+21,June,8,4.3,None,4
+21,July,13,3.7,None,4
+21,August,22,4.7,None,2
+21,September,21,2.5,None,4
+21,October,13,2.0,Rodents,3
+21,November,4,1.8,Damp Woodlice,2
+21,December,8,4.4,None,2
+22,January,15,2.8,None,1
+22,February,6,3.4,None,1
+22,March,21,4.1,None,3
+22,April,14,4.3,None,2
+22,May,18,4.2,None,1
+22,June,13,3.0,None,3
+22,July,5,2.7,None,3
+22,August,10,1.7,None,3
+22,September,18,3.9,None,4
+22,October,6,3.7,None,3
+22,November,15,2.3,None,2
+22,December,9,3.6,Wasps,4
+23,January,13,2.8,None,2
+23,February,17,1.1,Wasps,2
+23,March,12,3.4,Rodents,2
+23,April,11,2.4,None,3
+23,May,11,2.6,Damp Woodlice,5
+23,June,20,3.1,Damp Woodlice,4
+23,July,18,1.0,None,3
+23,August,6,1.1,Wasps,4
+23,September,16,1.1,Rodents,2
+23,October,17,2.0,None,3
+23,November,2,2.5,None,2
+23,December,7,2.7,None,1
+24,January,15,3.4,None,4
+24,February,3,2.9,Damp Woodlice,1
+24,March,18,1.4,None,2
+24,April,13,1.9,None,7
+24,May,7,0.8,None,9
+24,June,18,3.2,None,2
+24,July,17,2.1,None,6
+24,August,9,3.8,None,7
+24,September,18,1.3,None,1
+24,October,22,1.7,None,1
+24,November,3,3.5,None,1
+24,December,5,2.4,None,3
+25,January,6,1.4,None,1
+25,February,5,3.5,None,2
+25,March,5,2.8,None,3
+25,April,5,2.7,Damp Woodlice,3
+25,May,8,2.1,None,2
+25,June,17,4.6,None,4
+25,July,2,0.6,Damp Woodlice,5
+25,August,17,1.2,None,7
+25,September,5,4.6,Wasps,4
+25,October,11,1.7,Damp Woodlice,5
+25,November,11,2.1,Rodents,4
+25,December,5,4.3,Damp Woodlice,1
+26,January,22,1.3,Wasps,4
+26,February,10,4.5,None,6
+26,March,14,2.3,None,4
+26,April,17,4.1,None,2
+26,May,3,4.9,None,1
+26,June,20,2.7,None,4
+26,July,14,4.0,None,2
+26,August,17,1.0,None,1
+26,September,22,1.9,Wasps,2
+26,October,12,2.8,None,1
+26,November,9,2.7,None,4
+26,December,19,4.5,None,1
+27,January,7,2.8,Damp Woodlice,4
+27,February,4,3.9,Wasps,3
+27,March,3,2.8,None,4
+27,April,9,0.9,None,4
+27,May,17,2.5,Rodents,6
+27,June,2,1.0,Damp Woodlice,1
+27,July,21,4.8,None,2
+27,August,16,4.8,Damp Woodlice,1
+27,September,16,2.0,Rodents,4
+27,October,13,3.7,None,7
+27,November,12,2.1,None,3
+27,December,13,3.7,None,8
+28,January,15,1.0,None,2
+28,February,14,1.5,Rodents,2
+28,March,5,3.9,Damp Woodlice,10
+28,April,20,1.1,None,4
+28,May,18,1.1,None,1
+28,June,15,4.3,None,2
+28,July,7,3.8,None,6
+28,August,21,4.5,None,4
+28,September,21,4.6,None,3
+28,October,12,4.9,None,2
+28,November,21,3.7,Damp Woodlice,3
+28,December,19,4.4,None,2
+29,January,21,3.7,Wasps,2
+29,February,22,4.9,None,7
+29,March,12,3.7,None,4
+29,April,15,3.5,Damp Woodlice,3
+29,May,15,4.1,None,1
+29,June,3,3.5,Wasps,5
+29,July,10,1.2,None,6
+29,August,19,0.6,None,1
+29,September,19,4.4,None,4
+29,October,11,3.6,None,9
+29,November,12,4.8,None,7
+29,December,21,4.4,Damp Woodlice,4
+30,January,22,3.7,Rodents,2
+30,February,8,1.8,None,7
+30,March,7,3.8,None,5
+30,April,19,1.7,None,6
+30,May,16,3.7,Wasps,5
+30,June,21,0.7,None,3
+30,July,20,3.0,None,7
+30,August,9,4.8,None,2
+30,September,19,2.3,None,2
+30,October,12,2.1,Wasps,4
+30,November,22,0.5,None,4
+30,December,22,3.3,None,1
+31,January,12,2.2,None,1
+31,February,19,3.8,Damp Woodlice,10
+31,March,13,2.8,None,4
+31,April,22,1.4,None,1
+31,May,19,2.9,None,2
+31,June,8,4.4,None,1
+31,July,15,3.4,None,2
+31,August,12,0.7,Rodents,5
+31,September,19,0.8,None,3
+31,October,16,3.3,None,1
+31,November,5,2.9,Rodents,1
+31,December,20,0.7,Wasps,3
+32,January,5,1.8,None,1
+32,February,16,2.2,None,1
+32,March,19,1.5,Wasps,3
+32,April,6,1.8,Wasps,3
+32,May,2,3.0,None,1
+32,June,20,3.2,None,1
+32,July,13,1.5,None,2
+32,August,9,3.3,None,1
+32,September,20,4.3,None,4
+32,October,4,1.8,None,5
+32,November,20,2.7,None,2
+32,December,9,1.0,None,2
+33,January,16,2.0,None,2
+33,February,13,4.1,None,2
+33,March,9,4.0,None,4
+33,April,13,1.1,None,4
+33,May,13,4.0,None,1
+33,June,21,0.9,Damp Woodlice,2
+33,July,8,1.7,Rodents,1
+33,August,2,4.3,Rodents,4
+33,September,8,4.6,None,4
+33,October,6,2.1,None,3
+33,November,18,2.8,None,1
+33,December,21,3.6,None,2
+34,January,7,3.0,Rodents,2
+34,February,17,4.7,None,9
+34,March,10,2.2,None,8
+34,April,13,2.2,None,1
+34,May,22,2.0,Damp Woodlice,3
+34,June,10,3.1,None,4
+34,July,13,3.1,None,1
+34,August,14,4.9,None,4
+34,September,13,2.7,None,1
+34,October,6,2.5,None,3
+34,November,7,1.2,None,1
+34,December,15,4.2,None,4
+35,January,17,1.4,None,6
+35,February,3,1.1,None,2
+35,March,3,4.5,None,5
+35,April,7,2.8,Damp Woodlice,1
+35,May,11,4.8,Damp Woodlice,4
+35,June,7,1.5,Rodents,2
+35,July,7,3.3,Rodents,2
+35,August,12,4.7,None,1
+35,September,14,1.1,Damp Woodlice,10
+35,October,18,3.6,None,1
+35,November,21,3.2,None,1
+35,December,6,4.6,Damp Woodlice,1
+36,January,22,2.4,None,1
+36,February,15,1.5,None,4
+36,March,20,0.9,Rodents,6
+36,April,4,1.8,None,4
+36,May,2,3.7,None,1
+36,June,14,3.4,None,3
+36,July,5,1.2,None,3
+36,August,19,2.4,Wasps,3
+36,September,14,3.9,None,4
+36,October,19,3.0,None,3
+36,November,14,3.8,Rodents,1
+36,December,16,4.0,None,1
+37,January,14,4.0,None,1
+37,February,22,0.5,None,5
+37,March,21,2.5,None,5
+37,April,21,0.7,None,4
+37,May,18,1.8,Wasps,1
+37,June,7,3.4,Damp Woodlice,2
+37,July,18,1.8,None,10
+37,August,9,3.3,None,3
+37,September,2,4.9,Rodents,6
+37,October,13,3.5,None,2
+37,November,4,4.6,None,3
+37,December,10,1.5,Wasps,4
+38,January,20,0.5,None,7
+38,February,4,2.8,Damp Woodlice,1
+38,March,10,4.4,None,3
+38,April,14,3.0,Wasps,3
+38,May,16,3.6,None,1
+38,June,10,0.8,None,2
+38,July,9,4.1,None,3
+38,August,2,3.7,None,3
+38,September,12,0.8,None,4
+38,October,8,4.5,None,2
+38,November,8,1.6,None,3
+38,December,8,4.3,None,3
+39,January,5,1.0,None,7
+39,February,2,3.9,Damp Woodlice,1
+39,March,13,3.3,None,3
+39,April,18,1.8,None,2
+39,May,15,2.7,None,3
+39,June,7,2.6,None,7
+39,July,2,0.6,None,1
+39,August,21,4.4,None,6
+39,September,17,4.8,None,2
+39,October,8,2.4,Damp Woodlice,3
+39,November,10,2.5,Damp Woodlice,2
+39,December,10,4.1,None,4
+40,January,6,2.6,None,9
+40,February,22,2.8,None,4
+40,March,19,4.4,None,8
+40,April,3,1.5,None,1
+40,May,12,1.7,None,3
+40,June,15,1.0,None,2
+40,July,22,3.4,None,6
+40,August,18,2.7,None,1
+40,September,11,2.6,None,2
+40,October,12,2.4,Damp Woodlice,4
+40,November,4,0.9,None,3
+40,December,11,3.7,None,4
+41,January,16,4.0,None,4
+41,February,7,4.3,None,5
+41,March,4,1.4,None,1
+41,April,17,3.0,None,9
+41,May,4,1.0,None,1
+41,June,14,1.9,None,3
+41,July,6,1.1,None,1
+41,August,13,4.4,None,4
+41,September,19,4.7,Wasps,2
+41,October,19,1.3,None,4
+41,November,22,2.9,None,4
+41,December,4,2.5,None,3
+42,January,2,0.5,None,2
+42,February,17,2.9,Wasps,4
+42,March,17,1.8,None,3
+42,April,2,3.0,None,7
+42,May,9,1.2,Damp Woodlice,4
+42,June,9,1.7,None,2
+42,July,21,4.1,None,3
+42,August,19,4.1,None,1
+42,September,11,1.0,None,4
+42,October,21,2.7,None,2
+42,November,19,0.6,None,3
+42,December,16,3.8,None,2
+43,January,8,2.0,Wasps,4
+43,February,16,3.6,Damp Woodlice,8
+43,March,6,0.8,None,1
+43,April,7,1.4,Damp Woodlice,4
+43,May,5,4.9,Rodents,4
+43,June,16,1.6,None,2
+43,July,5,2.8,None,4
+43,August,11,4.7,None,7
+43,September,19,2.8,None,3
+43,October,3,4.4,None,1
+43,November,15,2.0,None,6
+43,December,14,4.1,None,8
+44,January,17,3.6,None,5
+44,February,17,0.9,None,1
+44,March,22,1.2,None,1
+44,April,9,1.9,Damp Woodlice,3
+44,May,16,3.8,None,9
+44,June,6,1.6,None,10
+44,July,11,2.9,None,2
+44,August,12,3.8,None,2
+44,September,6,2.5,None,3
+44,October,22,2.8,None,1
+44,November,13,4.0,None,1
+44,December,19,4.2,None,7
+45,January,19,1.2,None,4
+45,February,5,0.9,Damp Woodlice,1
+45,March,6,1.3,None,8
+45,April,5,0.6,None,4
+45,May,18,3.3,None,1
+45,June,21,3.7,None,8
+45,July,4,2.6,None,3
+45,August,15,4.2,Damp Woodlice,1
+45,September,10,2.9,None,3
+45,October,8,4.8,None,7
+45,November,14,1.4,None,2
+45,December,7,3.0,Rodents,1
+46,January,20,2.1,Damp Woodlice,4
+46,February,7,4.1,None,3
+46,March,19,5.0,Wasps,3
+46,April,19,5.0,None,3
+46,May,22,2.4,None,2
+46,June,8,2.2,None,3
+46,July,16,2.5,Wasps,1
+46,August,21,0.6,None,6
+46,September,9,1.5,Wasps,3
+46,October,18,3.0,None,2
+46,November,16,2.1,Damp Woodlice,6
+46,December,9,1.5,None,1
+47,January,20,4.6,Rodents,3
+47,February,7,2.7,None,1
+47,March,11,0.7,None,4
+47,April,3,4.6,None,4
+47,May,5,4.4,None,1
+47,June,22,2.2,None,1
+47,July,20,1.2,None,2
+47,August,14,4.9,None,1
+47,September,11,4.0,None,6
+47,October,20,3.9,None,3
+47,November,18,2.5,None,2
+47,December,8,2.7,None,2
+48,January,18,1.6,None,6
+48,February,20,0.9,None,4
+48,March,8,1.9,Rodents,1
+48,April,7,4.9,None,4
+48,May,16,0.7,None,2
+48,June,6,3.9,Rodents,1
+48,July,9,4.8,None,3
+48,August,5,1.9,None,3
+48,September,19,1.5,None,3
+48,October,21,3.8,None,7
+48,November,14,3.1,None,1
+48,December,3,1.8,None,3
+49,January,22,4.8,None,7
+49,February,13,4.4,None,10
+49,March,14,2.8,None,3
+49,April,21,2.9,Wasps,7
+49,May,19,4.7,Wasps,8
+49,June,11,2.0,None,2
+49,July,13,2.1,Damp Woodlice,3
+49,August,22,1.7,Wasps,1
+49,September,10,1.5,None,4
+49,October,4,3.8,None,2
+49,November,20,1.2,None,3
+49,December,6,1.4,None,7
+50,January,8,4.4,None,2
+50,February,6,3.5,None,2
+50,March,19,2.9,None,2
+50,April,6,3.8,Wasps,4
+50,May,11,2.5,None,3
+50,June,8,1.0,None,7
+50,July,21,3.1,None,2
+50,August,2,2.1,None,4
+50,September,21,2.6,Damp Woodlice,2
+50,October,17,2.6,None,5
+50,November,2,4.7,Rodents,2
+50,December,8,3.9,Damp Woodlice,6
+51,January,17,3.6,None,2
+51,February,3,3.2,None,3
+51,March,20,3.2,None,1
+51,April,16,2.6,None,2
+51,May,14,4.9,None,9
+51,June,22,4.8,None,6
+51,July,11,4.0,None,2
+51,August,21,4.6,None,2
+51,September,22,2.5,None,1
+51,October,20,4.7,None,2
+51,November,12,2.5,Damp Woodlice,7
+51,December,8,4.5,None,6
+52,January,7,3.7,Rodents,5
+52,February,22,2.1,Rodents,4
+52,March,18,3.3,None,7
+52,April,7,4.6,None,2
+52,May,6,1.3,None,4
+52,June,16,1.8,Wasps,5
+52,July,2,3.3,None,4
+52,August,17,2.9,None,9
+52,September,20,3.5,None,4
+52,October,21,0.5,None,3
+52,November,19,4.2,None,2
+52,December,22,2.1,None,5
+53,January,21,1.8,None,1
+53,February,7,1.2,Wasps,2
+53,March,20,2.1,None,9
+53,April,14,4.2,None,1
+53,May,6,1.0,None,3
+53,June,18,1.4,None,1
+53,July,22,2.9,None,7
+53,August,11,2.4,None,3
+53,September,21,2.1,None,7
+53,October,22,2.7,Rodents,2
+53,November,8,0.5,Rodents,10
+53,December,8,4.1,None,4
+54,January,13,3.0,None,1
+54,February,11,1.6,None,6
+54,March,12,4.0,None,6
+54,April,20,3.3,None,8
+54,May,12,4.7,Rodents,4
+54,June,22,1.1,Damp Woodlice,6
+54,July,19,4.5,Wasps,4
+54,August,3,4.3,None,3
+54,September,2,1.4,None,3
+54,October,6,1.8,None,9
+54,November,7,3.1,Damp Woodlice,1
+54,December,11,3.7,None,1
+55,January,4,2.7,Damp Woodlice,4
+55,February,11,1.5,None,1
+55,March,3,4.0,None,4
+55,April,17,4.6,Wasps,6
+55,May,18,1.9,Damp Woodlice,1
+55,June,18,3.5,None,7
+55,July,14,3.7,None,1
+55,August,3,3.6,None,1
+55,September,3,1.0,None,3
+55,October,11,3.4,None,2
+55,November,10,2.9,None,1
+55,December,7,1.7,None,10
+56,January,5,1.4,None,3
+56,February,11,3.1,None,6
+56,March,12,2.9,None,5
+56,April,3,1.0,None,6
+56,May,21,4.5,None,4
+56,June,11,2.0,Damp Woodlice,7
+56,July,4,4.9,None,4
+56,August,4,4.2,None,4
+56,September,11,3.6,None,4
+56,October,9,1.1,Wasps,3
+56,November,14,1.3,Rodents,3
+56,December,12,2.5,None,9
+57,January,17,2.6,None,6
+57,February,6,2.8,None,1
+57,March,22,0.8,None,4
+57,April,15,1.6,Wasps,2
+57,May,14,0.8,Rodents,4
+57,June,15,3.1,None,2
+57,July,4,3.8,None,4
+57,August,21,2.6,None,4
+57,September,14,0.8,Rodents,7
+57,October,14,2.0,None,1
+57,November,6,4.5,Rodents,1
+57,December,6,2.5,None,4
+58,January,12,1.8,Wasps,3
+58,February,15,3.7,None,1
+58,March,21,4.9,Damp Woodlice,2
+58,April,3,2.2,None,1
+58,May,19,4.2,Damp Woodlice,3
+58,June,9,2.4,Rodents,3
+58,July,14,2.2,None,2
+58,August,8,3.0,Damp Woodlice,3
+58,September,6,1.8,None,2
+58,October,4,3.4,None,6
+58,November,6,0.9,Damp Woodlice,4
+58,December,21,4.7,None,4
+59,January,19,4.2,None,2
+59,February,21,0.5,Rodents,2
+59,March,10,2.3,None,3
+59,April,3,3.1,None,1
+59,May,4,1.1,None,3
+59,June,4,2.9,None,2
+59,July,4,3.6,None,3
+59,August,12,2.9,None,9
+59,September,17,3.1,Wasps,3
+59,October,11,1.8,Rodents,10
+59,November,20,1.7,None,2
+59,December,11,4.1,None,3
+60,January,6,2.8,None,3
+60,February,21,1.8,Rodents,1
+60,March,21,1.3,None,2
+60,April,13,4.1,None,2
+60,May,18,4.4,Wasps,1
+60,June,21,4.7,Rodents,6
+60,July,15,4.0,Rodents,4
+60,August,7,1.4,None,3
+60,September,10,3.9,None,5
+60,October,17,1.9,None,2
+60,November,14,2.6,None,6
+60,December,16,2.2,None,1
+61,January,19,3.4,None,4
+61,February,22,4.4,Damp Woodlice,3
+61,March,10,3.4,Rodents,2
+61,April,20,4.0,None,2
+61,May,2,3.5,None,1
+61,June,18,1.0,Rodents,2
+61,July,10,1.4,None,8
+61,August,21,3.5,Rodents,1
+61,September,5,0.9,None,4
+61,October,22,3.0,None,1
+61,November,10,1.8,None,1
+61,December,10,4.0,None,3
+62,January,4,1.7,None,6
+62,February,3,1.7,None,2
+62,March,17,4.9,None,4
+62,April,17,1.0,None,4
+62,May,22,1.0,None,3
+62,June,4,0.8,None,4
+62,July,17,1.2,None,1
+62,August,10,1.2,None,4
+62,September,18,3.7,None,4
+62,October,4,2.9,Damp Woodlice,10
+62,November,17,1.0,None,3
+62,December,11,2.3,None,1
+63,January,12,0.9,None,3
+63,February,7,3.0,None,2
+63,March,14,4.5,None,3
+63,April,22,2.5,None,5
+63,May,20,1.6,None,3
+63,June,16,4.8,None,9
+63,July,3,2.3,Wasps,4
+63,August,19,1.2,None,1
+63,September,6,2.7,None,10
+63,October,22,1.1,Wasps,5
+63,November,5,2.6,None,7
+63,December,5,1.0,None,2
+64,January,8,2.4,None,4
+64,February,20,3.0,Rodents,2
+64,March,20,1.3,None,6
+64,April,15,1.3,None,2
+64,May,20,0.7,None,7
+64,June,7,0.6,None,1
+64,July,4,3.7,None,3
+64,August,17,3.6,None,3
+64,September,15,1.6,None,7
+64,October,7,3.7,None,1
+64,November,11,2.1,None,8
+64,December,18,4.9,None,2
+65,January,22,3.5,None,2
+65,February,6,3.6,None,4
+65,March,7,3.5,None,10
+65,April,8,2.5,None,4
+65,May,3,4.7,None,5
+65,June,5,0.8,None,4
+65,July,12,2.4,None,3
+65,August,5,2.0,None,7
+65,September,8,2.2,None,4
+65,October,3,4.5,None,7
+65,November,14,2.2,None,2
+65,December,10,1.4,None,7
+66,January,10,1.1,None,4
+66,February,12,1.5,Rodents,2
+66,March,22,4.8,None,2
+66,April,18,2.7,Damp Woodlice,4
+66,May,10,0.6,None,2
+66,June,15,3.1,Wasps,2
+66,July,2,2.4,Rodents,9
+66,August,18,0.7,Damp Woodlice,4
+66,September,5,2.5,None,1
+66,October,15,4.8,None,6
+66,November,4,0.6,Rodents,2
+66,December,20,3.9,None,9
+67,January,6,4.4,None,3
+67,February,22,0.5,Damp Woodlice,4
+67,March,12,2.9,None,3
+67,April,21,2.9,None,1
+67,May,12,3.8,None,7
+67,June,3,1.0,None,1
+67,July,7,3.4,None,2
+67,August,12,1.6,Rodents,6
+67,September,20,4.4,None,2
+67,October,10,2.8,None,1
+67,November,13,2.5,None,1
+67,December,19,3.6,None,3
+68,January,13,4.1,None,1
+68,February,16,0.9,None,2
+68,March,4,1.0,None,2
+68,April,8,2.8,None,3
+68,May,19,4.7,None,4
+68,June,22,0.6,Damp Woodlice,5
+68,July,9,4.3,None,3
+68,August,12,3.5,None,4
+68,September,18,4.3,None,3
+68,October,11,1.3,None,4
+68,November,11,4.0,None,9
+68,December,7,3.3,None,7
+69,January,7,4.3,None,2
+69,February,5,0.7,None,2
+69,March,13,1.3,None,1
+69,April,13,1.2,None,2
+69,May,5,4.6,Rodents,4
+69,June,16,4.7,None,7
+69,July,18,2.0,Damp Woodlice,4
+69,August,20,3.5,None,4
+69,September,5,3.8,None,2
+69,October,5,1.9,None,2
+69,November,4,2.0,None,2
+69,December,9,4.0,None,2
+70,January,19,4.3,Wasps,1
+70,February,14,1.4,Wasps,1
+70,March,13,2.3,None,4
+70,April,13,0.6,Wasps,3
+70,May,19,0.9,Rodents,4
+70,June,15,4.1,Rodents,4
+70,July,15,1.1,None,1
+70,August,11,2.6,None,3
+70,September,20,3.9,None,6
+70,October,10,2.4,None,2
+70,November,14,1.8,Damp Woodlice,3
+70,December,11,2.7,None,2
+71,January,2,1.2,None,4
+71,February,11,2.4,None,2
+71,March,10,2.7,None,3
+71,April,20,2.5,Wasps,4
+71,May,5,2.2,Damp Woodlice,1
+71,June,7,3.1,Damp Woodlice,6
+71,July,6,2.1,None,6
+71,August,13,0.7,None,1
+71,September,22,1.3,None,5
+71,October,12,4.2,None,3
+71,November,13,0.9,None,2
+71,December,18,1.8,None,4
+72,January,7,1.0,Damp Woodlice,5
+72,February,19,3.3,None,1
+72,March,4,1.0,None,5
+72,April,11,3.6,Damp Woodlice,6
+72,May,21,2.9,Rodents,2
+72,June,2,3.9,Damp Woodlice,5
+72,July,6,3.6,None,2
+72,August,4,2.4,None,1
+72,September,17,3.9,None,8
+72,October,18,3.2,None,3
+72,November,11,3.5,Wasps,1
+72,December,8,3.1,None,3
+73,January,6,4.3,None,3
+73,February,18,4.0,None,1
+73,March,20,3.9,Wasps,2
+73,April,7,4.6,Wasps,1
+73,May,18,4.3,None,2
+73,June,5,1.3,None,4
+73,July,18,1.5,None,6
+73,August,5,2.8,Rodents,3
+73,September,19,3.7,None,6
+73,October,11,2.6,None,4
+73,November,15,1.8,Damp Woodlice,2
+73,December,17,4.7,Wasps,1
+74,January,17,3.5,None,1
+74,February,14,2.3,Rodents,1
+74,March,7,0.8,None,3
+74,April,14,1.1,None,4
+74,May,20,3.2,None,4
+74,June,21,4.8,None,3
+74,July,16,1.0,None,4
+74,August,6,0.6,None,1
+74,September,2,4.9,None,3
+74,October,21,3.3,Rodents,4
+74,November,8,1.8,None,3
+74,December,19,3.0,Wasps,1
+75,January,5,2.2,None,4
+75,February,3,0.6,Damp Woodlice,3
+75,March,7,2.7,None,7
+75,April,5,3.1,None,4
+75,May,7,2.8,None,4
+75,June,14,3.3,None,3
+75,July,2,3.2,None,6
+75,August,20,0.6,None,3
+75,September,15,2.1,None,3
+75,October,9,1.6,Wasps,1
+75,November,4,4.4,None,5
+75,December,12,0.7,None,4
+76,January,15,1.7,Wasps,1
+76,February,14,3.1,Damp Woodlice,1
+76,March,5,3.6,None,4
+76,April,12,1.2,None,4
+76,May,22,4.3,None,2
+76,June,3,1.8,None,2
+76,July,4,3.7,None,3
+76,August,20,4.1,None,2
+76,September,4,3.4,None,3
+76,October,19,1.9,None,3
+76,November,16,3.5,None,1
+76,December,18,4.4,None,2
+77,January,16,1.7,Wasps,4
+77,February,22,0.8,None,4
+77,March,6,3.9,None,4
+77,April,4,3.4,Damp Woodlice,3
+77,May,22,1.2,None,2
+77,June,5,1.2,None,9
+77,July,19,5.0,None,1
+77,August,10,1.1,None,3
+77,September,7,3.4,None,10
+77,October,2,0.7,None,3
+77,November,4,4.6,None,3
+77,December,4,2.3,None,2
+78,January,20,3.8,None,3
+78,February,4,1.6,None,6
+78,March,20,3.8,Wasps,2
+78,April,8,1.1,None,6
+78,May,10,4.4,None,7
+78,June,5,1.9,Wasps,2
+78,July,6,2.1,None,3
+78,August,21,0.7,None,1
+78,September,9,1.6,Wasps,3
+78,October,5,2.9,None,4
+78,November,14,4.7,None,3
+78,December,9,1.8,Wasps,2
+79,January,22,1.9,Rodents,4
+79,February,10,4.4,None,4
+79,March,15,4.7,Damp Woodlice,4
+79,April,5,4.2,None,1
+79,May,21,3.8,None,3
+79,June,2,3.9,None,2
+79,July,22,1.1,None,3
+79,August,4,1.0,Damp Woodlice,2
+79,September,15,4.1,Damp Woodlice,4
+79,October,6,1.7,Rodents,3
+79,November,8,0.9,Damp Woodlice,4
+79,December,20,1.5,Wasps,2
+80,January,16,1.4,None,2
+80,February,21,2.4,Wasps,1
+80,March,7,4.8,None,7
+80,April,16,4.2,Rodents,2
+80,May,8,4.8,None,3
+80,June,17,2.2,None,2
+80,July,11,3.8,None,5
+80,August,6,0.6,None,2
+80,September,9,2.2,None,4
+80,October,17,1.1,None,4
+80,November,14,3.7,None,3
+80,December,19,0.8,None,2
+81,January,13,5.0,None,1
+81,February,18,3.3,None,4
+81,March,6,4.9,None,2
+81,April,18,2.7,None,4
+81,May,12,3.7,None,3
+81,June,3,4.9,Rodents,3
+81,July,15,1.8,None,3
+81,August,15,4.5,Rodents,4
+81,September,6,3.0,None,4
+81,October,6,0.7,None,6
+81,November,16,2.5,None,4
+81,December,13,4.9,None,4
+82,January,6,1.1,None,6
+82,February,7,3.9,None,2
+82,March,2,2.9,Wasps,4
+82,April,9,4.0,None,3
+82,May,5,2.3,Damp Woodlice,1
+82,June,6,0.6,None,4
+82,July,10,3.2,None,8
+82,August,16,2.0,None,2
+82,September,3,4.1,Rodents,1
+82,October,19,4.8,None,4
+82,November,9,4.8,None,1
+82,December,8,1.2,None,3
+83,January,22,1.2,Rodents,4
+83,February,11,4.6,None,3
+83,March,13,2.8,None,4
+83,April,20,3.2,Damp Woodlice,6
+83,May,21,1.3,None,1
+83,June,12,4.9,Wasps,2
+83,July,18,3.3,None,3
+83,August,4,4.6,Wasps,2
+83,September,11,4.3,None,3
+83,October,19,0.8,None,8
+83,November,15,0.9,None,3
+83,December,20,0.9,Rodents,1
+84,January,16,1.3,None,6
+84,February,15,4.4,Rodents,4
+84,March,16,3.3,None,2
+84,April,4,3.9,None,1
+84,May,2,0.5,None,5
+84,June,16,3.6,None,4
+84,July,21,2.1,Damp Woodlice,4
+84,August,4,1.1,Damp Woodlice,8
+84,September,8,4.4,None,2
+84,October,15,4.3,None,2
+84,November,16,1.2,None,1
+84,December,6,3.8,None,4
+85,January,16,3.1,None,4
+85,February,2,1.0,Wasps,4
+85,March,17,3.8,None,3
+85,April,14,2.7,None,4
+85,May,3,2.9,None,3
+85,June,10,4.5,None,4
+85,July,21,4.7,None,4
+85,August,11,3.8,None,4
+85,September,9,3.1,None,4
+85,October,11,3.8,Damp Woodlice,4
+85,November,22,3.8,None,2
+85,December,11,3.6,None,6
+86,January,8,1.2,Wasps,4
+86,February,17,1.9,Wasps,1
+86,March,13,4.5,None,2
+86,April,18,0.6,None,6
+86,May,9,1.0,Wasps,3
+86,June,13,4.0,Damp Woodlice,3
+86,July,18,3.2,Wasps,5
+86,August,16,4.1,Wasps,1
+86,September,21,3.2,Damp Woodlice,1
+86,October,3,2.8,Damp Woodlice,5
+86,November,13,1.2,Rodents,4
+86,December,17,3.8,None,7
+87,January,6,1.1,Rodents,4
+87,February,2,1.6,None,3
+87,March,7,0.9,None,4
+87,April,9,1.2,Rodents,4
+87,May,6,4.1,Damp Woodlice,4
+87,June,18,4.1,None,1
+87,July,2,3.7,None,1
+87,August,12,2.3,None,4
+87,September,3,3.5,Wasps,1
+87,October,18,4.9,Rodents,3
+87,November,12,4.6,Wasps,9
+87,December,21,4.6,None,4
+88,January,19,3.3,None,4
+88,February,22,2.3,None,6
+88,March,19,2.0,None,2
+88,April,19,1.8,None,7
+88,May,12,3.9,Damp Woodlice,5
+88,June,19,3.2,Rodents,3
+88,July,18,1.0,None,6
+88,August,18,2.1,Wasps,10
+88,September,16,1.8,None,4
+88,October,9,4.1,None,2
+88,November,11,3.5,Rodents,2
+88,December,18,3.8,None,7
+89,January,13,2.5,Damp Woodlice,6
+89,February,4,0.9,None,2
+89,March,16,0.9,None,4
+89,April,18,4.0,None,4
+89,May,16,3.6,Damp Woodlice,4
+89,June,6,2.8,None,4
+89,July,18,4.4,None,5
+89,August,3,3.9,Wasps,3
+89,September,5,3.2,None,1
+89,October,11,0.7,None,6
+89,November,13,1.9,None,2
+89,December,20,2.4,Damp Woodlice,3
+90,January,8,1.3,None,1
+90,February,13,0.8,None,9
+90,March,20,2.5,None,4
+90,April,21,1.1,None,7
+90,May,16,3.5,None,7
+90,June,21,3.5,Wasps,2
+90,July,12,2.9,Rodents,4
+90,August,22,0.9,None,5
+90,September,11,3.0,None,7
+90,October,21,2.9,Rodents,2
+90,November,18,4.5,None,7
+90,December,2,1.7,None,4
+91,January,19,3.2,None,1
+91,February,2,2.0,Damp Woodlice,5
+91,March,12,2.2,None,5
+91,April,11,1.1,None,1
+91,May,15,3.6,None,6
+91,June,3,1.8,None,5
+91,July,12,1.7,None,1
+91,August,9,3.9,None,4
+91,September,18,2.2,None,5
+91,October,19,2.3,None,4
+91,November,2,1.7,None,1
+91,December,19,3.4,None,7
+92,January,4,4.3,None,2
+92,February,7,4.0,Wasps,4
+92,March,19,2.5,Wasps,9
+92,April,21,1.8,None,1
+92,May,17,1.7,Wasps,4
+92,June,22,1.5,None,3
+92,July,19,3.0,None,4
+92,August,6,3.8,None,4
+92,September,18,4.8,None,3
+92,October,16,1.7,None,3
+92,November,16,4.8,None,2
+92,December,2,3.2,None,8
+93,January,15,3.0,Rodents,4
+93,February,19,0.9,None,1
+93,March,16,3.5,Damp Woodlice,4
+93,April,13,2.2,None,1
+93,May,13,4.7,Rodents,2
+93,June,10,3.6,None,2
+93,July,21,3.3,None,2
+93,August,17,4.9,Wasps,9
+93,September,21,1.4,None,7
+93,October,10,3.1,None,2
+93,November,20,3.5,None,2
+93,December,6,3.9,Damp Woodlice,7
+94,January,18,3.8,Wasps,1
+94,February,19,3.3,None,4
+94,March,15,3.4,Damp Woodlice,1
+94,April,12,2.4,None,3
+94,May,18,2.6,Damp Woodlice,1
+94,June,9,0.7,None,4
+94,July,14,1.4,Damp Woodlice,7
+94,August,9,4.9,Wasps,1
+94,September,8,1.2,None,1
+94,October,15,4.1,Damp Woodlice,3
+94,November,9,1.0,Damp Woodlice,3
+94,December,12,2.8,Rodents,1
+95,January,21,2.5,None,6
+95,February,4,4.9,None,4
+95,March,4,4.0,None,6
+95,April,21,3.3,None,7
+95,May,3,1.8,None,1
+95,June,15,1.5,None,1
+95,July,16,4.1,None,1
+95,August,2,2.5,None,2
+95,September,2,3.2,Wasps,5
+95,October,6,3.4,None,4
+95,November,21,2.5,None,1
+95,December,11,3.1,None,3
+96,January,19,4.0,None,6
+96,February,11,2.2,None,10
+96,March,6,0.8,None,1
+96,April,8,4.9,Rodents,2
+96,May,12,1.4,None,4
+96,June,12,4.3,None,3
+96,July,15,2.0,None,5
+96,August,2,3.4,None,4
+96,September,9,2.7,Damp Woodlice,3
+96,October,14,1.4,None,5
+96,November,4,2.1,None,2
+96,December,8,3.3,None,3
+97,January,2,1.4,Damp Woodlice,2
+97,February,7,2.0,None,2
+97,March,7,4.3,Damp Woodlice,1
+97,April,6,2.2,None,1
+97,May,8,1.9,None,3
+97,June,18,4.9,Damp Woodlice,4
+97,July,4,1.0,Rodents,2
+97,August,8,2.9,None,3
+97,September,22,1.6,None,10
+97,October,19,1.8,None,5
+97,November,10,4.4,None,4
+97,December,4,4.0,None,1
+98,January,14,3.9,None,3
+98,February,16,1.3,Rodents,4
+98,March,17,2.6,None,1
+98,April,8,2.5,None,2
+98,May,14,3.1,None,3
+98,June,4,1.1,None,6
+98,July,9,3.1,None,3
+98,August,16,2.4,None,4
+98,September,14,0.6,None,3
+98,October,13,4.6,Rodents,1
+98,November,9,0.9,None,5
+98,December,12,1.4,Rodents,3
+99,January,10,1.4,Wasps,2
+99,February,19,4.6,None,9
+99,March,13,4.0,Damp Woodlice,4
+99,April,22,0.6,Damp Woodlice,2
+99,May,9,1.5,None,4
+99,June,20,4.0,None,4
+99,July,4,1.9,None,7
+99,August,16,2.5,None,3
+99,September,6,1.9,Damp Woodlice,4
+99,October,13,2.0,Rodents,4
+99,November,19,1.8,Wasps,1
+99,December,6,4.9,Wasps,4
+100,January,8,4.8,None,6
+100,February,5,2.0,None,3
+100,March,5,3.5,None,7
+100,April,2,1.3,None,6
+100,May,9,1.8,None,4
+100,June,18,0.5,None,4
+100,July,5,1.1,None,1
+100,August,8,1.1,Damp Woodlice,4
+100,September,17,1.2,None,3
+100,October,18,3.7,None,2
+100,November,6,2.5,None,2
+100,December,20,4.5,Rodents,1

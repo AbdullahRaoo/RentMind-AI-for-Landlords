@@ -49,25 +49,6 @@ front/.next/
 front/node_modules/
 front/dist/
 
-# Backend artifacts
-backend/db.sqlite3
-backend/__pycache__/
-backend/chatbot/__pycache__/
-backend/backend/__pycache__/
-
-# Minimal backend deployment
-minimal_backend/
-
-# Data/model artifacts
-Rent Pricing AI/data/
-Rent Pricing AI/data copy/
-Rent Pricing AI/models/
-Rent Pricing AI/models copy/
-predictive_maintenance_ai/data/
-predictive_maintenance_ai/data copy/
-predictive_maintenance_ai/models/
-predictive_maintenance_ai/models copy/
-
 # Documentation outputs
 *.docx
 *.pdf
