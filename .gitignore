@@ -1,13 +1,83 @@
 @"
-frontend/node_modules/
-node_modules/
+# .gitignore for AI-for-Landlords project
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg-info/
+*.egg
+*.log
+*.sqlite3
+*.db
+*.env
+.env.*
+.venv/
 venv/
-.env
 ailords/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+.settings/
+
+# Node/React/Next.js
+node_modules/
+.next/
+dist/
+build/
+*.tsbuildinfo
+
+# OS
 .DS_Store
 Thumbs.db
-*.log
-*.tmp
+
+# Compiled
+*.so
+*.dll
+*.exe
+*.out
+*.app
+
+# Frontend build artifacts
+front/.next/
+front/node_modules/
+front/dist/
+
+# Backend artifacts
+backend/db.sqlite3
+backend/__pycache__/
+backend/chatbot/__pycache__/
+backend/backend/__pycache__/
+
+# Minimal backend deployment
+minimal_backend/
+
+# Data/model artifacts
+Rent Pricing AI/data/
+Rent Pricing AI/data copy/
+Rent Pricing AI/models/
+Rent Pricing AI/models copy/
+predictive_maintenance_ai/data/
+predictive_maintenance_ai/data copy/
+predictive_maintenance_ai/models/
+predictive_maintenance_ai/models copy/
+
+# Documentation outputs
+*.docx
+*.pdf
+
+# Misc
 *.bak
 *.swp
+*.tmp
+*.orig
+
+# Ignore test prompt files
+testprompts.txt
 "@ | Out-File -FilePath .gitignore -Encoding utf8

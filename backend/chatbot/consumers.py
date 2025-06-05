@@ -41,6 +41,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         print("[DEBUG] Received data:", data)
+        # Handle alert fetch request
+        if data.get('type') == 'get_alerts':
+            alerts = chatbot_integration.MaintenancePredictionHandler().batch_alerts(as_json=True)
+            await self.send(text_data=json.dumps({
+                'type': 'alerts',
+                'alerts': alerts
+            }))
+            return
         # Accept both 'message' and 'text' keys for user input
         user_message = data.get('message') or data.get('text') or ''
         print("[DEBUG] User message:", user_message)

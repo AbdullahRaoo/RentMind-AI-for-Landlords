@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import numpy as np
-import xgboost as xgb
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
@@ -11,39 +10,6 @@ load_dotenv()
 
 # Set OpenAI API key
 openai_api_key = os.getenv("OPENAI_API_KEY")
-
-# Dynamically construct the absolute path to the model file
-current_dir = os.path.dirname(__file__)
-model_path = os.path.join(current_dir, "../Rent Pricing AI/rent_xgboost_model.json")
-
-# Load the trained model
-model = xgb.Booster()
-model.load_model(model_path)
-
-def predict_rent(input_data):
-    # Convert input data to a DataFrame
-    input_df = pd.DataFrame([input_data])
-
-    # Prepare the data for XGBoost
-    dinput = xgb.DMatrix(input_df, missing=np.nan)
-
-    # Make predictions
-    predicted_log_rent = model.predict(dinput)
-    predicted_rent = np.expm1(predicted_log_rent)  # Reverse log transformation
-
-    # Calculate rent range (±10%)
-    predicted_rent = predicted_rent[0]
-    lower_rent = int(predicted_rent - 0.10 * predicted_rent)
-    upper_rent = int(predicted_rent + 0.10 * predicted_rent)
-
-    # Define RMSE (use the RMSE from your training process, e.g., £1039.64)
-    rmse = 1039.64  # Replace with the actual RMSE from your training output
-
-    # Calculate confidence score
-    confidence = max(0, 1 - (rmse / predicted_rent))  # Confidence level as a percentage
-    confidence_percentage = round(confidence * 100, 2)
-
-    return predicted_rent, lower_rent, upper_rent, confidence_percentage
 
 # --- Modular Conversational Engine ---
 
@@ -78,6 +44,16 @@ class RentPredictionHandler(BaseModuleHandler):
         "avg_distance_to_nearest_station": ["average distance to nearest station", "avg distance", "station distance", "distance to station", "average station distance", "avg station distance", "distance"],
         "nearest_station_count": ["number of nearby stations", "number of stations", "station count", "stations", "nearby stations", "stations nearby"]
     }
+    _model = None
+    _model_path = os.path.join(os.path.dirname(__file__), "../Rent Pricing AI/rent_xgboost_model.json")
+
+    @classmethod
+    def get_model(cls):
+        if cls._model is None:
+            import xgboost as xgb
+            cls._model = xgb.Booster()
+            cls._model.load_model(cls._model_path)
+        return cls._model
 
     def __init__(self):
         self.system_prompt = (
@@ -236,8 +212,19 @@ class RentPredictionHandler(BaseModuleHandler):
             "PROPERTY TYPE", "avg_distance_to_nearest_station", "nearest_station_count"
         ]
         model_input = {k: encoded_fields[k] for k in MODEL_FIELDS if k in encoded_fields}
-        predicted_rent, lower_rent, upper_rent, confidence_percentage = predict_rent(model_input)
-        rounded_confidence_percentage = round(confidence_percentage, 2)
+        # Lazy load model
+        model = self.get_model()
+        import pandas as pd
+        import numpy as np
+        dinput = xgb.DMatrix(pd.DataFrame([model_input]), missing=np.nan)
+        predicted_log_rent = model.predict(dinput)
+        predicted_rent = np.expm1(predicted_log_rent)
+        predicted_rent = predicted_rent[0]
+        lower_rent = int(predicted_rent - 0.10 * predicted_rent)
+        upper_rent = int(predicted_rent + 0.10 * predicted_rent)
+        rmse = 1039.64
+        confidence = max(0, 1 - (rmse / predicted_rent))
+        confidence_percentage = round(confidence * 100, 2)
         summary = (
             f"- **Estimated Monthly Rent:** £{int(predicted_rent)}\n"
             f"- **Suggested Range:** £{int(lower_rent)}–£{int(upper_rent)}\n"
@@ -512,6 +499,15 @@ class TenantScreeningHandler(BaseModuleHandler):
         # Always return only required fields
         return {"response": reply, "action": "chat", "fields": {k: tenant_fields[k] for k in self.required_fields}}
 
+    def _is_field_filled(self, key, value):
+        if key in ["credit_score", "income", "rent"]:
+            return value not in (None, '', 0, 0.0)
+        if key == "eviction_record":
+            return value is not None  # Boolean, so False is a valid value
+        if key == "employment_status":
+            return bool(value and str(value).strip())
+        return value not in (None, '', False)
+
     def should_run_model(self, conversation_history, candidate_fields):
         # Only run the model if all required fields are present and the last assistant message explicitly asks for confirmation
         if not candidate_fields or not all(f in candidate_fields and candidate_fields[f] not in (None, '', 0, 0.0, False) for f in self.required_fields):
@@ -525,6 +521,157 @@ class TenantScreeningHandler(BaseModuleHandler):
             "please confirm", "is this information correct", "is this correct", "can you confirm", "are these details correct", "please confirm so i can screen the tenant"
         ]
         return any(kw in last_assistant["content"].lower() for kw in confirmation_keywords)
+
+# --- Predictive Maintenance Integration ---
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from predictive_maintenance_ai.maintenance_alerts import preprocessor, clf, df as maintenance_df, feature_cols, action_labels
+import datetime
+
+class MaintenancePredictionHandler(BaseModuleHandler):
+    required_fields = [
+        'address', 'construction_type', 'age_years', 'hvac_age', 'plumbing_age', 'roof_age',
+        'total_incidents', 'urgent_incidents', 'open_issues'
+    ]
+    FIELD_SYNONYMS = {
+        'address': ['address', 'property address', 'location'],
+        'construction_type': ['construction type', 'build type', 'structure'],
+        'age_years': ['age', 'property age', 'years old', 'age_years'],
+        'hvac_age': ['hvac age', 'heating age', 'cooling age', 'hvac system age'],
+        'plumbing_age': ['plumbing age', 'pipes age', 'plumbing system age'],
+        'roof_age': ['roof age', 'roofing age'],
+        'total_incidents': ['total incidents', 'maintenance incidents', 'incident count'],
+        'urgent_incidents': ['urgent incidents', 'urgent maintenance', 'critical incidents'],
+        'open_issues': ['open issues', 'unresolved issues', 'open maintenance']
+    }
+    _preprocessor = None
+    _clf = None
+    _maintenance_df = None
+    _feature_cols = None
+    _action_labels = None
+
+    @classmethod
+    def lazy_load_models(cls):
+        if cls._preprocessor is None or cls._clf is None or cls._maintenance_df is None:
+            import importlib
+            m = importlib.import_module('predictive_maintenance_ai.maintenance_alerts')
+            cls._preprocessor = m.preprocessor
+            cls._clf = m.clf
+            cls._maintenance_df = m.df
+            cls._feature_cols = m.feature_cols
+            cls._action_labels = m.action_labels
+
+    def extract_fields(self, user_message, conversation_history, last_candidate_fields=None):
+        # Simple extraction: look for numbers/keywords in user_message
+        import re
+        fields = dict(last_candidate_fields) if last_candidate_fields else {}
+        text = user_message.lower()
+        for field, synonyms in self.FIELD_SYNONYMS.items():
+            for syn in synonyms:
+                pattern = rf"{syn}[:=\-]?\s*(\d+)"
+                match = re.search(pattern, text)
+                if match:
+                    fields[field] = int(match.group(1))
+        # Address and construction type as string
+        for field in ['address', 'construction_type']:
+            for syn in self.FIELD_SYNONYMS[field]:
+                pattern = rf"{syn}[:=\-]?\s*([\w\s]+)"
+                match = re.search(pattern, text)
+                if match:
+                    fields[field] = match.group(1).strip()
+        return fields
+
+    def summarize_fields(self, fields):
+        summary = "**Property Information for Maintenance Prediction:**\n\n"
+        for k, v in fields.items():
+            summary += f"- **{k}**: {v}\n"
+        summary += "\nIs this information correct? Please confirm to proceed with the maintenance risk assessment."
+        return summary
+
+    def needs_confirmation(self, user_message):
+        confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
+        return user_message.strip().lower() in confirmation_phrases
+
+    def should_run_model(self, conversation_history, candidate_fields):
+        if not candidate_fields or not all(f in candidate_fields and candidate_fields[f] not in (None, '', 0, 0.0) for f in self.required_fields):
+            return False
+        if not conversation_history:
+            return False
+        last_assistant = next((m for m in reversed(conversation_history) if m["role"] == "assistant"), None)
+        if not last_assistant:
+            return False
+        confirmation_keywords = [
+            "please confirm", "is this information correct", "is this correct", "can you confirm", "are these details correct"
+        ]
+        return any(kw in last_assistant["content"].lower() for kw in confirmation_keywords)
+
+    def run_model(self, fields):
+        self.lazy_load_models()
+        import pandas as pd
+        input_df = pd.DataFrame([fields], columns=self._feature_cols)
+        X_processed = self._preprocessor.transform(input_df)
+        risk_score = self._clf.predict(X_processed)[0]
+        bins = [0, 4.5, 7.5, 10]
+        action = pd.cut([risk_score], bins=bins, labels=self._action_labels, include_lowest=True)[0]
+        summary = (
+            f"- **Predicted Maintenance Risk Score:** {risk_score:.2f}\n"
+            f"- **Recommended Action:** {action}\n"
+        )
+        explanation = (
+            "\n**How this was calculated:**\n"
+            "The risk score is based on property age, system ages, incident history, and open issues. "
+            "A higher score means more urgent maintenance is likely needed.\n"
+        )
+        return summary + explanation
+
+    def batch_alerts(self, as_json=False):
+        self.lazy_load_models()
+        alert_actions = [
+            'Immediate inspection and preventive maintenance required',
+            'Schedule maintenance soon'
+        ]
+        alerts = self._maintenance_df[self._maintenance_df['predicted_action'].isin(alert_actions)]
+        if alerts.empty:
+            return [] if as_json else "No urgent maintenance alerts at this time."
+        alert_list = []
+        for _, row in alerts.iterrows():
+            alert_list.append({
+                "id": row.get("address", "") + str(row.get("age_years", "")),
+                "title": row["predicted_action"],
+                "type": "maintenance" if row["predicted_action"] != "Immediate inspection and preventive maintenance required" else "urgent",
+                "priority": "high" if row["predicted_action"] == "Immediate inspection and preventive maintenance required" else "medium",
+                "property": row.get("address", ""),
+                "address": row.get("address", ""),
+                "action": row["predicted_action"],
+                "riskFactors": f"Age {row['age_years']} yrs, Open Issues {int(row['open_issues'])}, Urgent Incidents {int(row['urgent_incidents'])}",
+                "lastInspection": row.get("last_inspection_date", "N/A"),
+                "timestamp": row.get("last_inspection_date", "N/A"),
+            })
+        if as_json:
+            return alert_list
+        alert_msgs = []
+        for alert in alert_list:
+            alert_msgs.append(
+                f"🔔 [Maintenance Alert] {alert['address']}\n"
+                f"Recommended Action: {alert['action']}\n"
+                f"Risk Factors: {alert['riskFactors']}\n"
+                f"Last Inspection: {alert['lastInspection']}\n---"
+            )
+        return "\n\n".join(alert_msgs)
+
+    def handle(self, conversation_history, user_message, last_candidate_fields=None):
+        # Always respond with a summary of all current alerts (count and most common action), no confirmation or property-specific prediction
+        alerts = self.batch_alerts(as_json=True)
+        alert_count = len(alerts)
+        if alert_count > 0:
+            from collections import Counter
+            action_counts = Counter([a['action'] for a in alerts])
+            most_common_action, most_common_count = action_counts.most_common(1)[0]
+            summary = f"\n**There are currently {alert_count} properties needing attention.**\n"
+            summary += f"Most common recommended action: **{most_common_action}** ({most_common_count} properties).\n"
+        else:
+            summary = "\nNo urgent maintenance alerts at this time.\n"
+        return {"response": summary, "action": "maintenance_alerts", "fields": {}}
 
 # --- Intent Detection ---
 def detect_intent(user_message, conversation_history=None):
@@ -609,19 +756,11 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
     elif intent == "maintenance_prediction":
-        return {
-            "response": (
-                "Maintenance prediction is a supported feature, but it is not yet implemented. "
-                "Currently, I can help you with:\n"
-                "- **Rent Prediction**: Estimate the rent for your property.\n"
-                "- **Tenant Screening**: Assess a tenant's suitability.\n\n"
-                "Please specify which of these you'd like help with, and provide any relevant details."
-            ),
-            "action": "not_implemented",
-            "fields": {},
-            "last_intent": None,
-            "intent_completed": True
-        }
+        handler = MaintenancePredictionHandler()
+        result = handler.handle(conversation_history, user_message, last_candidate_fields)
+        if result.get("action") == "maintenance_prediction" or result.get("action") == "maintenance_alerts":
+            intent_completed = True
+        return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
     else:
         return {
             "response": (

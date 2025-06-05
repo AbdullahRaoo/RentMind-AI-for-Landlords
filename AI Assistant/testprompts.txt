@@ -12,3 +12,5 @@ a 700 sq foot flat, located at Holland Road, Kensington with code W14 having 2 b
 
   
 daphne backend.asgi:application
+
+https://linangdata.com/pdf-generator/
