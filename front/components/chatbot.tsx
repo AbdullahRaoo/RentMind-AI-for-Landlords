@@ -64,6 +64,7 @@ export default function Chatbot() {
   const [isAlertsOpen, setIsAlertsOpen] = useState(false)
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [isClient, setIsClient] = useState(false)
+  const [selectedIntent, setSelectedIntent] = useState<string | null>(null)
   const ws = useRef<WebSocket | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -156,55 +157,29 @@ export default function Chatbot() {
     setMessages((msgs) => [...msgs, { sender: "user", text: input, timestamp: new Date() }])
     setIsTyping(true)
 
-    // Check if user is asking about alerts
-    const isAlertQuery =
-      input.toLowerCase().includes("alert") ||
-      input.toLowerCase().includes("notification") ||
-      input.toLowerCase().includes("maintenance") ||
-      input.toLowerCase().includes("issue")
-      
-    if (input.trim().toLowerCase() === "/predict") {
-      ws.current.send(
-        JSON.stringify({
-          type: "property",
-          input_data: {
-            address: 1308,
-            subdistrict_code: 182,
-            BEDROOMS: 2.0,
-            BATHROOMS: 1.0,
-            SIZE: 700.0,
-            "PROPERTY TYPE": 9,
-            avg_distance_to_nearest_station: 0.4,
-            nearest_station_count: 3.0,
-          },
-        }),
-      )
-    } else {
-      ws.current.send(
-        JSON.stringify({
-          type: "text",
-          message: input,
-        }),
-      )
-    }
-
-    // Simulate showing alerts button for relevant queries
-    if (isAlertQuery) {
-      setTimeout(() => {
-        setIsTyping(false)
-        setMessages((msgs) => [
-          ...msgs,
-          {
-            sender: "bot",
-            text: `I found ${alerts.length} alerts for your properties. You can view detailed information about maintenance issues, inspections, and urgent matters.`,
-            timestamp: new Date(),
-            showAlertsButton: true,
-          },
-        ])
-      }, 1500)
-    }
+    // Send both input and selectedIntent to backend
+    ws.current.send(
+      JSON.stringify({
+        type: "text",
+        message: input,
+        intent: selectedIntent, // null if not selected
+      }),
+    )
 
     setInput("")
+    // Optionally unselect intent after send:
+    // setSelectedIntent(null)
+  }
+
+  // Intent button handler (toggle)
+  const handleIntent = (intent: string) => {
+    // Use backend intent keys
+    const intentMap: Record<string, string> = {
+      rent: "rent_prediction",
+      tenant: "tenant_screening",
+      maintenance: "maintenance_prediction",
+    };
+    setSelectedIntent((prev) => (prev === intentMap[intent] ? null : intentMap[intent]));
   }
 
   const formatTime = (date: Date) => {
@@ -239,6 +214,68 @@ export default function Chatbot() {
   }
 
   const urgentAlerts = alerts.filter((alert) => alert.priority === "high").length
+
+  // Add a helper to detect if a message is a rent prediction (by type or content)
+  const isRentPrediction = (msg: Message) => {
+    // Heuristic: check for 'Predicted Rent' or similar in bot message
+    return (
+      msg.sender === "bot" &&
+      (msg.text.includes("Predicted Rent") || msg.text.includes("Rent Range") || msg.text.includes("Confidence"))
+    )
+  }
+
+  // Track the last rent prediction message and its index
+  const lastRentPredictionIdx = messages
+    .map((msg, idx) => (isRentPrediction(msg) ? idx : -1))
+    .filter((idx) => idx !== -1)
+    .pop()
+
+  // Add support for 'compare & save' follow-up
+  const handleFollowup = async (action: "compare" | "save" | "both") => {
+    if (!ws.current || lastRentPredictionIdx == null) return
+    ws.current.send(
+      JSON.stringify({
+        type: "followup",
+        action,
+      })
+    )
+    setIsTyping(true)
+  }
+
+  // Helper: Parse similar listings from bot message
+  function parseSimilarListings(text: string) {
+    // Improved regex: Address: (greedy, up to ', Bedrooms:'), Bedrooms: ..., Bathrooms: ..., Size: ..., Property Type: ..., Rent: £...
+    const lines = text.split("\n").filter((l) => l.trim().startsWith("- Address:"));
+    const listings = lines.map((line) => {
+      const addrMatch = line.match(/Address: (.*?), Bedrooms:/);
+      const bedsMatch = line.match(/Bedrooms: ([^,]+),/);
+      const bathsMatch = line.match(/Bathrooms: ([^,]+),/);
+      const sizeMatch = line.match(/Size: ([^,]+) sq ft/);
+      const ptypeMatch = line.match(/Property Type: ([^,]+),?/);
+      const rentMatch = line.match(/Rent: £([\d.]+)/);
+      return {
+        address: addrMatch ? addrMatch[1].trim() : "",
+        bedrooms: bedsMatch ? bedsMatch[1].trim() : "",
+        bathrooms: bathsMatch ? bathsMatch[1].trim() : "",
+        size: sizeMatch ? sizeMatch[1].trim() : "",
+        propertyType: ptypeMatch ? ptypeMatch[1].trim() : "",
+        rent: rentMatch ? rentMatch[1].trim() : "",
+      };
+    });
+    return listings.length > 0 ? listings : null;
+  }
+
+  // Helper: Extract summary (first 1-2 lines before listings)
+  function extractSummary(text: string) {
+    const lines = text.split("\n");
+    const summaryLines = [];
+    for (const line of lines) {
+      if (line.trim().startsWith("- Address:")) break;
+      if (line.trim() !== "") summaryLines.push(line);
+      if (summaryLines.length >= 2) break;
+    }
+    return summaryLines.join(" ");
+  }
 
   return (
     <div className="h-screen w-screen relative overflow-hidden">
@@ -305,22 +342,7 @@ export default function Chatbot() {
         ></div>
       </div>
 
-      {/* Notification Button */}
-      <div className="absolute top-6 right-6 z-50">
-        <Button
-          onClick={() => setIsAlertsOpen(!isAlertsOpen)}
-          variant="outline"
-          size="icon"
-          className="relative bg-white/90 backdrop-blur-md border-2 border-white/50 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
-        >
-          <Bell className="h-5 w-5" />
-          {urgentAlerts > 0 && (
-            <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs animate-pulse">
-              {urgentAlerts > 5 ? '5+' : urgentAlerts}
-            </Badge>
-          )}
-        </Button>
-      </div>
+      {/* Notification Button removed */}
 
       <div className="h-full flex items-center justify-center p-4 relative z-10">
         <div className={`transition-all duration-300 w-full max-w-4xl h-full ${isAlertsOpen ? "mr-96" : ""}`}>
@@ -365,80 +387,125 @@ export default function Chatbot() {
             <CardContent className="flex-1 p-0 overflow-hidden">
               <ScrollArea className="h-full">
                 <div className="p-6 space-y-6">
-                  {messages.map((msg, idx) => (
-                    <div key={idx}>
-                      <div
-                        className={`flex items-start space-x-3 ${
-                          msg.sender === "user" ? "flex-row-reverse space-x-reverse" : ""
-                        }`}
-                      >
-                        <Avatar className="w-10 h-10 border-2 border-white shadow-lg flex-shrink-0">
-                          {msg.sender === "user" ? (
-                            <>
-                              <AvatarImage src="/placeholder-logo.avif" />
-                              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                                <User className="h-5 w-5" />
-                              </AvatarFallback>
-                            </>
-                          ) : (
-                            <>
-                              <AvatarImage src="/chatbot.avif" />
-                              <AvatarFallback className="bg-gradient-to-r from-purple-500 to-blue-500 text-white">
-                                <Bot className="h-5 w-5" />
-                              </AvatarFallback>
-                            </>
-                          )}
-                        </Avatar>
-
-                        <div className={`flex-1 max-w-[80%] ${msg.sender === "user" ? "text-right" : ""}`}>
-                          <div
-                            className={`inline-block p-4 rounded-2xl shadow-lg ${
-                              msg.sender === "user"
-                                ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-br-md"
-                                : "bg-white/80 backdrop-blur-sm text-gray-800 rounded-bl-md border border-gray-200/50"
-                            }`}
-                          >
-                            {msg.sender === "bot" ? (
-                              <div className="prose prose-sm max-w-none">
-                                <ReactMarkdown
-                                  components={{
-                                    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                                    strong: ({ children }) => (
-                                      <strong className="font-semibold text-gray-900">{children}</strong>
-                                    ),
-                                  }}
-                                >
-                                  {msg.text}
-                                </ReactMarkdown>
-                              </div>
+                  {messages.map((msg, idx) => {
+                    // Check if this is a similar listings message
+                    const similarListings = msg.sender === "bot" ? parseSimilarListings(msg.text) : null;
+                    const summary = similarListings ? extractSummary(msg.text) : null;
+                    return (
+                      <div key={idx}>
+                        <div
+                          className={`flex items-start space-x-3 ${
+                            msg.sender === "user" ? "flex-row-reverse space-x-reverse" : ""
+                          }`}
+                        >
+                          <Avatar className="w-10 h-10 border-2 border-white shadow-lg flex-shrink-0">
+                            {msg.sender === "user" ? (
+                              <>
+                                <AvatarImage src="/placeholder-logo.avif" />
+                                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                                  <User className="h-5 w-5" />
+                                </AvatarFallback>
+                              </>
                             ) : (
-                              <div className="whitespace-pre-wrap">{msg.text}</div>
+                              <>
+                                <AvatarImage src="/chatbot.avif" />
+                                <AvatarFallback className="bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+                                  <Bot className="h-5 w-5" />
+                                </AvatarFallback>
+                              </>
+                            )}
+                          </Avatar>
+
+                          <div className={`flex-1 max-w-[80%] ${msg.sender === "user" ? "text-right" : ""}`}>
+                            <div className={`inline-block p-4 rounded-2xl shadow-lg ${msg.sender === "user" ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-br-md" : "bg-white/80 backdrop-blur-sm text-gray-800 rounded-bl-md border border-gray-200/50"}`}>
+                              {similarListings && similarListings.length >= 2 ? (
+                                <div>
+                                  {summary && <div className="mb-2 text-sm text-gray-700 font-medium">{summary}</div>}
+                                  <div className="overflow-x-auto w-full">
+                                    <table className="min-w-[700px] border border-gray-200 rounded-lg text-sm">
+                                      <thead className="bg-blue-50">
+                                        <tr>
+                                          <th className="px-3 py-2 text-left font-semibold w-2/5 min-w-[160px]">Address</th>
+                                          <th className="px-3 py-2 text-left font-semibold">Bedrooms</th>
+                                          <th className="px-3 py-2 text-left font-semibold">Bathrooms</th>
+                                          <th className="px-3 py-2 text-left font-semibold">Size (sq ft)</th>
+                                          {/* <th className="px-3 py-2 text-left font-semibold">Property Type</th> */}
+                                          <th className="px-3 py-2 text-left font-semibold">Rent (£)</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {similarListings.map((listing, i) => (
+                                          <tr key={i} className="border-t border-gray-100 hover:bg-blue-50/50">
+                                            <td className="px-3 py-2">{listing.address}</td>
+                                            <td className="px-3 py-2">{listing.bedrooms}</td>
+                                            <td className="px-3 py-2">{listing.bathrooms}</td>
+                                            <td className="px-3 py-2">{listing.size}</td>
+                                            {/* <td className="px-3 py-2">{listing.propertyType}</td> */}
+                                            <td className="px-3 py-2">{listing.rent}</td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              ) : (
+                                msg.sender === "bot" ? (
+                                  <div className="prose prose-sm max-w-none">
+                                    <ReactMarkdown
+                                      components={{
+                                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                        strong: ({ children }) => (
+                                          <strong className="font-semibold text-gray-900">{children}</strong>
+                                        ),
+                                      }}
+                                    >
+                                      {msg.text}
+                                    </ReactMarkdown>
+                                  </div>
+                                ) : (
+                                  <div className="whitespace-pre-wrap">{msg.text}</div>
+                                )
+                              )}
+                            </div>
+                            {msg.timestamp && isClient && (
+                              <div className={`text-xs text-gray-400 mt-1 ${msg.sender === "user" ? "text-right" : ""}`}>
+                                {formatTime(msg.timestamp)}
+                              </div>
                             )}
                           </div>
-                          {msg.timestamp && isClient && (
-                            <div className={`text-xs text-gray-400 mt-1 ${msg.sender === "user" ? "text-right" : ""}`}>
-                              {formatTime(msg.timestamp)}
-                            </div>
-                          )}
                         </div>
-                      </div>
 
-                      {/* Alerts Button */}
-                      {msg.showAlertsButton && (
-                        <div className="mt-3 flex justify-start">
-                          <Button
-                            onClick={() => setIsAlertsOpen(true)}
-                            variant="outline"
-                            className="bg-blue-50/80 backdrop-blur-sm border-blue-200 text-blue-700 hover:bg-blue-100/80 transition-all duration-200 shadow-md hover:shadow-lg"
-                          >
-                            <Bell className="h-4 w-4 mr-2" />
-                            View All Alerts ({alerts.length})
-                            <ChevronRight className="h-4 w-4 ml-2" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        {/* Alerts Button removed */}
+
+                        {/* Follow-up buttons for rent prediction */}
+                        {isRentPrediction(msg) && idx === lastRentPredictionIdx && (
+                          <div className="mt-3 ml-14 flex gap-3 flex-wrap">
+                            <Button
+                              variant="outline"
+                              className="bg-green-50/80 border-green-200 text-green-700 hover:bg-green-100/80 shadow-md hover:shadow-lg"
+                              onClick={() => handleFollowup("compare")}
+                            >
+                              Compare to similar listings
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="bg-blue-50/80 border-blue-200 text-blue-700 hover:bg-blue-100/80 shadow-md hover:shadow-lg"
+                              onClick={() => handleFollowup("save")}
+                            >
+                              Save this property
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="bg-purple-50/80 border-purple-200 text-purple-700 hover:bg-purple-100/80 shadow-md hover:shadow-lg"
+                              onClick={() => handleFollowup("both")}
+                            >
+                              Compare & Save
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
 
                   {isTyping && (
                     <div className="flex items-start space-x-3">
@@ -497,120 +564,39 @@ export default function Chatbot() {
                   <Send className="h-4 w-4" />
                 </Button>
               </form>
-              <div className="mt-3 text-center">
-                <p className="text-xs text-gray-600">
-                  💡 Tip: Ask for any of the three tasks told above from the Assistant!
-                </p>
+
+              {/* Intent Buttons Below Input */}
+              <div className="flex justify-center gap-4 mt-4 mb-2">
+                <Button
+                  variant={selectedIntent === "rent_prediction" ? "default" : "secondary"}
+                  className={`rounded-full px-6 py-2 shadow-md hover:scale-105 transition-all ${selectedIntent === "rent_prediction" ? "ring-2 ring-blue-500" : ""}`}
+                  onClick={() => handleIntent("rent")}
+                >
+                  🏠 Rent Estimation
+                </Button>
+                <Button
+                  variant={selectedIntent === "tenant_screening" ? "default" : "secondary"}
+                  className={`rounded-full px-6 py-2 shadow-md hover:scale-105 transition-all ${selectedIntent === "tenant_screening" ? "ring-2 ring-purple-500" : ""}`}
+                  onClick={() => handleIntent("tenant")}
+                >
+                  👤 Tenant Screening
+                </Button>
+                <Button
+                  variant={selectedIntent === "maintenance_prediction" ? "default" : "secondary"}
+                  className={`rounded-full px-6 py-2 shadow-md hover:scale-105 transition-all ${selectedIntent === "maintenance_prediction" ? "ring-2 ring-green-500" : ""}`}
+                  onClick={() => handleIntent("maintenance")}
+                >
+                  🛠️ Maintenance Prediction
+                </Button>
               </div>
             </div>
           </Card>
         </div>
       </div>
 
-      {/* Alerts Sidebar */}
-      <div
-        className={`fixed top-0 right-0 h-full w-96 bg-white/95 backdrop-blur-lg shadow-2xl transform transition-transform duration-300 z-40 ${
-          isAlertsOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <div className="flex flex-col h-full">
-          <div className="p-6 border-b bg-gradient-to-r from-red-500 to-orange-500 text-white relative overflow-hidden flex-shrink-0">
-            {/* Sidebar header pattern */}
-            <div
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: `repeating-linear-gradient(
-                -45deg,
-                transparent,
-                transparent 10px,
-                rgba(255,255,255,0.1) 10px,
-                rgba(255,255,255,0.1) 20px
-              )`,
-              }}
-            ></div>
+      {/* Alerts Sidebar removed */}
 
-            <div className="flex items-center justify-between relative z-10">
-              <div className="flex items-center space-x-3">
-                <Bell className="h-6 w-6" />
-                <div>
-                  <h2 className="text-xl font-bold">Property Alerts</h2>
-                  <p className="text-red-100 text-sm">{alerts.length} active alerts</p>
-                </div>
-              </div>
-              <Button
-                onClick={() => setIsAlertsOpen(false)}
-                variant="ghost"
-                size="icon"
-                className="text-white hover:bg-white/20 transition-all duration-200 hover:scale-110"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-
-          <ScrollArea className="flex-1">
-            <div className="p-4 space-y-4">
-              {alerts.map((alert) => (
-                <Card
-                  key={alert.id}
-                  className="border-l-4 border-l-red-400 shadow-lg hover:shadow-xl transition-all duration-200 bg-white/90 backdrop-blur-sm hover:scale-105"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center space-x-2">
-                        {getAlertIcon(alert.type)}
-                        <span className="font-semibold text-gray-900">[{alert.title}]</span>
-                      </div>
-                      <Badge className={`text-xs ${getPriorityColor(alert.priority)}`}>
-                        {alert.priority.toUpperCase()}
-                      </Badge>
-                    </div>
-
-                    <div className="space-y-2 text-sm">
-                      <div className="font-medium text-blue-600">{alert.property}</div>
-                      <div className="flex items-center text-gray-600">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        {alert.address}
-                      </div>
-
-                      <Separator className="my-2" />
-
-                      <div>
-                        <span className="font-medium text-gray-700">Recommended Action:</span>
-                        <p className="text-gray-600 mt-1">{alert.action}</p>
-                      </div>
-
-                      <div>
-                        <span className="font-medium text-gray-700">Risk Factors:</span>
-                        <p className="text-gray-600 mt-1">{alert.riskFactors}</p>
-                      </div>
-
-                      <div className="flex items-center text-gray-500 text-xs">
-                        <Clock className="h-3 w-3 mr-1" />
-                        Last Inspection: {alert.lastInspection}
-                      </div>
-
-                      {isClient && <div className="text-xs text-gray-400">{formatTime(alert.timestamp)}</div>}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </ScrollArea>
-
-          <div className="p-4 border-t bg-white/50 backdrop-blur-sm flex-shrink-0">
-            <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
-              <AlertTriangle className="h-4 w-4 mr-2" />
-              Manage All Alerts
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Enhanced Overlay */}
-      {isAlertsOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30" onClick={() => setIsAlertsOpen(false)} />
-      )}
+      {/* Enhanced Overlay removed */}
     </div>
   )
 }
