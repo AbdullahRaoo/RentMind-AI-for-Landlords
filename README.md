@@ -15,20 +15,20 @@ RentMind AI is an intelligent platform designed to assist landlords in managing 
 ## 🛠️ Tech Stack
 
 ### **Backend**
-- ![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white) High-level Python web framework.
-- ![Channels](https://img.shields.io/badge/Channels-4.0-blue?style=for-the-badge) For real-time communication.
-- ![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-orange?style=for-the-badge) Vector search for tenant screening.
-- ![LangChain](https://img.shields.io/badge/LangChain-AI%20Infrastructure-green?style=for-the-badge) AI infrastructure for chatbot and decision-making.
+- [![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/) High-level Python web framework.
+- [![Channels](https://img.shields.io/badge/Channels-4.0-blue?style=for-the-badge)](https://channels.readthedocs.io/en/stable/) For real-time communication.
+- [![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-orange?style=for-the-badge)](https://faiss.ai/) Vector search for tenant screening.
+- [![LangChain](https://img.shields.io/badge/LangChain-AI%20Infrastructure-green?style=for-the-badge)](https://www.langchain.com/) AI infrastructure for chatbot and decision-making.
 
 ### **Frontend**
-- ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white) React framework for server-side rendering.
-- ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white) Utility-first CSS framework.
-- ![Radix UI](https://img.shields.io/badge/Radix%20UI-Accessible%20Components-blueviolet?style=for-the-badge) Accessible UI components.
+- [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/) React framework for server-side rendering.
+- [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/) Utility-first CSS framework.
+- [![Radix UI](https://img.shields.io/badge/Radix%20UI-Accessible%20Components-blueviolet?style=for-the-badge)](https://www.radix-ui.com/) Accessible UI components.
 
 ### **AI/ML**
-- ![OpenAI](https://img.shields.io/badge/OpenAI-GPT%20Integration-purple?style=for-the-badge&logo=openai&logoColor=white) GPT-based chatbot integration.
-- ![XGBoost](https://img.shields.io/badge/XGBoost-Rent%20Pricing-red?style=for-the-badge) Rent pricing model.
-- ![Sentence Transformers](https://img.shields.io/badge/Sentence%20Transformers-Tenant%20Screening-blue?style=for-the-badge) For tenant screening.
+- [![OpenAI](https://img.shields.io/badge/OpenAI-GPT%20Integration-purple?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/) GPT-based chatbot integration.
+- [![XGBoost](https://img.shields.io/badge/XGBoost-Rent%20Pricing-red?style=for-the-badge)](https://xgboost.readthedocs.io/) Rent pricing model.
+- [![Sentence Transformers](https://img.shields.io/badge/Sentence%20Transformers-Tenant%20Screening-blue?style=for-the-badge)](https://www.sbert.net/) For tenant screening.
 
 ---
 
