@@ -12,4 +12,10 @@ openai
 joblib
 requests
 scikit-learn==1.6.1
+<<<<<<< HEAD
 channels_redis   # Only if you want Redis for production
+=======
+channels_redis   # Only if you want Redis for production
+faiss-cpu
+sentence-transformers
+>>>>>>> e557d0a2473995fad9ad19a951fd612358aac91b

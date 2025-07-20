@@ -14,11 +14,65 @@ daphne backend.asgi:application
 
 https://linangdata.com/pdf-generator/
 
+<<<<<<< HEAD
 
 
 
+=======
+sudo systemctl restart daphne-landlord.service
+
+
+
+root@srv889806:/srv/landlord-app# sudo systemctl reload nginx
+root@srv889806:/srv/landlord-app# sudo systemctl daemon-reload
+root@srv889806:/srv/landlord-app# sudo systemctl restart nextjs-landlord
+root@srv889806:/srv/landlord-app# sudo systemctl status nextjs-landlord
+
+
+>>>>>>> e557d0a2473995fad9ad19a951fd612358aac91b
 (3 near stations with 0.4 avg distance)
 button for intent
 predictive maintiance (Response)
 Tennant reject/accpted response
 
+<<<<<<< HEAD
+=======
+
+
+
+
+
+
+
+
+
+
+  GNU nano 7.2                                                                         /etc/nginx/sites-available/landlord-app                                                                                   server {
+    listen 443;
+    server_name srv889806.hstgr.cloud;
+
+    # Serve frontend at root
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Serve Django static files (if needed)
+    location /static/ {
+        alias /srv/landlord-app/backend/staticfiles/;
+    }
+
+    # Proxy API/backend requests to Daphne (adjust path as needed)
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+>>>>>>> e557d0a2473995fad9ad19a951fd612358aac91b
