@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'AI for Landlords',
+  description: 'Hi! I am your AI Assistant for Landlords. Ask me about rent estimation, tenant screening, or predictive maintenance! (Notifications and alerts UI have been removed.)',
   generator: 'v0.dev',
 }
 

@@ -18,7 +18,8 @@ target = 'log_rent'
 # Features and target
 features = [
     'address', 'subdistrict_code', 'BEDROOMS', 'BATHROOMS', 'SIZE',
-    'PROPERTY TYPE', 'avg_distance_to_nearest_station', 'nearest_station_count'
+    'PROPERTY TYPE'
+    # Removed: 'avg_distance_to_nearest_station', 'nearest_station_count'
 ]
 
 X = df[features]
@@ -77,7 +78,6 @@ for i in range(5):  # Show first 5 predictions
 
     # Explanation based on features
     x_sample = X_test.iloc[i]
-    print(" - Explanation:")
     for col in features:
         print(f"   - {col}: {x_sample[col]}")
 

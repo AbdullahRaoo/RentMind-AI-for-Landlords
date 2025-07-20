@@ -8,9 +8,62 @@ waleed sheikh, his rentt is 300, he's unemployed and earns 50 a month with credi
 
 can you do rent estimation for me?
 
-a 700 sq foot flat, located at Holland Road, Kensington with code W14 having 2 bedrooms and 1 bathroom 3 near stations with 0.4 avg distance from them
-
+a 700 sq foot flat, located at Holland Road, Kensington with code W14 having 2 bedrooms and 1 bathroom (3 near stations with 0.4 avg distance) from them
   
 daphne backend.asgi:application
 
 https://linangdata.com/pdf-generator/
+
+sudo systemctl restart daphne-landlord.service
+
+
+
+root@srv889806:/srv/landlord-app# sudo systemctl reload nginx
+root@srv889806:/srv/landlord-app# sudo systemctl daemon-reload
+root@srv889806:/srv/landlord-app# sudo systemctl restart nextjs-landlord
+root@srv889806:/srv/landlord-app# sudo systemctl status nextjs-landlord
+
+
+(3 near stations with 0.4 avg distance)
+button for intent
+predictive maintiance (Response)
+Tennant reject/accpted response
+
+
+
+
+
+
+
+
+
+
+
+  GNU nano 7.2                                                                         /etc/nginx/sites-available/landlord-app                                                                                   server {
+    listen 443;
+    server_name srv889806.hstgr.cloud;
+
+    # Serve frontend at root
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Serve Django static files (if needed)
+    location /static/ {
+        alias /srv/landlord-app/backend/staticfiles/;
+    }
+
+    # Proxy API/backend requests to Daphne (adjust path as needed)
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
