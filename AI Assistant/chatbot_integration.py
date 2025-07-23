@@ -34,6 +34,7 @@ class RentPredictionHandler(BaseModuleHandler):
     required_fields = [
         "address", "subdistrict_code", "BEDROOMS", "BATHROOMS", "SIZE", "PROPERTY TYPE"
     ]
+    
     FIELD_SYNONYMS = {
         "address": ["address", "location", "property address"],
         "subdistrict_code": ["subdistrict code", "code", "postcode", "postal code", "ub8"],
