@@ -16,6 +16,8 @@ RUN pip install --no-cache-dir -r requirements-production.txt
 # Copy backend code
 COPY backend/ .
 COPY ["AI Assistant/", "./AI_Assistant/"]
+COPY ["predictive_maintenance_ai/", "./predictive_maintenance_ai/"]
+COPY ["Rent Pricing AI/", "./Rent_Pricing_AI/"]
 
 # Create necessary directories
 RUN mkdir -p /app/media /app/static /app/data
