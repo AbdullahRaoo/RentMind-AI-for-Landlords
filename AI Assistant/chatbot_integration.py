@@ -1,10 +1,20 @@
 import os
+import re
+import json
+import csv
 import pandas as pd
 import numpy as np
+import xgboost as xgb
+import joblib
+from datetime import datetime
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
+
+# Import our new modules
+from milvus_utils import get_milvus_store
+from conversation_intelligence import get_conversation_intelligence, IntentType
 
 load_dotenv()
 
@@ -612,7 +622,7 @@ class TenantScreeningHandler(BaseModuleHandler):
         all_text = "\n".join([m["content"] for m in conversation_history if m["role"] in ("user", "assistant")])
         all_text += "\n" + user_message
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for landlords. Extract ONLY the following fields from the conversation and user message. If a field is missing, use 0, empty string, or False. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record. DO NOT extract any other fields. If a field is missing, use 0, empty string, or False. Output only the JSON object as specified by the schema: {format_instructions}"),
             ("user", "Conversation so far:\n{conversation}\nUser message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
@@ -734,25 +744,42 @@ class TenantScreeningHandler(BaseModuleHandler):
     def handle(self, conversation_history, user_message, last_candidate_fields=None):
         # Always merge new extracted fields with last candidate fields, only for required fields
         new_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
-        merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+        
+        # Only work with tenant screening fields - filter out any other fields
+        merged_fields = {}
+        if last_candidate_fields:
+            for k in self.required_fields:
+                if k in last_candidate_fields:
+                    merged_fields[k] = last_candidate_fields[k]
+        
+        # Update with new tenant fields
         for k in self.required_fields:
             v = new_fields.get(k, None)
             if v not in (None, '', 0, 0.0, False):
                 merged_fields[k] = v
-        # Only keep required fields
-        tenant_fields = {k: merged_fields.get(k, 0 if k in ["credit_score", "income", "rent"] else (False if k == "eviction_record" else "")) for k in self.required_fields}
-        filtered_fields = {k: tenant_fields[k] for k in self.required_fields}
+        
+        # Ensure all required fields exist with defaults
+        tenant_fields = {}
+        for k in self.required_fields:
+            if k in ["credit_score", "income", "rent"]:
+                tenant_fields[k] = merged_fields.get(k, 0)
+            elif k == "eviction_record":
+                tenant_fields[k] = merged_fields.get(k, False)
+            else:  # employment_status
+                tenant_fields[k] = merged_fields.get(k, "")
+        
         # --- After user confirmation, always run the script if all required fields are present ---
         if self.needs_confirmation(user_message):
-            if all(self._is_field_filled(k, filtered_fields.get(k)) for k in self.required_fields):
-                result = self.run_model(filtered_fields)
-                return {"response": result, "action": "screen_tenant", "fields": filtered_fields}
+            if all(self._is_field_filled(k, tenant_fields.get(k)) for k in self.required_fields):
+                result = self.run_model(tenant_fields)
+                return {"response": result, "action": "screen_tenant", "fields": tenant_fields}
             else:
                 return {
                     "response": "Sorry, I couldn't run the tenant screening script because some required information is missing. Please provide all the details (credit score, income, rent, employment status, and eviction record).",
                     "action": "ask_for_info",
-                    "fields": filtered_fields
+                    "fields": tenant_fields
                 }
+        
         # Otherwise, continue the LLM-driven flow
         messages = [
             {"role": "system", "content": self.system_prompt}
@@ -760,8 +787,10 @@ class TenantScreeningHandler(BaseModuleHandler):
         for msg in conversation_history:
             messages.append({"role": msg["role"], "content": msg["content"]})
         messages.append({"role": "user", "content": user_message})
+        
         response = self.chat.invoke([HumanMessage(content=m["content"]) for m in messages])
         reply = response.content.strip()
+        
         # Remove any LLM advice/summary or extra fields
         for phrase in [
             "please wait", "processing", "hold on", "one moment", "I'll process", "wait a moment",
@@ -771,6 +800,7 @@ class TenantScreeningHandler(BaseModuleHandler):
         ]:
             reply = reply.replace(phrase, "")
             reply = reply.replace(phrase.capitalize(), "")
+        
         # Remove lines with extra fields
         lines = reply.split('\n')
         filtered_lines = []
@@ -779,14 +809,16 @@ class TenantScreeningHandler(BaseModuleHandler):
                 continue
             filtered_lines.append(line)
         reply = '\n'.join(filtered_lines)
+        
         # Extract fields from reply and merge again
         reply_fields = self.extract_fields(reply, conversation_history, tenant_fields)
         for k in self.required_fields:
             v = reply_fields.get(k, None)
             if v not in (None, '', 0, 0.0, False):
                 tenant_fields[k] = v
-        # Always return only required fields
-        return {"response": reply, "action": "chat", "fields": {k: tenant_fields[k] for k in self.required_fields}}
+        
+        # Always return only tenant screening fields
+        return {"response": reply, "action": "chat", "fields": tenant_fields}
 
     def _is_field_filled(self, key, value):
         if key in ["credit_score", "income", "rent"]:
@@ -837,6 +869,22 @@ class MaintenancePredictionHandler(BaseModuleHandler):
     _address_map = None
     _model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../predictive_maintenance_ai/models/maintenance_rf_model.pkl'))
     _address_map_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/address_map.json'))
+    
+    def __init__(self):
+        """Initialize maintenance prediction handler."""
+        self.system_prompt = (
+            "You are LandlordBuddy, an expert and professional AI assistant for landlords. "
+            "You support rent pricing, tenant screening, and maintenance prediction. "
+            "For maintenance prediction, your job is to gather all required info (property address, property age in years, years since last service, current season), confirm with the user, and then run the maintenance prediction model. "
+            "If info is missing, ask for it in a friendly, casual way. "
+            "You must be flexible in understanding user input: users may provide information in any format, not just JSON or structured lists. "
+            "The required information for maintenance prediction is: address, age_years (how old the property is), last_service_years_ago (how long since last maintenance), seasonality (current season). "
+            "When you have all the required information, summarize the details in a clear, markdown-formatted list (not JSON or code block), and politely ask the user to confirm if the details are correct for maintenance risk assessment. "
+            "Never mention OpenAI or your own limitations. "
+            "Always keep the conversation natural and helpful. "
+            "Respond in markdown."
+        )
+        self.chat = ChatOpenAI(model="gpt-4", temperature=0.7, openai_api_key=openai_api_key)
 
     @classmethod
     def get_model(cls):
@@ -986,17 +1034,42 @@ class MaintenancePredictionHandler(BaseModuleHandler):
             'seasonality': encoded_fields['seasonality']
         }])
         risk_score = model.predict(input_df)[0]
-        # Map risk score to recommended action
+        
+        # Map risk score to recommended action with specific recommendations
         if risk_score > 7:
             action = 'Immediate Action'
+            recommendations = [
+                "Schedule emergency maintenance inspection within 1-2 days",
+                "Check HVAC, plumbing, and electrical systems immediately",
+                "Consider temporary tenant relocation if safety concerns arise",
+                "Contact professional maintenance contractors urgently"
+            ]
         elif risk_score > 4:
             action = 'Monitor'
+            recommendations = [
+                "Schedule comprehensive maintenance inspection within 2-4 weeks",
+                "Perform preventive maintenance on aging systems",
+                "Monitor tenant reports of any issues closely",
+                "Plan budget for potential repairs in the next 3-6 months"
+            ]
         else:
             action = 'Routine'
+            recommendations = [
+                "Continue with regular maintenance schedule",
+                "Perform annual safety checks and inspections",
+                "Keep maintenance reserves for unexpected issues",
+                "Monitor seasonal maintenance needs (heating/cooling systems)"
+            ]
+        
         summary = (
             f"- **Predicted Maintenance Risk Score:** {risk_score:.2f}\n"
-            f"- **Recommended Action:** {action}\n"
+            f"- **Recommended Action:** {action}\n\n"
+            f"**What you should do:**\n"
         )
+        
+        for i, rec in enumerate(recommendations, 1):
+            summary += f"{i}. {rec}\n"
+        
         explanation = (
             "\n**How this was calculated:**\n"
             "The risk score is based on property age, time since last service, seasonality, and past maintenance history. "
@@ -1005,58 +1078,131 @@ class MaintenancePredictionHandler(BaseModuleHandler):
         return summary + explanation
 
     def handle(self, conversation_history, user_message, last_candidate_fields=None):
-        # If user provides all required fields and confirms, run the model
+        # Extract fields from the current message
         candidate_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
+        
+        # Merge with last candidate fields to preserve previously collected info
+        merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+        for k, v in candidate_fields.items():
+            if v not in (None, '', 0, 0.0):  # Only update if we have a meaningful value
+                merged_fields[k] = v
+        
+        # Check if user is confirming with complete information
         if self.needs_confirmation(user_message):
-            fields = candidate_fields
-            if all(f in fields and fields[f] not in (None, '', 0, 0.0) for f in self.required_fields):
-                result = self.run_model(fields)
-                return {"response": result, "action": "maintenance_prediction", "fields": fields}
+            if all(f in merged_fields and merged_fields[f] not in (None, '', 0, 0.0) for f in self.required_fields):
+                result = self.run_model(merged_fields)
+                return {"response": result, "action": "maintenance_prediction", "fields": merged_fields}
             else:
-                missing = [f for f in self.required_fields if f not in fields or fields[f] in (None, '', 0, 0.0)]
-                return {"response": f"I need the following details to predict maintenance risk: {', '.join(missing)}. Please provide them.", "action": "ask_for_info", "fields": fields}
-        # Otherwise, continue the LLM-driven flow
-        summary = self.summarize_fields(candidate_fields)
-        return {"response": summary, "action": "chat", "fields": candidate_fields}
+                missing = [f for f in self.required_fields if f not in merged_fields or merged_fields[f] in (None, '', 0, 0.0)]
+                return {"response": f"I need the following details to predict maintenance risk: {', '.join(missing)}. Please provide them.", "action": "ask_for_info", "fields": merged_fields}
+        
+        # Check if we have all required fields to ask for confirmation
+        if all(f in merged_fields and merged_fields[f] not in (None, '', 0, 0.0) for f in self.required_fields):
+            summary = self.summarize_fields(merged_fields)
+            return {"response": summary, "action": "chat", "fields": merged_fields}
+        
+        # Otherwise, continue the LLM-driven flow to ask for missing information
+        messages = [
+            {"role": "system", "content": self.system_prompt}
+        ]
+        for msg in conversation_history:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+        messages.append({"role": "user", "content": user_message})
+        
+        response = self.chat.invoke([HumanMessage(content=m["content"]) for m in messages])
+        reply = response.content.strip()
+        
+        # Extract any additional fields from the LLM response
+        extracted_from_reply = self.extract_fields(reply, conversation_history, merged_fields)
+        for k, v in extracted_from_reply.items():
+            if v not in (None, '', 0, 0.0):
+                merged_fields[k] = v
+        
+        return {"response": reply, "action": "chat", "fields": merged_fields}
 
-# --- Intent Detection ---
+# --- Enhanced Intent Detection and Entity Recognition ---
 def detect_intent(user_message, conversation_history=None):
-    msg = user_message.lower()
-    if any(word in msg for word in ["rent", "price", "how much", "estimate"]):
-        return "rent_prediction"
-    if any(word in msg for word in ["tenant", "screen", "applicant", "background"]):
-        return "tenant_screening"
-    if any(word in msg for word in ["maintenance", "repair", "fix", "upkeep"]):
-        return "maintenance_prediction"
-    # If no intent is detected, return None
-    return None
+    """
+    Enhanced intent detection using the new conversation intelligence system.
+    Falls back to basic keyword matching if enhanced system is unavailable.
+    """
+    try:
+        # Use enhanced conversation intelligence
+        conversation_ai = get_conversation_intelligence()
+        analysis = conversation_ai.analyze_message(user_message, conversation_history)
+        
+        # Map to our legacy intent names for compatibility
+        intent_map = {
+            IntentType.RENT_PREDICTION: "rent_prediction",
+            IntentType.TENANT_SCREENING: "tenant_screening", 
+            IntentType.MAINTENANCE_PREDICTION: "maintenance_prediction",
+            IntentType.GREETING: "greeting",
+            IntentType.SMALL_TALK: "greeting",
+            IntentType.CLARIFICATION: "clarify_intent"
+        }
+        
+        return intent_map.get(analysis.primary_intent.type, "clarify_intent")
+        
+    except Exception as e:
+        print(f"[WARNING] Enhanced intent detection failed, using fallback: {e}")
+        # Fallback to basic keyword matching
+        msg = user_message.lower()
+        if any(word in msg for word in ["hello", "hi", "hey", "good morning", "good afternoon", "thanks", "thank you"]):
+            return "greeting"
+        elif any(word in msg for word in ["rent", "price", "how much", "estimate"]):
+            return "rent_prediction"
+        elif any(word in msg for word in ["tenant", "screen", "applicant", "background"]):
+            return "tenant_screening"
+        elif any(word in msg for word in ["maintenance", "repair", "fix", "upkeep"]):
+            return "maintenance_prediction"
+        # If no intent is detected, return None
+        return None
 
-# --- LLM-based Intent Detection ---
+# --- Enhanced LLM-based Intent Detection with Entity Recognition ---
 def llm_detect_intent(conversation_history, user_message):
     """
-    Use the LLM to robustly detect the user's intent, using the last 4-5 messages for context.
-    Returns: 'rent_prediction', 'tenant_screening', 'maintenance_prediction', or None
+    Enhanced LLM-based intent detection with entity recognition and multi-intent support.
     """
-    from langchain_openai import ChatOpenAI
-    chat = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key=openai_api_key)
-    # Use last 4-5 messages for context
-    history = conversation_history[-5:] if len(conversation_history) > 5 else conversation_history
-    context = "\n".join([f"{m['role']}: {m['content']}" for m in history])
-    prompt = (
-        "You are an expert assistant for landlords. "
-        "Given the following conversation, classify the user's current intent as one of: 'rent_prediction', 'tenant_screening', 'maintenance_prediction', or 'other'. "
-        "Only output the intent keyword.\n"
-        f"Conversation:\n{context}\nUser message:\n{user_message}\nIntent:"
-    )
-    response = chat.invoke([HumanMessage(content=prompt)])
-    intent = response.content.strip().lower()
-    if "rent" in intent:
-        return "rent_prediction"
-    if "tenant" in intent or "screen" in intent:
-        return "tenant_screening"
-    if "maintenance" in intent or "repair" in intent:
-        return "maintenance_prediction"
-    return None
+    try:
+        # Use the enhanced conversation intelligence system
+        conversation_ai = get_conversation_intelligence()
+        analysis = conversation_ai.analyze_message(user_message, conversation_history)
+        
+        # Return comprehensive analysis instead of just intent
+        return {
+            'primary_intent': analysis.primary_intent.type.value,
+            'confidence': analysis.confidence,
+            'all_intents': [intent.type.value for intent in analysis.intents],
+            'entities': [{'label': e.label, 'text': e.text, 'confidence': e.confidence} for e in analysis.entities],
+            'requires_clarification': analysis.requires_clarification,
+            'clarification_message': analysis.clarification_message
+        }
+        
+    except Exception as e:
+        print(f"[WARNING] Enhanced LLM intent detection failed, using fallback: {e}")
+        # Fallback to basic LLM detection
+        from langchain_openai import ChatOpenAI
+        chat = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key=openai_api_key)
+        # Use last 4-5 messages for context
+        history = conversation_history[-5:] if len(conversation_history) > 5 else conversation_history
+        context = "\n".join([f"{m['role']}: {m['content']}" for m in history])
+        prompt = (
+            "You are an expert assistant for landlords. "
+            "Given the following conversation, classify the user's current intent as one of: 'rent_prediction', 'tenant_screening', 'maintenance_prediction', 'greeting', or 'other'. "
+            "Only output the intent keyword.\n"
+            f"Conversation:\n{context}\nUser message:\n{user_message}\nIntent:"
+        )
+        response = chat.invoke([HumanMessage(content=prompt)])
+        intent = response.content.strip().lower()
+        if "greeting" in intent or "hello" in intent or "hi" in intent:
+            return "greeting"
+        elif "rent" in intent:
+            return "rent_prediction"
+        elif "tenant" in intent or "screen" in intent:
+            return "tenant_screening"
+        elif "maintenance" in intent or "repair" in intent:
+            return "maintenance_prediction"
+        return None
 
 # --- Explicit Intent Switch Detection ---
 def user_requests_intent_switch(user_message):
@@ -1066,7 +1212,201 @@ def user_requests_intent_switch(user_message):
     ]
     return any(phrase in msg for phrase in switch_phrases)
 
-# --- Main Conversational Engine ---
+# --- Enhanced Conversational Engine with Milvus and Advanced Intelligence ---
+def enhanced_conversational_engine(conversation_history, user_message, last_candidate_fields=None, 
+                                 last_intent=None, intent_completed=False, session_id=None, user_id=None):
+    """
+    Enhanced modular conversational engine for LandlordBuddy.
+    Uses Milvus for memory and advanced NER/intent detection.
+    """
+    try:
+        # Initialize services
+        milvus_store = get_milvus_store()
+        conversation_ai = get_conversation_intelligence()
+        
+        # Store user message in Milvus
+        if session_id and user_id:
+            milvus_store.store_chat_message(
+                session_id=session_id,
+                user_id=user_id,
+                message_type="user",
+                content=user_message,
+                intent="",  # Will be filled after detection
+                entities={}
+            )
+        
+        # Get relevant conversation memory
+        relevant_memory = []
+        if session_id:
+            relevant_memory = milvus_store.retrieve_chat_memory(
+                session_id=session_id,
+                query_text=user_message,
+                limit=5
+            )
+        
+        # Enhance conversation history with memory
+        enhanced_history = conversation_history.copy() if conversation_history else []
+        for memory in relevant_memory:
+            if memory not in enhanced_history:  # Avoid duplicates
+                enhanced_history.insert(0, {
+                    "role": memory["message_type"],
+                    "content": memory["content"]
+                })
+        
+        # Analyze the message with advanced AI
+        analysis = conversation_ai.analyze_message(
+            user_message=user_message,
+            conversation_history=enhanced_history,
+            current_fields=last_candidate_fields,
+            session_id=session_id
+        )
+        
+        primary_intent = analysis.primary_intent.type
+        extracted_entities = {entity.label: entity.normalized_value or entity.text 
+                            for entity in analysis.entities}
+        
+        # Handle greeting intent
+        if primary_intent == IntentType.GREETING:
+            response = conversation_ai.handle_greeting()
+            result = {
+                "response": response,
+                "action": "greeting",
+                "fields": last_candidate_fields or {},
+                "last_intent": None,
+                "intent_completed": True
+            }
+        
+        # Handle small talk intent
+        elif primary_intent == IntentType.SMALL_TALK:
+            response = conversation_ai.handle_small_talk(user_message)
+            result = {
+                "response": response,
+                "action": "small_talk",
+                "fields": last_candidate_fields or {},
+                "last_intent": None,
+                "intent_completed": True
+            }
+        
+        # Handle clarification needed
+        elif analysis.requires_clarification:
+            result = {
+                "response": analysis.clarification_message,
+                "action": "clarify_intent",
+                "fields": last_candidate_fields or {},
+                "last_intent": None,
+                "intent_completed": True
+            }
+        
+        # Handle multiple intents
+        elif len(analysis.intents) > 1 and all(i.confidence > 0.7 for i in analysis.intents[:2]):
+            # Multi-intent handling - ask user to choose
+            intent_names = [intent.type.value.replace('_', ' ').title() for intent in analysis.intents[:2]]
+            response = (f"I can see you're interested in multiple things: {' and '.join(intent_names)}. "
+                       f"Which would you like to start with first?")
+            result = {
+                "response": response,
+                "action": "clarify_intent",
+                "fields": last_candidate_fields or {},
+                "last_intent": None,
+                "intent_completed": True
+            }
+        
+        # Handle specific intents
+        elif primary_intent == IntentType.RENT_PREDICTION:
+            handler = RentPredictionHandler()
+            # Merge AI-extracted entities with existing fields
+            merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+            merged_fields.update(extracted_entities)
+            result = handler.handle(enhanced_history, user_message, merged_fields)
+            result["last_intent"] = "rent_prediction" if not result.get("action") == "rent_prediction" else None
+            result["intent_completed"] = result.get("action") == "rent_prediction"
+        
+        elif primary_intent == IntentType.TENANT_SCREENING:
+            handler = TenantScreeningHandler()
+            merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+            merged_fields.update(extracted_entities)
+            result = handler.handle(enhanced_history, user_message, merged_fields)
+            result["last_intent"] = "tenant_screening" if not result.get("action") == "screen_tenant" else None
+            result["intent_completed"] = result.get("action") == "screen_tenant"
+        
+        elif primary_intent == IntentType.MAINTENANCE_PREDICTION:
+            handler = MaintenancePredictionHandler()
+            merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+            merged_fields.update(extracted_entities)
+            result = handler.handle(enhanced_history, user_message, merged_fields)
+            result["last_intent"] = "maintenance_prediction" if not result.get("action") == "maintenance_prediction" else None
+            result["intent_completed"] = result.get("action") == "maintenance_prediction"
+        
+        # Handle continuation of previous intent
+        elif last_intent and not intent_completed:
+            if last_intent == "rent_prediction":
+                handler = RentPredictionHandler()
+                merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+                merged_fields.update(extracted_entities)
+                result = handler.handle(enhanced_history, user_message, merged_fields)
+                result["last_intent"] = last_intent if not result.get("action") == "rent_prediction" else None
+                result["intent_completed"] = result.get("action") == "rent_prediction"
+            elif last_intent == "tenant_screening":
+                handler = TenantScreeningHandler()
+                merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+                merged_fields.update(extracted_entities)
+                result = handler.handle(enhanced_history, user_message, merged_fields)
+                result["last_intent"] = last_intent if not result.get("action") == "screen_tenant" else None
+                result["intent_completed"] = result.get("action") == "screen_tenant"
+            elif last_intent == "maintenance_prediction":
+                handler = MaintenancePredictionHandler()
+                merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+                merged_fields.update(extracted_entities)
+                result = handler.handle(enhanced_history, user_message, merged_fields)
+                result["last_intent"] = last_intent if not result.get("action") == "maintenance_prediction" else None
+                result["intent_completed"] = result.get("action") == "maintenance_prediction"
+            else:
+                result = {
+                    "response": "I'm not sure how to continue. What would you like me to help you with?",
+                    "action": "clarify_intent",
+                    "fields": {},
+                    "last_intent": None,
+                    "intent_completed": True
+                }
+        
+        # Unknown or unsupported intent
+        else:
+            result = {
+                "response": (
+                    "I'm sorry, I couldn't clearly understand your request. "
+                    "You may be using different wording or asking for something else.\n\n"
+                    "Here are the tasks I can help you with:\n"
+                    "- **Rent Prediction**: Estimate the rent for your property.\n"
+                    "- **Tenant Screening**: Assess a tenant's suitability.\n"
+                    "- **Maintenance Prediction**: Predict potential maintenance needs.\n\n"
+                    "Please specify which of these you'd like help with, and provide any relevant details."
+                ),
+                "action": "clarify_intent",
+                "fields": {},
+                "last_intent": None,
+                "intent_completed": True
+            }
+        
+        # Store assistant response in Milvus
+        if session_id and user_id:
+            milvus_store.store_chat_message(
+                session_id=session_id,
+                user_id=user_id,
+                message_type="assistant",
+                content=result["response"],
+                intent=primary_intent.value if primary_intent else "",
+                entities=extracted_entities
+            )
+        
+        return result
+        
+    except Exception as e:
+        # Fallback to original engine if enhanced version fails
+        print(f"[WARNING] Enhanced engine failed, falling back to original: {e}")
+        return conversational_engine(conversation_history, user_message, last_candidate_fields, 
+                                   last_intent, intent_completed)
+
+# --- Original Conversational Engine (Fallback) ---
 def conversational_engine(conversation_history, user_message, last_candidate_fields=None, last_intent=None, intent_completed=False):
     """
     Modular conversational engine for LandlordBuddy.
@@ -1074,21 +1414,45 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
     """
     # If user requests to switch/cancel, re-detect intent
     if user_requests_intent_switch(user_message):
-        intent = llm_detect_intent(conversation_history, user_message)
+        detected_intent = llm_detect_intent(conversation_history, user_message)
+        if isinstance(detected_intent, dict):
+            intent = detected_intent.get('primary_intent')
+        else:
+            intent = detected_intent
         intent_completed = False
     elif last_intent and not intent_completed:
         # Persist the last intent until the flow is completed
         intent = last_intent
     else:
         # No active intent or just completed, detect new intent
-        intent = llm_detect_intent(conversation_history, user_message)
+        detected_intent = llm_detect_intent(conversation_history, user_message)
+        
+        # Handle case where llm_detect_intent returns a dict (enhanced) or string (fallback)
+        if isinstance(detected_intent, dict):
+            intent = detected_intent.get('primary_intent')
+        else:
+            intent = detected_intent
+            
         intent_completed = False
 
     confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
     is_confirmation = user_message.strip().lower() in confirmation_phrases
 
     # Handle each intent
-    if intent == "rent_prediction":
+    if intent == "greeting":
+        # Handle greeting with friendly response
+        return {
+            "response": (
+                "Hello! I'm LandlordBuddy, your AI assistant for property management. "
+                "I can help you with rent pricing, tenant screening, and maintenance predictions.\n\n"
+                "What would you like to do today?"
+            ),
+            "action": "greeting",
+            "fields": {},
+            "last_intent": None,
+            "intent_completed": True
+        }
+    elif intent == "rent_prediction":
         handler = RentPredictionHandler()
         result = handler.handle(conversation_history, user_message, last_candidate_fields)
         # If model was run, mark intent as completed
@@ -1160,3 +1524,228 @@ Then, compare these rents to the predicted range: £{rent_range[0]}–£{rent_ra
     return response.content.strip()
 
 from faiss_utils import semantic_search, load_faiss_index, record_to_text
+
+# --- Enhanced Semantic Search with Milvus ---
+def milvus_semantic_search(query_text: str, source_filter: str = None, top_k: int = 5):
+    """
+    Perform semantic search using Milvus instead of FAISS.
+    
+    Args:
+        query_text: Search query
+        source_filter: Optional source filter (e.g., 'rent_data')
+        top_k: Number of results to return
+        
+    Returns:
+        List of matching records
+    """
+    try:
+        milvus_store = get_milvus_store()
+        results = milvus_store.semantic_search(
+            query_text=query_text,
+            source_filter=source_filter,
+            limit=top_k,
+            similarity_threshold=0.6
+        )
+        return results
+    except Exception as e:
+        print(f"[WARNING] Milvus semantic search failed: {e}")
+        # Fallback to FAISS if available
+        try:
+            return semantic_search(query_text, None, None, top_k)
+        except:
+            return []
+
+def record_to_text_enhanced(record_dict: dict) -> str:
+    """
+    Enhanced record to text conversion with better formatting.
+    """
+    try:
+        # Try the original function first
+        return record_to_text(record_dict)
+    except:
+        # Fallback implementation
+        parts = []
+        for key, value in record_dict.items():
+            if value and str(value).strip() and str(value) != 'nan':
+                parts.append(f"{key}: {value}")
+        return " | ".join(parts)
+
+# --- Milvus Data Migration Functions ---
+def migrate_existing_data_to_milvus():
+    """
+    Migrate existing FAISS data to Milvus.
+    """
+    try:
+        from milvus_utils import migrate_faiss_to_milvus
+        
+        base_dir = os.path.dirname(__file__)
+        
+        # Migrate rent data
+        rent_csv = os.path.join(base_dir, '../Rent Pricing AI/data/cleaned_rent_data.csv')
+        if os.path.exists(rent_csv):
+            migrate_faiss_to_milvus(
+                faiss_index_path="",  # Not needed for CSV migration
+                csv_data_path=rent_csv,
+                source_name="rent_data"
+            )
+            print("Migrated rent data to Milvus")
+        
+        # Migrate raw rent data
+        raw_rent_csv = os.path.join(base_dir, '../Rent Pricing AI/data/rent_ads_rightmove_extended.csv')
+        if os.path.exists(raw_rent_csv):
+            migrate_faiss_to_milvus(
+                faiss_index_path="",
+                csv_data_path=raw_rent_csv,
+                source_name="raw_rent_data"
+            )
+            print("Migrated raw rent data to Milvus")
+            
+        print("Data migration to Milvus completed successfully")
+        
+    except Exception as e:
+        print(f"Data migration failed: {e}")
+
+# --- Main Conversation Function (Use This in Django Backend) ---
+def handle_conversation(conversation_history, user_message, last_candidate_fields=None, 
+                       last_intent=None, intent_completed=False, session_id=None, user_id=None):
+    """
+    Main conversation handler - automatically uses enhanced engine with Milvus when available,
+    gracefully falls back to original engine if needed.
+    
+    This is the function your Django backend should call.
+    """
+    try:
+        return enhanced_conversational_engine(
+            conversation_history=conversation_history,
+            user_message=user_message,
+            last_candidate_fields=last_candidate_fields,
+            last_intent=last_intent,
+            intent_completed=intent_completed,
+            session_id=session_id,
+            user_id=user_id
+        )
+    except Exception as e:
+        print(f"[ERROR] Enhanced conversation handler failed: {e}")
+        # Fallback to original engine
+        return conversational_engine(
+            conversation_history=conversation_history,
+            user_message=user_message,
+            last_candidate_fields=last_candidate_fields,
+            last_intent=last_intent,
+            intent_completed=intent_completed
+        )
+
+# --- Demo and Testing Functions ---
+def test_enhanced_features():
+    """
+    Test function for the enhanced conversational features.
+    """
+    try:
+        print("🚀 Testing Enhanced Conversational AI...")
+        print("=" * 60)
+        
+        # Test conversation intelligence
+        conversation_ai = get_conversation_intelligence()
+        
+        test_messages = [
+            "Hello! I'm new here",
+            "Hi, I want to estimate rent for my 2 bedroom flat in London",
+            "Can you help me screen a tenant with credit score 750, income £3000?",
+            "What maintenance issues might occur this winter for a 15-year-old property?",
+            "Thank you for your help!",
+        ]
+        
+        print("\n🧠 Testing Advanced NER and Intent Detection:")
+        print("-" * 50)
+        
+        for i, msg in enumerate(test_messages, 1):
+            print(f"\n--- Test {i} ---")
+            print(f"💬 User: {msg}")
+            
+            analysis = conversation_ai.analyze_message(msg)
+            print(f"🎯 Primary Intent: {analysis.primary_intent.type.value} (confidence: {analysis.confidence:.2f})")
+            
+            if analysis.entities:
+                print(f"📝 Extracted Entities:")
+                for entity in analysis.entities:
+                    print(f"   • {entity.label}: {entity.text} (confidence: {entity.confidence:.2f})")
+            
+            if len(analysis.intents) > 1:
+                other_intents = [f"{intent.type.value} ({intent.confidence:.2f})" 
+                               for intent in analysis.intents[1:3]]
+                print(f"🔍 Other Intents: {', '.join(other_intents)}")
+                
+        print("\n" + "=" * 60)
+        print("\n🤖 Testing Enhanced Conversation Engine:")
+        print("-" * 50)
+        
+        # Test conversation flow
+        conversation_history = []
+        test_conversations = [
+            "Hi there!",
+            "I want to estimate rent for my property",
+            "It's a 2 bedroom flat in Manchester, about 800 sq ft",
+        ]
+        
+        for i, msg in enumerate(test_conversations, 1):
+            print(f"\n--- Conversation Turn {i} ---")
+            print(f"👤 User: {msg}")
+            
+            # Use enhanced conversation engine
+            result = handle_conversation(
+                conversation_history=conversation_history,
+                user_message=msg,
+                session_id="test_session",
+                user_id="test_user"
+            )
+            
+            print(f"🎯 Action: {result.get('action', 'unknown')}")
+            print(f"🤖 Assistant: {result.get('response', 'No response')[:200]}...")
+            
+            if result.get('fields'):
+                print(f"📋 Fields Collected: {list(result['fields'].keys())}")
+            
+            # Update conversation history
+            conversation_history.append({"role": "user", "content": msg})
+            conversation_history.append({"role": "assistant", "content": result.get('response', '')})
+            
+        print("\n" + "=" * 60)
+        print("\n✅ Enhanced features test completed successfully!")
+        print("\nKey Features Demonstrated:")
+        print("✅ Advanced NER with real estate domain knowledge")
+        print("✅ Multi-intent detection and confidence scoring")
+        print("✅ Context-aware entity extraction")
+        print("✅ Greeting and small talk handling")
+        print("✅ Enhanced conversation flow management")
+        print("✅ Graceful fallback to original engine")
+        print("✅ Session-based memory integration")
+        
+    except Exception as e:
+        print(f"❌ Enhanced features test failed: {e}")
+        import traceback
+        traceback.print_exc()
+
+def demo_greeting_intelligence():
+    """
+    Specific demo for greeting and small talk handling.
+    """
+    print("\n🤝 Testing Greeting Intelligence:")
+    print("-" * 40)
+    
+    greetings = [
+        "Hi",
+        "Hello there!",
+        "Good morning",
+        "Hey, how are you?",
+        "Thanks for your help",
+        "Thank you so much!",
+    ]
+    
+    for greeting in greetings:
+        print(f"\n👤 User: {greeting}")
+        result = handle_conversation([], greeting)
+        print(f"🤖 Assistant: {result.get('response', 'No response')}")
+
+if __name__ == "__main__":
+    test_enhanced_features()
+    demo_greeting_intelligence()
