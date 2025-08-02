@@ -18,7 +18,7 @@ COPY backend/ .
 COPY ["AI Assistant/", "./AI_Assistant/"]
 
 # Create necessary directories
-RUN mkdir -p /app/media /app/static
+RUN mkdir -p /app/media /app/static /app/data
 
 # Set production environment
 ENV DJANGO_SETTINGS_MODULE=backend.production_settings
