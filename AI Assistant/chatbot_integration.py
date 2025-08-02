@@ -1312,30 +1312,37 @@ def enhanced_conversational_engine(conversation_history, user_message, last_cand
     Enhanced modular conversational engine for LandlordBuddy.
     Uses Milvus for memory and advanced NER/intent detection.
     """
+    import time
+    
     try:
-        print(f"[DEBUG] Enhanced engine starting for message: {user_message}")
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{timestamp}] ENHANCED_ENGINE_START")
+        print(f"[ENHANCED_ENGINE] Starting for message: '{user_message}'")
         
         # Initialize services with robust error handling
         milvus_store = None
         conversation_ai = None
         
+        print(f"[ENHANCED_ENGINE] Step 1: Initializing Milvus store...")
         try:
             milvus_store = get_milvus_store()
-            print(f"[DEBUG] Milvus store initialized successfully")
+            print(f"[ENHANCED_ENGINE] Milvus store initialized successfully")
         except Exception as e:
-            print(f"[WARNING] Milvus store failed to initialize: {e}")
+            print(f"[ENHANCED_ENGINE] WARNING: Milvus store failed to initialize: {e}")
             milvus_store = None
         
+        print(f"[ENHANCED_ENGINE] Step 2: Initializing Conversation AI...")
         try:
             conversation_ai = get_conversation_intelligence()
-            print(f"[DEBUG] Conversation AI initialized successfully")
+            print(f"[ENHANCED_ENGINE] Conversation AI initialized successfully")
         except Exception as e:
-            print(f"[WARNING] Conversation AI failed to initialize: {e}")
+            print(f"[ENHANCED_ENGINE] WARNING: Conversation AI failed to initialize: {e}")
             # Fallback immediately to basic engine if conversation AI fails
-            print(f"[INFO] Falling back to basic conversational engine")
+            print(f"[ENHANCED_ENGINE] Falling back to basic conversational engine")
             return conversational_engine(conversation_history, user_message, last_candidate_fields, 
                                        last_intent, intent_completed)
         
+        print(f"[ENHANCED_ENGINE] Step 3: Storing user message in Milvus...")
         # Store user message in Milvus if available
         if milvus_store and session_id and user_id:
             try:
@@ -1347,10 +1354,13 @@ def enhanced_conversational_engine(conversation_history, user_message, last_cand
                     intent="",  # Will be filled after detection
                     entities={}
                 )
-                print(f"[DEBUG] User message stored in Milvus")
+                print(f"[ENHANCED_ENGINE] User message stored in Milvus successfully")
             except Exception as e:
-                print(f"[WARNING] Failed to store message in Milvus: {e}")
+                print(f"[ENHANCED_ENGINE] WARNING: Failed to store message in Milvus: {e}")
+        else:
+            print(f"[ENHANCED_ENGINE] Skipping Milvus storage - missing store/session/user")
         
+        print(f"[ENHANCED_ENGINE] Step 4: Retrieving conversation memory...")
         # Get relevant conversation memory if available
         enhanced_history = conversation_history.copy() if conversation_history else []
         if milvus_store and session_id:
@@ -1366,10 +1376,13 @@ def enhanced_conversational_engine(conversation_history, user_message, last_cand
                             "role": memory["message_type"],
                             "content": memory["content"]
                         })
-                print(f"[DEBUG] Enhanced conversation history with {len(relevant_memory)} memories")
+                print(f"[ENHANCED_ENGINE] Enhanced conversation history with {len(relevant_memory)} memories")
             except Exception as e:
-                print(f"[WARNING] Failed to retrieve conversation memory: {e}")
+                print(f"[ENHANCED_ENGINE] WARNING: Failed to retrieve conversation memory: {e}")
+        else:
+            print(f"[ENHANCED_ENGINE] Using basic conversation history")
         
+        print(f"[ENHANCED_ENGINE] Step 5: Analyzing message with advanced AI...")
         # Analyze the message with advanced AI
         try:
             analysis = conversation_ai.analyze_message(
@@ -1382,11 +1395,12 @@ def enhanced_conversational_engine(conversation_history, user_message, last_cand
             primary_intent = analysis.primary_intent.type
             extracted_entities = {entity.label: entity.normalized_value or entity.text 
                                 for entity in analysis.entities}
-            print(f"[DEBUG] Message analysis completed - intent: {primary_intent}")
+            print(f"[ENHANCED_ENGINE] Message analysis completed - intent: {primary_intent}")
+            print(f"[ENHANCED_ENGINE] Extracted entities: {list(extracted_entities.keys())}")
         except Exception as e:
-            print(f"[ERROR] Message analysis failed: {e}")
+            print(f"[ENHANCED_ENGINE] ERROR: Message analysis failed: {e}")
             # Fallback to basic engine if analysis fails
-            print(f"[INFO] Falling back to basic conversational engine due to analysis failure")
+            print(f"[ENHANCED_ENGINE] Falling back to basic conversational engine due to analysis failure")
             return conversational_engine(conversation_history, user_message, last_candidate_fields, 
                                        last_intent, intent_completed)
         
@@ -1584,12 +1598,17 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
     Routes to the correct module handler based on detected intent.
     This is the bulletproof fallback engine that should NEVER fail.
     """
-    print(f"[DEBUG] Basic engine processing message: {user_message}")
+    import time
+    
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{timestamp}] BASIC_ENGINE_START")
+    print(f"[BASIC_ENGINE] Processing message: '{user_message}'")
     
     # Handle simple greetings first (bulletproof - no external dependencies)
     simple_greetings = ["hi", "hello", "hey", "good morning", "good afternoon", "good evening", "greetings"]
+    print(f"[BASIC_ENGINE] Step 1: Checking for simple greetings...")
     if user_message.strip().lower() in simple_greetings:
-        print(f"[DEBUG] Handling simple greeting")
+        print(f"[BASIC_ENGINE] Detected simple greeting: '{user_message.strip().lower()}'")
         return {
             "response": (
                 "Hello! I'm LandlordBuddy, your AI assistant for property management. "
@@ -1604,16 +1623,33 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
     
     # Handle maintenance requests immediately (bulletproof pattern matching)
     maintenance_keywords = ["maintenance", "repair", "fix", "upkeep", "predict", "prediction"]
+    print(f"[BASIC_ENGINE] Step 2: Checking for maintenance keywords...")
     if any(keyword in user_message.lower() for keyword in maintenance_keywords):
-        print(f"[DEBUG] Detected maintenance intent")
+        print(f"[BASIC_ENGINE] Detected maintenance intent with keywords: {[kw for kw in maintenance_keywords if kw in user_message.lower()]}")
         try:
+            print(f"[BASIC_ENGINE] Initializing MaintenancePredictionHandler...")
             handler = MaintenancePredictionHandler()
+            print(f"[BASIC_ENGINE] MaintenancePredictionHandler initialized successfully")
+            
+            print(f"[BASIC_ENGINE] Calling handler.handle()...")
             result = handler.handle(conversation_history, user_message, last_candidate_fields)
+            print(f"[BASIC_ENGINE] MaintenancePredictionHandler completed with action: {result.get('action')}")
+            
             if result.get("action") == "maintenance_prediction":
+                print(f"[BASIC_ENGINE] Maintenance prediction completed successfully")
                 intent_completed = True
+            else:
+                print(f"[BASIC_ENGINE] Maintenance prediction in progress")
+                intent_completed = False
+                
             return {**result, "last_intent": "maintenance_prediction" if not intent_completed else None, "intent_completed": intent_completed}
         except Exception as e:
-            print(f"[ERROR] Maintenance handler failed: {e}")
+            print(f"[BASIC_ENGINE] ERROR: Maintenance handler failed: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            # Emergency fallback for maintenance
+            print(f"[BASIC_ENGINE] Using emergency maintenance fallback")
             return {
                 "response": (
                     "I can help you with maintenance predictions. "
@@ -1626,11 +1662,13 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
                 "intent_completed": False
             }
     
+    print(f"[BASIC_ENGINE] Step 3: Advanced intent detection...")
     # Try advanced intent detection with fallback
     intent = None
     try:
         # If user requests to switch/cancel, re-detect intent
         if user_requests_intent_switch(user_message):
+            print(f"[BASIC_ENGINE] User requested intent switch")
             detected_intent = llm_detect_intent(conversation_history, user_message)
             if isinstance(detected_intent, dict):
                 intent = detected_intent.get('primary_intent')
@@ -1638,9 +1676,11 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
                 intent = detected_intent
             intent_completed = False
         elif last_intent and not intent_completed:
+            print(f"[BASIC_ENGINE] Continuing previous intent: {last_intent}")
             # Persist the last intent until the flow is completed
             intent = last_intent
         else:
+            print(f"[BASIC_ENGINE] Detecting new intent...")
             # No active intent or just completed, detect new intent
             detected_intent = llm_detect_intent(conversation_history, user_message)
             
@@ -1651,9 +1691,11 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
                 intent = detected_intent
                 
             intent_completed = False
+        print(f"[BASIC_ENGINE] Intent detection result: {intent}")
     except Exception as e:
-        print(f"[WARNING] Intent detection failed: {e}")
+        print(f"[BASIC_ENGINE] WARNING: Intent detection failed: {e}")
         # Use simple keyword-based intent detection as last resort
+        print(f"[BASIC_ENGINE] Using fallback keyword-based intent detection")
         msg = user_message.lower()
         if any(word in msg for word in ["rent", "price", "how much", "estimate"]):
             intent = "rent_prediction"
@@ -1663,14 +1705,16 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
             intent = "maintenance_prediction"
         else:
             intent = "greeting"  # Default to greeting if unclear
+        print(f"[BASIC_ENGINE] Fallback intent: {intent}")
     
-    print(f"[DEBUG] Detected intent: {intent}")
-    
+    print(f"[BASIC_ENGINE] Step 4: Processing intent '{intent}'")
     confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
     is_confirmation = user_message.strip().lower() in confirmation_phrases
+    print(f"[BASIC_ENGINE] Is confirmation: {is_confirmation}")
 
     # Handle each intent with bulletproof error handling
     if intent == "greeting":
+        print(f"[BASIC_ENGINE] Processing greeting intent")
         return {
             "response": (
                 "Hello! I'm LandlordBuddy, your AI assistant for property management. "
@@ -1683,15 +1727,19 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
             "intent_completed": True
         }
     elif intent == "rent_prediction":
+        print(f"[BASIC_ENGINE] Processing rent prediction intent")
         try:
             handler = RentPredictionHandler()
             result = handler.handle(conversation_history, user_message, last_candidate_fields)
             # If model was run, mark intent as completed
             if result.get("action") == "screen_tenant" or result.get("action") == "rent_prediction":
                 intent_completed = True
+            print(f"[BASIC_ENGINE] Rent prediction completed with action: {result.get('action')}")
             return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
         except Exception as e:
-            print(f"[ERROR] Rent prediction handler failed: {e}")
+            print(f"[BASIC_ENGINE] ERROR: Rent prediction handler failed: {e}")
+            import traceback
+            traceback.print_exc()
             return {
                 "response": "I can help you predict rent prices. Please provide property details like address, bedrooms, bathrooms, and size.",
                 "action": "chat",
@@ -1700,14 +1748,18 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
                 "intent_completed": False
             }
     elif intent == "tenant_screening":
+        print(f"[BASIC_ENGINE] Processing tenant screening intent")
         try:
             handler = TenantScreeningHandler()
             result = handler.handle(conversation_history, user_message, last_candidate_fields)
             if result.get("action") == "screen_tenant":
                 intent_completed = True
+            print(f"[BASIC_ENGINE] Tenant screening completed with action: {result.get('action')}")
             return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
         except Exception as e:
-            print(f"[ERROR] Tenant screening handler failed: {e}")
+            print(f"[BASIC_ENGINE] ERROR: Tenant screening handler failed: {e}")
+            import traceback
+            traceback.print_exc()
             return {
                 "response": "I can help you screen tenants. Please provide credit score, income, rent amount, employment status, and eviction record.",
                 "action": "chat",
@@ -1716,14 +1768,18 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
                 "intent_completed": False
             }
     elif intent == "maintenance_prediction":
+        print(f"[BASIC_ENGINE] Processing maintenance prediction intent (secondary path)")
         try:
             handler = MaintenancePredictionHandler()
             result = handler.handle(conversation_history, user_message, last_candidate_fields)
             if result.get("action") == "maintenance_prediction" or result.get("action") == "maintenance_alerts":
                 intent_completed = True
+            print(f"[BASIC_ENGINE] Maintenance prediction completed with action: {result.get('action')}")
             return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
         except Exception as e:
-            print(f"[ERROR] Maintenance prediction handler failed: {e}")
+            print(f"[BASIC_ENGINE] ERROR: Maintenance prediction handler failed: {e}")
+            import traceback
+            traceback.print_exc()
             return {
                 "response": (
                     "I can help you predict maintenance needs. "
@@ -1736,6 +1792,7 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
                 "intent_completed": False
             }
     else:
+        print(f"[BASIC_ENGINE] Processing unknown/clarify intent")
         # Ultimate fallback - should never fail
         return {
             "response": (
@@ -1880,11 +1937,27 @@ def handle_conversation(conversation_history, user_message, last_candidate_field
     This is the function your Django backend should call.
     This function is designed to NEVER crash, no matter what happens.
     """
-    print(f"[DEBUG] Main conversation handler starting for message: '{user_message}'")
+    import time
+    import traceback
+    
+    # Ultra-detailed logging for production debugging
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    print(f"\n{'='*80}")
+    print(f"[{timestamp}] CONVERSATION START")
+    print(f"{'='*80}")
+    print(f"[CONVERSATION_START] User message: '{user_message}'")
+    print(f"[CONVERSATION_START] Session ID: {session_id}")
+    print(f"[CONVERSATION_START] User ID: {user_id}")
+    print(f"[CONVERSATION_START] Last intent: {last_intent}")
+    print(f"[CONVERSATION_START] Intent completed: {intent_completed}")
+    print(f"[CONVERSATION_START] Last candidate fields: {last_candidate_fields}")
+    print(f"[CONVERSATION_START] Conversation history length: {len(conversation_history) if conversation_history else 0}")
     
     # Immediate fallback for empty or None messages
     if not user_message or not user_message.strip():
-        print(f"[DEBUG] Empty message detected, returning default response")
+        print(f"[EMPTY_MESSAGE] Empty or None message detected")
+        print(f"[EMPTY_MESSAGE] Message type: {type(user_message)}")
+        print(f"[EMPTY_MESSAGE] Message repr: {repr(user_message)}")
         return {
             "response": "I didn't receive your message. Please try again.",
             "action": "error",
@@ -1895,7 +1968,16 @@ def handle_conversation(conversation_history, user_message, last_candidate_field
     
     # First, try the enhanced engine with comprehensive error handling
     try:
-        print(f"[DEBUG] Attempting enhanced conversational engine")
+        print(f"[ENHANCED_ENGINE] Attempting enhanced conversational engine")
+        print(f"[ENHANCED_ENGINE] Starting enhanced engine with parameters:")
+        print(f"[ENHANCED_ENGINE]   - conversation_history: {len(conversation_history) if conversation_history else 0} messages")
+        print(f"[ENHANCED_ENGINE]   - user_message: '{user_message}'")
+        print(f"[ENHANCED_ENGINE]   - last_candidate_fields: {last_candidate_fields}")
+        print(f"[ENHANCED_ENGINE]   - last_intent: {last_intent}")
+        print(f"[ENHANCED_ENGINE]   - intent_completed: {intent_completed}")
+        print(f"[ENHANCED_ENGINE]   - session_id: {session_id}")
+        print(f"[ENHANCED_ENGINE]   - user_id: {user_id}")
+        
         result = enhanced_conversational_engine(
             conversation_history=conversation_history,
             user_message=user_message,
@@ -1905,20 +1987,33 @@ def handle_conversation(conversation_history, user_message, last_candidate_field
             session_id=session_id,
             user_id=user_id
         )
-        print(f"[DEBUG] Enhanced engine succeeded with action: {result.get('action')}")
+        print(f"[ENHANCED_ENGINE] SUCCESS - Enhanced engine returned successfully")
+        print(f"[ENHANCED_ENGINE] Result action: {result.get('action')}")
+        print(f"[ENHANCED_ENGINE] Result response length: {len(result.get('response', ''))}")
+        print(f"[ENHANCED_ENGINE] Result fields: {list(result.get('fields', {}).keys())}")
+        print(f"[{timestamp}] CONVERSATION SUCCESS - Enhanced Engine")
+        print(f"{'='*80}\n")
         return result
     except ImportError as e:
-        print(f"[WARNING] Enhanced engine import error: {e}")
-        print(f"[INFO] Falling back to basic engine due to import issues")
+        print(f"[ENHANCED_ENGINE] IMPORT_ERROR: {e}")
+        print(f"[ENHANCED_ENGINE] Falling back to basic engine due to import issues")
+        traceback.print_exc()
     except Exception as e:
-        print(f"[WARNING] Enhanced engine failed: {e}")
-        print(f"[INFO] Falling back to basic engine due to unexpected error")
-        import traceback
+        print(f"[ENHANCED_ENGINE] UNEXPECTED_ERROR: {e}")
+        print(f"[ENHANCED_ENGINE] Error type: {type(e).__name__}")
+        print(f"[ENHANCED_ENGINE] Falling back to basic engine due to unexpected error")
         traceback.print_exc()
     
     # Fallback to basic engine with bulletproof error handling
     try:
-        print(f"[DEBUG] Using basic conversational engine")
+        print(f"[BASIC_ENGINE] Using basic conversational engine")
+        print(f"[BASIC_ENGINE] Starting basic engine with parameters:")
+        print(f"[BASIC_ENGINE]   - conversation_history: {len(conversation_history) if conversation_history else 0} messages")
+        print(f"[BASIC_ENGINE]   - user_message: '{user_message}'")
+        print(f"[BASIC_ENGINE]   - last_candidate_fields: {last_candidate_fields}")
+        print(f"[BASIC_ENGINE]   - last_intent: {last_intent}")
+        print(f"[BASIC_ENGINE]   - intent_completed: {intent_completed}")
+        
         result = conversational_engine(
             conversation_history=conversation_history,
             user_message=user_message,
@@ -1926,18 +2021,30 @@ def handle_conversation(conversation_history, user_message, last_candidate_field
             last_intent=last_intent,
             intent_completed=intent_completed
         )
-        print(f"[DEBUG] Basic engine succeeded with action: {result.get('action')}")
+        print(f"[BASIC_ENGINE] SUCCESS - Basic engine returned successfully")
+        print(f"[BASIC_ENGINE] Result action: {result.get('action')}")
+        print(f"[BASIC_ENGINE] Result response length: {len(result.get('response', ''))}")
+        print(f"[BASIC_ENGINE] Result fields: {list(result.get('fields', {}).keys())}")
+        print(f"[{timestamp}] CONVERSATION SUCCESS - Basic Engine")
+        print(f"{'='*80}\n")
         return result
     except Exception as e:
-        print(f"[ERROR] Basic engine also failed: {e}")
-        import traceback
+        print(f"[BASIC_ENGINE] CRITICAL_ERROR: {e}")
+        print(f"[BASIC_ENGINE] Error type: {type(e).__name__}")
+        print(f"[BASIC_ENGINE] Basic engine also failed - this should never happen!")
         traceback.print_exc()
         
         # Ultimate emergency fallback - should absolutely never fail
-        print(f"[EMERGENCY] Using emergency fallback response")
+        print(f"[EMERGENCY_FALLBACK] Activating emergency response system")
+        print(f"[EMERGENCY_FALLBACK] User message analysis:")
+        print(f"[EMERGENCY_FALLBACK]   - Message: '{user_message}'")
+        print(f"[EMERGENCY_FALLBACK]   - Length: {len(user_message)}")
+        print(f"[EMERGENCY_FALLBACK]   - Lowercase: '{user_message.lower()}'")
+        print(f"[EMERGENCY_FALLBACK]   - Stripped: '{user_message.strip()}'")
         
         # Handle simple greetings manually
         if user_message.strip().lower() in ["hi", "hello", "hey", "good morning", "good afternoon"]:
+            print(f"[EMERGENCY_FALLBACK] Detected simple greeting")
             return {
                 "response": (
                     "Hello! I'm LandlordBuddy, your AI assistant for property management. "
@@ -1951,7 +2058,9 @@ def handle_conversation(conversation_history, user_message, last_candidate_field
             }
         
         # Handle maintenance requests manually
-        if any(word in user_message.lower() for word in ["maintenance", "repair", "predict", "prediction"]):
+        maintenance_keywords = ["maintenance", "repair", "predict", "prediction"]
+        if any(word in user_message.lower() for word in maintenance_keywords):
+            print(f"[EMERGENCY_FALLBACK] Detected maintenance request")
             return {
                 "response": (
                     "I can help you with maintenance predictions. "
@@ -1968,6 +2077,9 @@ def handle_conversation(conversation_history, user_message, last_candidate_field
             }
         
         # Generic helpful response
+        print(f"[EMERGENCY_FALLBACK] Using generic helpful response")
+        print(f"[{timestamp}] CONVERSATION EMERGENCY_FALLBACK")
+        print(f"{'='*80}\n")
         return {
             "response": (
                 "I apologize, but I'm experiencing some technical difficulties. "
