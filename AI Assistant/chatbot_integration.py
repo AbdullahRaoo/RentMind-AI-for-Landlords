@@ -1313,50 +1313,82 @@ def enhanced_conversational_engine(conversation_history, user_message, last_cand
     Uses Milvus for memory and advanced NER/intent detection.
     """
     try:
-        # Initialize services
-        milvus_store = get_milvus_store()
-        conversation_ai = get_conversation_intelligence()
+        print(f"[DEBUG] Enhanced engine starting for message: {user_message}")
         
-        # Store user message in Milvus
-        if session_id and user_id:
-            milvus_store.store_chat_message(
-                session_id=session_id,
-                user_id=user_id,
-                message_type="user",
-                content=user_message,
-                intent="",  # Will be filled after detection
-                entities={}
-            )
+        # Initialize services with robust error handling
+        milvus_store = None
+        conversation_ai = None
         
-        # Get relevant conversation memory
-        relevant_memory = []
-        if session_id:
-            relevant_memory = milvus_store.retrieve_chat_memory(
-                session_id=session_id,
-                query_text=user_message,
-                limit=5
-            )
+        try:
+            milvus_store = get_milvus_store()
+            print(f"[DEBUG] Milvus store initialized successfully")
+        except Exception as e:
+            print(f"[WARNING] Milvus store failed to initialize: {e}")
+            milvus_store = None
         
-        # Enhance conversation history with memory
+        try:
+            conversation_ai = get_conversation_intelligence()
+            print(f"[DEBUG] Conversation AI initialized successfully")
+        except Exception as e:
+            print(f"[WARNING] Conversation AI failed to initialize: {e}")
+            # Fallback immediately to basic engine if conversation AI fails
+            print(f"[INFO] Falling back to basic conversational engine")
+            return conversational_engine(conversation_history, user_message, last_candidate_fields, 
+                                       last_intent, intent_completed)
+        
+        # Store user message in Milvus if available
+        if milvus_store and session_id and user_id:
+            try:
+                milvus_store.store_chat_message(
+                    session_id=session_id,
+                    user_id=user_id,
+                    message_type="user",
+                    content=user_message,
+                    intent="",  # Will be filled after detection
+                    entities={}
+                )
+                print(f"[DEBUG] User message stored in Milvus")
+            except Exception as e:
+                print(f"[WARNING] Failed to store message in Milvus: {e}")
+        
+        # Get relevant conversation memory if available
         enhanced_history = conversation_history.copy() if conversation_history else []
-        for memory in relevant_memory:
-            if memory not in enhanced_history:  # Avoid duplicates
-                enhanced_history.insert(0, {
-                    "role": memory["message_type"],
-                    "content": memory["content"]
-                })
+        if milvus_store and session_id:
+            try:
+                relevant_memory = milvus_store.retrieve_chat_memory(
+                    session_id=session_id,
+                    query_text=user_message,
+                    limit=5
+                )
+                for memory in relevant_memory:
+                    if memory not in enhanced_history:  # Avoid duplicates
+                        enhanced_history.insert(0, {
+                            "role": memory["message_type"],
+                            "content": memory["content"]
+                        })
+                print(f"[DEBUG] Enhanced conversation history with {len(relevant_memory)} memories")
+            except Exception as e:
+                print(f"[WARNING] Failed to retrieve conversation memory: {e}")
         
         # Analyze the message with advanced AI
-        analysis = conversation_ai.analyze_message(
-            user_message=user_message,
-            conversation_history=enhanced_history,
-            current_fields=last_candidate_fields,
-            session_id=session_id
-        )
-        
-        primary_intent = analysis.primary_intent.type
-        extracted_entities = {entity.label: entity.normalized_value or entity.text 
-                            for entity in analysis.entities}
+        try:
+            analysis = conversation_ai.analyze_message(
+                user_message=user_message,
+                conversation_history=enhanced_history,
+                current_fields=last_candidate_fields,
+                session_id=session_id
+            )
+            
+            primary_intent = analysis.primary_intent.type
+            extracted_entities = {entity.label: entity.normalized_value or entity.text 
+                                for entity in analysis.entities}
+            print(f"[DEBUG] Message analysis completed - intent: {primary_intent}")
+        except Exception as e:
+            print(f"[ERROR] Message analysis failed: {e}")
+            # Fallback to basic engine if analysis fails
+            print(f"[INFO] Falling back to basic conversational engine due to analysis failure")
+            return conversational_engine(conversation_history, user_message, last_candidate_fields, 
+                                       last_intent, intent_completed)
         
         # Handle greeting intent
         if primary_intent == IntentType.GREETING:
@@ -1550,36 +1582,95 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
     """
     Modular conversational engine for LandlordBuddy.
     Routes to the correct module handler based on detected intent.
+    This is the bulletproof fallback engine that should NEVER fail.
     """
-    # If user requests to switch/cancel, re-detect intent
-    if user_requests_intent_switch(user_message):
-        detected_intent = llm_detect_intent(conversation_history, user_message)
-        if isinstance(detected_intent, dict):
-            intent = detected_intent.get('primary_intent')
+    print(f"[DEBUG] Basic engine processing message: {user_message}")
+    
+    # Handle simple greetings first (bulletproof - no external dependencies)
+    simple_greetings = ["hi", "hello", "hey", "good morning", "good afternoon", "good evening", "greetings"]
+    if user_message.strip().lower() in simple_greetings:
+        print(f"[DEBUG] Handling simple greeting")
+        return {
+            "response": (
+                "Hello! I'm LandlordBuddy, your AI assistant for property management. "
+                "I can help you with rent pricing, tenant screening, and maintenance predictions.\n\n"
+                "What would you like to do today?"
+            ),
+            "action": "greeting",
+            "fields": {},
+            "last_intent": None,
+            "intent_completed": True
+        }
+    
+    # Handle maintenance requests immediately (bulletproof pattern matching)
+    maintenance_keywords = ["maintenance", "repair", "fix", "upkeep", "predict", "prediction"]
+    if any(keyword in user_message.lower() for keyword in maintenance_keywords):
+        print(f"[DEBUG] Detected maintenance intent")
+        try:
+            handler = MaintenancePredictionHandler()
+            result = handler.handle(conversation_history, user_message, last_candidate_fields)
+            if result.get("action") == "maintenance_prediction":
+                intent_completed = True
+            return {**result, "last_intent": "maintenance_prediction" if not intent_completed else None, "intent_completed": intent_completed}
+        except Exception as e:
+            print(f"[ERROR] Maintenance handler failed: {e}")
+            return {
+                "response": (
+                    "I can help you with maintenance predictions. "
+                    "Please tell me about your property: the address, age in years, "
+                    "years since last maintenance, and current season."
+                ),
+                "action": "chat",
+                "fields": {},
+                "last_intent": "maintenance_prediction",
+                "intent_completed": False
+            }
+    
+    # Try advanced intent detection with fallback
+    intent = None
+    try:
+        # If user requests to switch/cancel, re-detect intent
+        if user_requests_intent_switch(user_message):
+            detected_intent = llm_detect_intent(conversation_history, user_message)
+            if isinstance(detected_intent, dict):
+                intent = detected_intent.get('primary_intent')
+            else:
+                intent = detected_intent
+            intent_completed = False
+        elif last_intent and not intent_completed:
+            # Persist the last intent until the flow is completed
+            intent = last_intent
         else:
-            intent = detected_intent
-        intent_completed = False
-    elif last_intent and not intent_completed:
-        # Persist the last intent until the flow is completed
-        intent = last_intent
-    else:
-        # No active intent or just completed, detect new intent
-        detected_intent = llm_detect_intent(conversation_history, user_message)
-        
-        # Handle case where llm_detect_intent returns a dict (enhanced) or string (fallback)
-        if isinstance(detected_intent, dict):
-            intent = detected_intent.get('primary_intent')
-        else:
-            intent = detected_intent
+            # No active intent or just completed, detect new intent
+            detected_intent = llm_detect_intent(conversation_history, user_message)
             
-        intent_completed = False
-
+            # Handle case where llm_detect_intent returns a dict (enhanced) or string (fallback)
+            if isinstance(detected_intent, dict):
+                intent = detected_intent.get('primary_intent')
+            else:
+                intent = detected_intent
+                
+            intent_completed = False
+    except Exception as e:
+        print(f"[WARNING] Intent detection failed: {e}")
+        # Use simple keyword-based intent detection as last resort
+        msg = user_message.lower()
+        if any(word in msg for word in ["rent", "price", "how much", "estimate"]):
+            intent = "rent_prediction"
+        elif any(word in msg for word in ["tenant", "screen", "applicant", "background"]):
+            intent = "tenant_screening"
+        elif any(word in msg for word in ["maintenance", "repair", "fix", "upkeep"]):
+            intent = "maintenance_prediction"
+        else:
+            intent = "greeting"  # Default to greeting if unclear
+    
+    print(f"[DEBUG] Detected intent: {intent}")
+    
     confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
     is_confirmation = user_message.strip().lower() in confirmation_phrases
 
-    # Handle each intent
+    # Handle each intent with bulletproof error handling
     if intent == "greeting":
-        # Handle greeting with friendly response
         return {
             "response": (
                 "Hello! I'm LandlordBuddy, your AI assistant for property management. "
@@ -1592,25 +1683,60 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
             "intent_completed": True
         }
     elif intent == "rent_prediction":
-        handler = RentPredictionHandler()
-        result = handler.handle(conversation_history, user_message, last_candidate_fields)
-        # If model was run, mark intent as completed
-        if result.get("action") == "screen_tenant" or result.get("action") == "rent_prediction":
-            intent_completed = True
-        return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
+        try:
+            handler = RentPredictionHandler()
+            result = handler.handle(conversation_history, user_message, last_candidate_fields)
+            # If model was run, mark intent as completed
+            if result.get("action") == "screen_tenant" or result.get("action") == "rent_prediction":
+                intent_completed = True
+            return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
+        except Exception as e:
+            print(f"[ERROR] Rent prediction handler failed: {e}")
+            return {
+                "response": "I can help you predict rent prices. Please provide property details like address, bedrooms, bathrooms, and size.",
+                "action": "chat",
+                "fields": {},
+                "last_intent": "rent_prediction",
+                "intent_completed": False
+            }
     elif intent == "tenant_screening":
-        handler = TenantScreeningHandler()
-        result = handler.handle(conversation_history, user_message, last_candidate_fields)
-        if result.get("action") == "screen_tenant":
-            intent_completed = True
-        return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
+        try:
+            handler = TenantScreeningHandler()
+            result = handler.handle(conversation_history, user_message, last_candidate_fields)
+            if result.get("action") == "screen_tenant":
+                intent_completed = True
+            return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
+        except Exception as e:
+            print(f"[ERROR] Tenant screening handler failed: {e}")
+            return {
+                "response": "I can help you screen tenants. Please provide credit score, income, rent amount, employment status, and eviction record.",
+                "action": "chat",
+                "fields": {},
+                "last_intent": "tenant_screening",
+                "intent_completed": False
+            }
     elif intent == "maintenance_prediction":
-        handler = MaintenancePredictionHandler()
-        result = handler.handle(conversation_history, user_message, last_candidate_fields)
-        if result.get("action") == "maintenance_prediction" or result.get("action") == "maintenance_alerts":
-            intent_completed = True
-        return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
+        try:
+            handler = MaintenancePredictionHandler()
+            result = handler.handle(conversation_history, user_message, last_candidate_fields)
+            if result.get("action") == "maintenance_prediction" or result.get("action") == "maintenance_alerts":
+                intent_completed = True
+            return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
+        except Exception as e:
+            print(f"[ERROR] Maintenance prediction handler failed: {e}")
+            return {
+                "response": (
+                    "I can help you predict maintenance needs. "
+                    "Please tell me about your property: the address, age in years, "
+                    "years since last maintenance, and current season."
+                ),
+                "action": "chat",
+                "fields": {},
+                "last_intent": "maintenance_prediction",
+                "intent_completed": False
+            }
     else:
+        # Ultimate fallback - should never fail
         return {
             "response": (
                 "I'm sorry, I couldn't clearly understand your request. "
@@ -1752,9 +1878,25 @@ def handle_conversation(conversation_history, user_message, last_candidate_field
     gracefully falls back to original engine if needed.
     
     This is the function your Django backend should call.
+    This function is designed to NEVER crash, no matter what happens.
     """
+    print(f"[DEBUG] Main conversation handler starting for message: '{user_message}'")
+    
+    # Immediate fallback for empty or None messages
+    if not user_message or not user_message.strip():
+        print(f"[DEBUG] Empty message detected, returning default response")
+        return {
+            "response": "I didn't receive your message. Please try again.",
+            "action": "error",
+            "fields": {},
+            "last_intent": None,
+            "intent_completed": True
+        }
+    
+    # First, try the enhanced engine with comprehensive error handling
     try:
-        return enhanced_conversational_engine(
+        print(f"[DEBUG] Attempting enhanced conversational engine")
+        result = enhanced_conversational_engine(
             conversation_history=conversation_history,
             user_message=user_message,
             last_candidate_fields=last_candidate_fields,
@@ -1763,16 +1905,83 @@ def handle_conversation(conversation_history, user_message, last_candidate_field
             session_id=session_id,
             user_id=user_id
         )
+        print(f"[DEBUG] Enhanced engine succeeded with action: {result.get('action')}")
+        return result
+    except ImportError as e:
+        print(f"[WARNING] Enhanced engine import error: {e}")
+        print(f"[INFO] Falling back to basic engine due to import issues")
     except Exception as e:
-        print(f"[ERROR] Enhanced conversation handler failed: {e}")
-        # Fallback to original engine
-        return conversational_engine(
+        print(f"[WARNING] Enhanced engine failed: {e}")
+        print(f"[INFO] Falling back to basic engine due to unexpected error")
+        import traceback
+        traceback.print_exc()
+    
+    # Fallback to basic engine with bulletproof error handling
+    try:
+        print(f"[DEBUG] Using basic conversational engine")
+        result = conversational_engine(
             conversation_history=conversation_history,
             user_message=user_message,
             last_candidate_fields=last_candidate_fields,
             last_intent=last_intent,
             intent_completed=intent_completed
         )
+        print(f"[DEBUG] Basic engine succeeded with action: {result.get('action')}")
+        return result
+    except Exception as e:
+        print(f"[ERROR] Basic engine also failed: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        # Ultimate emergency fallback - should absolutely never fail
+        print(f"[EMERGENCY] Using emergency fallback response")
+        
+        # Handle simple greetings manually
+        if user_message.strip().lower() in ["hi", "hello", "hey", "good morning", "good afternoon"]:
+            return {
+                "response": (
+                    "Hello! I'm LandlordBuddy, your AI assistant for property management. "
+                    "I can help you with rent pricing, tenant screening, and maintenance predictions. "
+                    "What would you like to do today?"
+                ),
+                "action": "greeting",
+                "fields": {},
+                "last_intent": None,
+                "intent_completed": True
+            }
+        
+        # Handle maintenance requests manually
+        if any(word in user_message.lower() for word in ["maintenance", "repair", "predict", "prediction"]):
+            return {
+                "response": (
+                    "I can help you with maintenance predictions. "
+                    "Please provide the following information:\n"
+                    "- Property address\n"
+                    "- Property age in years\n" 
+                    "- Years since last maintenance\n"
+                    "- Current season (Winter, Spring, Summer, Autumn)"
+                ),
+                "action": "chat",
+                "fields": {},
+                "last_intent": "maintenance_prediction",
+                "intent_completed": False
+            }
+        
+        # Generic helpful response
+        return {
+            "response": (
+                "I apologize, but I'm experiencing some technical difficulties. "
+                "I can help you with:\n\n"
+                "• **Rent Prediction** - Estimate property rental prices\n"
+                "• **Tenant Screening** - Assess tenant applications\n"
+                "• **Maintenance Prediction** - Predict property maintenance needs\n\n"
+                "Please let me know which service you'd like to use, and I'll do my best to help."
+            ),
+            "action": "chat",
+            "fields": {},
+            "last_intent": None,
+            "intent_completed": True
+        }
 
 # --- Demo and Testing Functions ---
 def test_enhanced_features():

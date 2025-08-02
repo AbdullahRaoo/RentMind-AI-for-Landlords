@@ -108,13 +108,41 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         self.candidate_fields.update(extracted)
                     break
         # Call the conversational engine with candidate fields and intent
-        result = chatbot_integration.conversational_engine(
-            self.conversation_history,
-            user_message,
-            last_candidate_fields=self.candidate_fields,
-            last_intent=user_intent,  # <-- Pass user intent if provided
-            intent_completed=False
-        )
+        try:
+            print(f"[DEBUG] Calling conversational engine with message: {user_message}")
+            result = chatbot_integration.handle_conversation(
+                conversation_history=self.conversation_history,
+                user_message=user_message,
+                last_candidate_fields=self.candidate_fields,
+                last_intent=user_intent,  # Pass user intent if provided
+                intent_completed=False
+            )
+            print(f"[DEBUG] Conversational engine result: {result.get('action', 'no_action')}")
+        except Exception as e:
+            print(f"[ERROR] Conversational engine failed: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            # Emergency fallback response
+            if user_message.strip().lower() in ["hi", "hello", "hey", "good morning", "good afternoon"]:
+                result = {
+                    "response": (
+                        "Hello! I'm LandlordBuddy, your AI assistant for property management. "
+                        "I can help you with rent pricing, tenant screening, and maintenance predictions. "
+                        "What would you like to do today?"
+                    ),
+                    "action": "greeting",
+                    "fields": {}
+                }
+            else:
+                result = {
+                    "response": (
+                        "I apologize, but I'm experiencing technical difficulties. "
+                        "Please try again in a moment. If the problem persists, please refresh the page."
+                    ),
+                    "action": "error", 
+                    "fields": {}
+                }
         print("[DEBUG] LLM result:", result)
         # If the model just returned new fields (e.g., after prediction), update candidate_fields
         if result.get('fields'):

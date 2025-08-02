@@ -12,7 +12,7 @@ a 700 sq foot flat, located at Holland Road, Kensington with code W14 having 2 b
 
 located at Holland Road and it's age is 50 years old and it's been 5 years since last maintiancec and it's winter now
 
-.\ailord\Scripts\Activate.ps1
+.\ailords\Scripts\Activate.ps1
 cd .\backend\ 
 daphne backend.asgi:application
 
