@@ -1,9 +1,5 @@
-version: '3.8      - "certificatesresolvers.myresolver.acme.email=abdullahsaleem75911@gmail.com"
-      - "certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "entrypoints.web.http.redirections.entrypoint.scheme=https"
-      - "global.checkNewVersion=false"
-      - "global.sendAnonymousUsage=false"
+version: '3.8'
+
 services:
   # Traefik reverse proxy with automatic SSL
   traefik:
@@ -15,10 +11,12 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=your-email@example.com"  # CHANGE THIS
+      - "--certificatesresolvers.myresolver.acme.email=abdullahsaleem75911@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--global.checkNewVersion=false"
+      - "--global.sendAnonymousUsage=false"
     ports:
       - "80:80"
       - "443:443"
