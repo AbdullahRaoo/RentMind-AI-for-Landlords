@@ -6,6 +6,11 @@ import sys
 import os
 import traceback
 
+print(f"[CRITICAL] ===== CONSUMERS.PY MODULE LOADING =====")
+print(f"[CRITICAL] This proves the consumers.py file is being imported!")
+print(f"[CRITICAL] Module path: {__file__}")
+print(f"[CRITICAL] ===== CONSUMERS.PY MODULE LOADING =====")
+
 # Bulletproof chatbot_integration import with fallback
 chatbot_integration = None
 import_error = None
