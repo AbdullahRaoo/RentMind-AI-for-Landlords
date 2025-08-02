@@ -7,7 +7,7 @@ import os
 
 # Dynamically import chatbot_integration from AI Assistant (support both local and Docker paths)
 ai_assistant_paths = [
-    os.path.abspath(os.path.join(os.path.dirname(__file__), '../../AI_Assistant/chatbot_integration.py')),  # Docker path
+    '/app/AI_Assistant/chatbot_integration.py',  # Docker path
     os.path.abspath(os.path.join(os.path.dirname(__file__), '../../AI Assistant/chatbot_integration.py'))   # Local path
 ]
 
