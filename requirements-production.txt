@@ -29,4 +29,6 @@ sentence-transformers
 pymilvus>=2.3.4
 
 # NLP packages - Ubuntu/Docker compatible
-# Note: spaCy will be handled gracefully in the code if not available
+spacy>=3.7,<3.8
+# Download English model for spaCy
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl

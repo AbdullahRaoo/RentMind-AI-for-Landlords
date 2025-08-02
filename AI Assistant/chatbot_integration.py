@@ -890,15 +890,44 @@ class MaintenancePredictionHandler(BaseModuleHandler):
     def get_model(cls):
         if cls._model is None:
             try:
+                print(f"[DEBUG] Starting maintenance model loading...")
+                
+                # Test scikit-learn import first
+                try:
+                    import sklearn
+                    print(f"[DEBUG] sklearn imported successfully, version: {sklearn.__version__}")
+                except Exception as sklearn_error:
+                    print(f"[ERROR] sklearn import failed: {sklearn_error}")
+                    raise Exception(f"sklearn not available: {sklearn_error}")
+                
+                # Test joblib import
                 import joblib
+                print(f"[DEBUG] joblib imported successfully, version: {joblib.__version__}")
+                
+                # Check if model file exists
+                if not os.path.exists(cls._model_path):
+                    raise FileNotFoundError(f"Model file not found: {cls._model_path}")
+                
                 print(f"[DEBUG] Loading maintenance model from: {cls._model_path}")
                 cls._model = joblib.load(cls._model_path)
                 print(f"[DEBUG] Model loaded successfully: {type(cls._model)}")
+                
+                # Test prediction capability with dummy data
+                import pandas as pd
+                test_df = pd.DataFrame([{
+                    'address': 0,
+                    'age_years': 50,
+                    'last_service_years_ago': 5,
+                    'seasonality': 'winter'
+                }])
+                test_prediction = cls._model.predict(test_df)
+                print(f"[DEBUG] Model test prediction successful: {test_prediction[0]}")
+                
             except Exception as e:
                 print(f"[ERROR] Failed to load maintenance model: {e}")
                 import traceback
                 traceback.print_exc()
-                raise
+                raise Exception(f"Maintenance model loading failed: {e}")
         return cls._model
 
     @classmethod
@@ -1394,12 +1423,39 @@ def enhanced_conversational_engine(conversation_history, user_message, last_cand
             result["intent_completed"] = result.get("action") == "screen_tenant"
         
         elif primary_intent == IntentType.MAINTENANCE_PREDICTION:
-            handler = MaintenancePredictionHandler()
-            merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
-            merged_fields.update(extracted_entities)
-            result = handler.handle(enhanced_history, user_message, merged_fields)
-            result["last_intent"] = "maintenance_prediction" if not result.get("action") == "maintenance_prediction" else None
-            result["intent_completed"] = result.get("action") == "maintenance_prediction"
+            try:
+                print(f"[DEBUG] Initializing maintenance handler...")
+                handler = MaintenancePredictionHandler()
+                print(f"[DEBUG] Maintenance handler initialized successfully")
+                
+                merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+                merged_fields.update(extracted_entities)
+                print(f"[DEBUG] Processing maintenance prediction with fields: {merged_fields}")
+                
+                result = handler.handle(enhanced_history, user_message, merged_fields)
+                print(f"[DEBUG] Maintenance handler completed with action: {result.get('action')}")
+                
+                result["last_intent"] = "maintenance_prediction" if not result.get("action") == "maintenance_prediction" else None
+                result["intent_completed"] = result.get("action") == "maintenance_prediction"
+                
+                print(f"[DEBUG] Maintenance prediction result prepared successfully")
+                
+            except Exception as e:
+                print(f"[ERROR] Maintenance prediction failed in enhanced engine: {e}")
+                import traceback
+                traceback.print_exc()
+                
+                # Return safe fallback response
+                result = {
+                    "response": (
+                        "I apologize, but I'm experiencing technical difficulties with the maintenance prediction service. "
+                        "Please try again in a moment. If the problem persists, you can contact support."
+                    ),
+                    "action": "error",
+                    "fields": {},
+                    "last_intent": None,
+                    "intent_completed": True
+                }
         
         # Handle continuation of previous intent
         elif last_intent and not intent_completed:
@@ -1418,12 +1474,31 @@ def enhanced_conversational_engine(conversation_history, user_message, last_cand
                 result["last_intent"] = last_intent if not result.get("action") == "screen_tenant" else None
                 result["intent_completed"] = result.get("action") == "screen_tenant"
             elif last_intent == "maintenance_prediction":
-                handler = MaintenancePredictionHandler()
-                merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
-                merged_fields.update(extracted_entities)
-                result = handler.handle(enhanced_history, user_message, merged_fields)
-                result["last_intent"] = last_intent if not result.get("action") == "maintenance_prediction" else None
-                result["intent_completed"] = result.get("action") == "maintenance_prediction"
+                try:
+                    print(f"[DEBUG] Continuing maintenance prediction with last_intent...")
+                    handler = MaintenancePredictionHandler()
+                    merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+                    merged_fields.update(extracted_entities)
+                    
+                    result = handler.handle(enhanced_history, user_message, merged_fields)
+                    result["last_intent"] = last_intent if not result.get("action") == "maintenance_prediction" else None
+                    result["intent_completed"] = result.get("action") == "maintenance_prediction"
+                    
+                except Exception as e:
+                    print(f"[ERROR] Maintenance prediction continuation failed: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    
+                    result = {
+                        "response": (
+                            "I apologize, but I'm experiencing technical difficulties with the maintenance prediction service. "
+                            "Please try again in a moment. If the problem persists, you can contact support."
+                        ),
+                        "action": "error",
+                        "fields": {},
+                        "last_intent": None,
+                        "intent_completed": True
+                    }
             else:
                 result = {
                     "response": "I'm not sure how to continue. What would you like me to help you with?",
