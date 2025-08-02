@@ -1,0 +1,3479 @@
+address,age_years,last_service_years_ago,seasonality,risk_score,recommended_action
+1800.0,43,5,Winter,5,Monitor
+809.0,11,0,Summer,4,Routine
+2716.0,87,0,Spring,4,Routine
+2222.0,84,5,Summer,2,Routine
+1879.0,90,0,Spring,4,Routine
+1011.0,103,6,Autumn,8,Immediate Action
+2765.0,118,5,Summer,7,Monitor
+2510.0,109,8,Spring,2,Routine
+2066.0,88,6,Spring,1,Routine
+239.0,76,8,Spring,1,Routine
+1063.0,25,1,Winter,5,Monitor
+2412.0,61,4,Winter,7,Monitor
+986.0,6,2,Summer,8,Immediate Action
+1217.0,73,6,Summer,6,Monitor
+1624.0,16,0,Spring,1,Routine
+1199.0,54,8,Autumn,6,Monitor
+1199.0,37,5,Winter,1,Routine
+2661.0,35,9,Summer,7,Monitor
+2161.0,33,3,Autumn,7,Monitor
+2292.0,101,0,Winter,3,Routine
+1061.0,88,9,Spring,7,Monitor
+809.0,29,6,Winter,8,Immediate Action
+526.0,63,8,Autumn,6,Monitor
+1993.0,7,1,Summer,4,Routine
+526.0,14,4,Spring,2,Routine
+2868.0,34,4,Autumn,4,Routine
+2250.0,79,9,Winter,4,Routine
+252.0,57,5,Spring,4,Routine
+2685.0,47,7,Winter,4,Routine
+1972.0,34,8,Summer,4,Routine
+1570.0,54,7,Winter,2,Routine
+308.0,42,2,Winter,6,Monitor
+2653.0,98,4,Spring,3,Routine
+1176.0,90,9,Autumn,7,Monitor
+1090.0,64,3,Spring,6,Monitor
+1586.0,56,9,Autumn,5,Monitor
+2656.0,78,7,Spring,2,Routine
+2584.0,12,4,Spring,6,Monitor
+139.0,104,9,Autumn,6,Monitor
+2487.0,19,4,Spring,5,Monitor
+927.0,8,7,Autumn,9,Immediate Action
+2544.0,37,7,Summer,2,Routine
+2544.0,19,7,Autumn,1,Routine
+2584.0,13,3,Autumn,7,Monitor
+2584.0,26,3,Summer,2,Routine
+2693.0,31,6,Autumn,7,Monitor
+2773.0,43,0,Autumn,3,Routine
+714.0,71,0,Winter,1,Routine
+1684.0,86,4,Spring,7,Monitor
+134.0,38,4,Winter,4,Routine
+421.0,79,9,Winter,1,Routine
+388.0,77,4,Summer,2,Routine
+1025.0,18,3,Summer,2,Routine
+2464.0,34,5,Summer,7,Monitor
+2464.0,35,6,Autumn,1,Routine
+1216.0,23,8,Summer,4,Routine
+1130.0,106,5,Spring,8,Immediate Action
+1392.0,27,1,Spring,8,Immediate Action
+302.0,42,4,Winter,6,Monitor
+1745.0,49,2,Spring,8,Immediate Action
+574.0,37,9,Winter,3,Routine
+1369.0,30,5,Spring,8,Immediate Action
+574.0,74,6,Summer,5,Monitor
+1536.0,53,2,Spring,9,Immediate Action
+1506.0,94,0,Summer,6,Monitor
+1506.0,97,0,Spring,2,Routine
+1531.0,22,6,Summer,4,Routine
+843.0,46,0,Autumn,7,Monitor
+2697.0,23,1,Summer,6,Monitor
+1839.0,82,3,Winter,7,Monitor
+2015.0,40,4,Summer,7,Monitor
+843.0,58,3,Autumn,8,Immediate Action
+763.0,38,9,Autumn,1,Routine
+763.0,24,0,Spring,5,Monitor
+763.0,89,6,Winter,7,Monitor
+894.0,30,2,Autumn,5,Monitor
+843.0,61,7,Winter,4,Routine
+2111.0,93,4,Summer,4,Routine
+2700.0,32,9,Spring,8,Immediate Action
+1095.0,8,1,Autumn,4,Routine
+575.0,32,9,Winter,7,Monitor
+270.0,52,8,Winter,3,Routine
+196.0,113,6,Summer,8,Immediate Action
+912.0,70,0,Autumn,7,Monitor
+842.0,71,7,Autumn,6,Monitor
+454.0,102,8,Summer,5,Monitor
+748.0,37,8,Spring,3,Routine
+675.0,74,1,Spring,8,Immediate Action
+2207.0,66,5,Winter,2,Routine
+2623.0,13,0,Spring,8,Immediate Action
+741.0,104,8,Winter,6,Monitor
+2508.0,9,0,Spring,3,Routine
+1959.0,26,3,Spring,7,Monitor
+1227.0,86,7,Summer,9,Immediate Action
+913.0,12,2,Winter,8,Immediate Action
+1637.0,77,7,Spring,5,Monitor
+2472.0,49,9,Spring,3,Routine
+195.0,80,8,Winter,3,Routine
+1984.0,115,0,Summer,2,Routine
+1594.0,119,2,Winter,1,Routine
+2387.0,112,1,Autumn,3,Routine
+1119.0,21,3,Spring,3,Routine
+2539.0,119,4,Autumn,4,Routine
+1046.0,25,3,Winter,4,Routine
+1622.0,78,8,Spring,3,Routine
+922.0,91,0,Spring,1,Routine
+2459.0,30,0,Winter,5,Monitor
+2703.0,56,7,Summer,3,Routine
+1082.0,22,4,Winter,8,Immediate Action
+1655.0,56,6,Autumn,8,Immediate Action
+2395.0,64,1,Autumn,6,Monitor
+814.0,63,8,Winter,3,Routine
+1220.0,102,8,Summer,8,Immediate Action
+2393.0,30,5,Winter,4,Routine
+1484.0,13,0,Autumn,6,Monitor
+1128.0,119,6,Autumn,3,Routine
+1279.0,65,1,Spring,2,Routine
+1347.0,35,2,Winter,3,Routine
+1875.0,24,8,Winter,4,Routine
+2821.0,72,2,Summer,3,Routine
+2770.0,116,8,Summer,6,Monitor
+1483.0,5,3,Summer,5,Monitor
+2461.0,108,2,Summer,9,Immediate Action
+504.0,111,4,Winter,5,Monitor
+1849.0,61,3,Winter,3,Routine
+946.0,27,0,Winter,4,Routine
+2055.0,72,3,Winter,2,Routine
+1681.0,81,1,Winter,8,Immediate Action
+1196.0,18,7,Autumn,1,Routine
+544.0,103,9,Spring,5,Monitor
+2652.0,74,1,Summer,4,Routine
+783.0,43,1,Summer,6,Monitor
+2112.0,42,9,Winter,8,Immediate Action
+1388.0,47,6,Winter,8,Immediate Action
+1891.0,95,4,Spring,4,Routine
+2162.0,59,4,Spring,7,Monitor
+820.0,25,4,Spring,1,Routine
+2878.0,115,8,Autumn,3,Routine
+1748.0,77,2,Winter,1,Routine
+151.0,15,2,Winter,1,Routine
+1466.0,113,1,Spring,2,Routine
+2388.0,92,7,Summer,6,Monitor
+229.0,43,2,Spring,5,Monitor
+165.0,113,3,Autumn,3,Routine
+2531.0,76,3,Spring,6,Monitor
+1628.0,74,2,Autumn,8,Immediate Action
+351.0,117,7,Winter,3,Routine
+1172.0,74,9,Winter,2,Routine
+126.0,89,1,Summer,5,Monitor
+1636.0,36,4,Summer,2,Routine
+2002.0,26,2,Winter,8,Immediate Action
+2022.0,108,0,Spring,1,Routine
+668.0,70,2,Summer,7,Monitor
+1886.0,6,6,Summer,6,Monitor
+1377.0,37,1,Summer,5,Monitor
+2874.0,79,9,Summer,2,Routine
+1070.0,25,0,Winter,6,Monitor
+228.0,23,6,Winter,4,Routine
+1767.0,82,7,Spring,5,Monitor
+108.0,20,4,Summer,4,Routine
+839.0,30,7,Winter,8,Immediate Action
+1845.0,81,2,Autumn,6,Monitor
+277.0,17,3,Spring,9,Immediate Action
+237.0,7,0,Summer,5,Monitor
+2820.0,94,6,Summer,8,Immediate Action
+632.0,73,7,Summer,9,Immediate Action
+2518.0,9,9,Spring,5,Monitor
+2427.0,91,5,Winter,8,Immediate Action
+676.0,42,9,Spring,6,Monitor
+1936.0,105,6,Winter,2,Routine
+1168.0,58,4,Autumn,7,Monitor
+534.0,78,4,Spring,6,Monitor
+812.0,112,6,Summer,4,Routine
+2793.0,21,4,Spring,8,Immediate Action
+2149.0,113,7,Summer,6,Monitor
+1548.0,70,4,Winter,6,Monitor
+648.0,18,2,Winter,6,Monitor
+2816.0,35,2,Summer,7,Monitor
+2194.0,68,7,Autumn,5,Monitor
+2215.0,39,0,Winter,6,Monitor
+2807.0,9,3,Spring,3,Routine
+1071.0,118,7,Autumn,2,Routine
+81.0,103,5,Winter,4,Routine
+1732.0,33,6,Spring,5,Monitor
+811.0,71,2,Winter,6,Monitor
+2003.0,89,5,Winter,7,Monitor
+2575.0,74,0,Summer,8,Immediate Action
+98.0,113,6,Spring,9,Immediate Action
+1396.0,66,7,Winter,9,Immediate Action
+753.0,109,0,Winter,7,Monitor
+1734.0,53,1,Autumn,6,Monitor
+1281.0,63,7,Summer,3,Routine
+81.0,110,8,Autumn,1,Routine
+1733.0,98,7,Autumn,1,Routine
+2120.0,45,7,Winter,5,Monitor
+670.0,65,8,Winter,6,Monitor
+1807.0,91,1,Spring,4,Routine
+1177.0,19,1,Autumn,6,Monitor
+469.0,27,9,Spring,4,Routine
+1269.0,32,8,Summer,8,Immediate Action
+1088.0,119,6,Summer,4,Routine
+2405.0,118,2,Autumn,6,Monitor
+1732.0,119,7,Spring,3,Routine
+2177.0,74,0,Spring,4,Routine
+2294.0,27,9,Spring,7,Monitor
+1420.0,33,4,Summer,4,Routine
+1792.0,49,8,Spring,1,Routine
+340.0,56,1,Winter,7,Monitor
+547.0,44,3,Winter,2,Routine
+1143.0,12,8,Winter,3,Routine
+230.0,40,8,Spring,7,Monitor
+2413.0,85,6,Spring,2,Routine
+1855.0,7,3,Winter,9,Immediate Action
+908.0,115,2,Summer,6,Monitor
+2707.0,85,7,Autumn,5,Monitor
+2862.0,25,9,Summer,3,Routine
+2593.0,49,2,Winter,6,Monitor
+2027.0,86,5,Autumn,2,Routine
+2707.0,9,1,Spring,6,Monitor
+2127.0,13,4,Autumn,3,Routine
+2379.0,32,5,Winter,9,Immediate Action
+665.0,88,4,Autumn,5,Monitor
+1735.0,37,2,Summer,4,Routine
+858.0,26,1,Autumn,3,Routine
+2294.0,38,8,Autumn,8,Immediate Action
+1191.0,48,6,Summer,6,Monitor
+892.0,9,4,Spring,4,Routine
+907.0,59,5,Autumn,1,Routine
+2254.0,93,3,Spring,7,Monitor
+4.0,46,8,Summer,9,Immediate Action
+895.0,78,2,Summer,8,Immediate Action
+2629.0,114,3,Spring,6,Monitor
+976.0,32,9,Summer,4,Routine
+72.0,33,5,Autumn,8,Immediate Action
+2707.0,62,7,Autumn,5,Monitor
+2706.0,25,0,Summer,7,Monitor
+507.0,22,8,Spring,7,Monitor
+1325.0,7,3,Winter,5,Monitor
+1017.0,91,9,Spring,5,Monitor
+2660.0,52,0,Spring,6,Monitor
+2234.0,16,2,Spring,3,Routine
+191.0,78,5,Autumn,8,Immediate Action
+96.0,104,6,Spring,9,Immediate Action
+1324.0,57,6,Autumn,5,Monitor
+2420.0,22,6,Winter,7,Monitor
+2054.0,82,9,Summer,6,Monitor
+284.0,70,1,Winter,3,Routine
+101.0,24,1,Spring,4,Routine
+2409.0,38,9,Summer,7,Monitor
+780.0,10,9,Winter,8,Immediate Action
+2707.0,48,1,Autumn,9,Immediate Action
+1084.0,17,0,Winter,6,Monitor
+2196.0,72,7,Winter,2,Routine
+192.0,82,5,Spring,9,Immediate Action
+835.0,65,8,Spring,2,Routine
+127.0,25,3,Spring,9,Immediate Action
+591.0,94,2,Spring,5,Monitor
+1123.0,114,2,Winter,9,Immediate Action
+2867.0,25,8,Winter,2,Routine
+1286.0,115,6,Winter,8,Immediate Action
+1689.0,114,8,Autumn,2,Routine
+149.0,109,3,Autumn,3,Routine
+583.0,87,1,Spring,9,Immediate Action
+990.0,38,0,Autumn,2,Routine
+1297.0,40,6,Spring,4,Routine
+422.0,77,2,Winter,8,Immediate Action
+256.0,60,1,Winter,2,Routine
+1360.0,19,2,Autumn,5,Monitor
+2585.0,90,1,Winter,7,Monitor
+924.0,52,8,Autumn,8,Immediate Action
+1074.0,15,6,Summer,4,Routine
+1932.0,91,2,Autumn,8,Immediate Action
+78.0,28,1,Summer,3,Routine
+589.0,50,6,Autumn,2,Routine
+2192.0,112,0,Summer,4,Routine
+122.0,63,2,Summer,9,Immediate Action
+424.0,35,3,Winter,5,Monitor
+2065.0,56,1,Spring,3,Routine
+435.0,83,3,Spring,9,Immediate Action
+1125.0,51,5,Spring,2,Routine
+702.0,112,6,Winter,6,Monitor
+570.0,58,3,Spring,7,Monitor
+1795.0,73,2,Summer,2,Routine
+2701.0,33,0,Spring,2,Routine
+1400.0,81,8,Winter,2,Routine
+2549.0,63,1,Autumn,7,Monitor
+1547.0,48,9,Summer,8,Immediate Action
+2828.0,110,3,Summer,7,Monitor
+879.0,6,1,Spring,5,Monitor
+2186.0,67,7,Summer,6,Monitor
+227.0,102,6,Summer,7,Monitor
+2599.0,41,9,Spring,9,Immediate Action
+1735.0,60,9,Spring,9,Immediate Action
+2560.0,17,3,Winter,3,Routine
+2287.0,92,7,Summer,2,Routine
+1852.0,27,0,Summer,3,Routine
+1083.0,56,8,Spring,4,Routine
+1746.0,13,5,Winter,9,Immediate Action
+1335.0,75,0,Spring,7,Monitor
+808.0,96,3,Autumn,6,Monitor
+259.0,69,5,Winter,7,Monitor
+1728.0,31,4,Autumn,9,Immediate Action
+1766.0,60,3,Spring,3,Routine
+1093.0,60,0,Autumn,1,Routine
+2550.0,75,5,Winter,4,Routine
+2690.0,112,9,Winter,6,Monitor
+1292.0,119,3,Spring,6,Monitor
+1932.0,77,1,Spring,2,Routine
+501.0,99,2,Summer,2,Routine
+449.0,27,8,Autumn,6,Monitor
+2000.0,18,2,Autumn,8,Immediate Action
+616.0,62,8,Spring,6,Monitor
+541.0,52,1,Summer,4,Routine
+451.0,14,9,Winter,6,Monitor
+1148.0,109,6,Winter,1,Routine
+2633.0,57,0,Autumn,9,Immediate Action
+1932.0,92,7,Autumn,9,Immediate Action
+463.0,27,4,Winter,5,Monitor
+1223.0,64,2,Spring,8,Immediate Action
+2229.0,49,9,Autumn,7,Monitor
+962.0,25,3,Summer,4,Routine
+2715.0,98,6,Summer,3,Routine
+1191.0,28,6,Spring,6,Monitor
+2103.0,29,7,Summer,3,Routine
+1285.0,57,6,Spring,8,Immediate Action
+1284.0,76,7,Summer,4,Routine
+2000.0,87,3,Summer,1,Routine
+1272.0,59,0,Spring,8,Immediate Action
+658.0,85,9,Summer,7,Monitor
+1971.0,50,2,Summer,3,Routine
+712.0,82,5,Spring,6,Monitor
+2694.0,34,6,Autumn,6,Monitor
+489.0,52,9,Spring,3,Routine
+2715.0,13,3,Winter,1,Routine
+124.0,50,2,Summer,9,Immediate Action
+985.0,38,9,Winter,1,Routine
+2355.0,77,4,Winter,6,Monitor
+258.0,103,8,Spring,1,Routine
+2056.0,115,8,Autumn,4,Routine
+2286.0,85,8,Spring,5,Monitor
+218.0,119,4,Spring,3,Routine
+1635.0,59,4,Spring,8,Immediate Action
+508.0,51,2,Autumn,2,Routine
+112.0,28,2,Winter,3,Routine
+636.0,48,3,Autumn,6,Monitor
+1651.0,31,3,Winter,3,Routine
+2852.0,98,0,Winter,9,Immediate Action
+287.0,81,5,Spring,5,Monitor
+1222.0,66,0,Spring,2,Routine
+1687.0,50,9,Winter,7,Monitor
+2815.0,80,5,Spring,9,Immediate Action
+2634.0,90,1,Spring,6,Monitor
+2634.0,25,3,Spring,5,Monitor
+1481.0,113,1,Summer,7,Monitor
+2822.0,110,6,Winter,3,Routine
+2475.0,44,5,Winter,2,Routine
+1469.0,60,5,Summer,3,Routine
+299.0,54,5,Spring,2,Routine
+1469.0,53,7,Spring,8,Immediate Action
+156.0,6,1,Summer,4,Routine
+1469.0,66,0,Autumn,7,Monitor
+510.0,50,7,Spring,2,Routine
+1530.0,76,3,Autumn,1,Routine
+2817.0,99,9,Autumn,7,Monitor
+734.0,20,4,Winter,1,Routine
+1719.0,85,2,Summer,2,Routine
+2562.0,44,3,Summer,6,Monitor
+2333.0,69,8,Summer,2,Routine
+446.0,21,8,Spring,6,Monitor
+769.0,82,4,Spring,5,Monitor
+359.0,84,8,Autumn,2,Routine
+2019.0,104,7,Autumn,3,Routine
+568.0,50,8,Autumn,5,Monitor
+118.0,11,1,Summer,2,Routine
+1813.0,105,5,Winter,1,Routine
+1469.0,15,7,Autumn,9,Immediate Action
+258.0,41,3,Autumn,4,Routine
+47.0,93,8,Summer,9,Immediate Action
+1995.0,13,7,Spring,9,Immediate Action
+841.0,99,0,Autumn,2,Routine
+884.0,20,3,Autumn,2,Routine
+1688.0,109,4,Summer,9,Immediate Action
+2631.0,93,6,Autumn,4,Routine
+1656.0,96,4,Summer,9,Immediate Action
+1954.0,32,3,Winter,9,Immediate Action
+1277.0,45,6,Spring,7,Monitor
+2055.0,104,5,Spring,9,Immediate Action
+2527.0,74,9,Spring,7,Monitor
+2494.0,71,2,Spring,1,Routine
+915.0,47,4,Winter,6,Monitor
+968.0,24,9,Spring,9,Immediate Action
+884.0,31,7,Summer,3,Routine
+2874.0,67,2,Winter,1,Routine
+1104.0,107,6,Winter,1,Routine
+1982.0,110,4,Spring,1,Routine
+2406.0,108,1,Spring,3,Routine
+2196.0,61,9,Autumn,7,Monitor
+2530.0,80,4,Spring,6,Monitor
+114.0,107,0,Spring,5,Monitor
+2104.0,6,9,Autumn,8,Immediate Action
+1794.0,119,6,Summer,7,Monitor
+910.0,44,3,Spring,9,Immediate Action
+1749.0,70,4,Summer,2,Routine
+1268.0,42,1,Autumn,3,Routine
+1006.0,57,7,Spring,4,Routine
+2671.0,44,1,Autumn,8,Immediate Action
+1647.0,80,4,Spring,7,Monitor
+1113.0,45,7,Summer,7,Monitor
+1114.0,75,6,Spring,7,Monitor
+2506.0,57,2,Spring,3,Routine
+2312.0,91,4,Autumn,9,Immediate Action
+1649.0,91,6,Spring,6,Monitor
+969.0,62,4,Autumn,3,Routine
+1487.0,102,8,Spring,3,Routine
+1190.0,56,0,Autumn,3,Routine
+1100.0,16,6,Winter,4,Routine
+2004.0,110,0,Spring,4,Routine
+247.0,59,5,Summer,5,Monitor
+472.0,42,5,Spring,4,Routine
+576.0,99,0,Summer,5,Monitor
+434.0,33,9,Summer,4,Routine
+1452.0,70,7,Summer,3,Routine
+2264.0,56,4,Winter,5,Monitor
+612.0,81,0,Autumn,5,Monitor
+1865.0,38,3,Summer,1,Routine
+1953.0,63,3,Summer,1,Routine
+496.0,27,6,Autumn,3,Routine
+416.0,119,7,Winter,4,Routine
+1796.0,38,6,Summer,7,Monitor
+612.0,109,2,Winter,4,Routine
+1793.0,39,4,Winter,4,Routine
+948.0,108,7,Winter,2,Routine
+581.0,74,0,Winter,1,Routine
+2779.0,117,9,Autumn,4,Routine
+204.0,51,9,Summer,2,Routine
+1820.0,109,4,Summer,4,Routine
+2319.0,62,4,Spring,2,Routine
+1173.0,113,7,Winter,3,Routine
+994.0,20,8,Autumn,3,Routine
+2480.0,63,0,Summer,1,Routine
+2571.0,24,2,Winter,4,Routine
+240.0,93,2,Summer,1,Routine
+713.0,72,3,Autumn,8,Immediate Action
+334.0,14,3,Spring,3,Routine
+1468.0,9,6,Spring,1,Routine
+1459.0,48,3,Spring,4,Routine
+1596.0,71,6,Summer,4,Routine
+2613.0,119,0,Autumn,4,Routine
+105.0,10,2,Autumn,4,Routine
+1674.0,99,6,Winter,7,Monitor
+1230.0,46,6,Autumn,2,Routine
+1200.0,94,3,Spring,7,Monitor
+1882.0,55,2,Spring,8,Immediate Action
+2219.0,47,3,Autumn,3,Routine
+2647.0,84,3,Autumn,3,Routine
+2792.0,43,5,Summer,7,Monitor
+120.0,20,3,Autumn,7,Monitor
+2024.0,102,8,Winter,6,Monitor
+1629.0,103,2,Summer,9,Immediate Action
+82.0,7,3,Spring,7,Monitor
+1988.0,119,1,Autumn,1,Routine
+181.0,108,3,Autumn,1,Routine
+343.0,77,4,Spring,7,Monitor
+125.0,12,3,Summer,3,Routine
+2102.0,43,9,Spring,6,Monitor
+2647.0,106,4,Spring,8,Immediate Action
+365.0,93,5,Spring,5,Monitor
+582.0,94,4,Autumn,1,Routine
+1047.0,63,8,Winter,4,Routine
+1774.0,12,1,Spring,9,Immediate Action
+288.0,86,1,Summer,1,Routine
+1373.0,100,1,Summer,4,Routine
+236.0,83,0,Summer,8,Immediate Action
+1511.0,61,0,Winter,8,Immediate Action
+2647.0,33,7,Summer,1,Routine
+322.0,21,1,Spring,7,Monitor
+1001.0,107,9,Autumn,5,Monitor
+2547.0,14,6,Spring,1,Routine
+2097.0,107,3,Spring,6,Monitor
+512.0,87,9,Summer,3,Routine
+2135.0,103,9,Winter,7,Monitor
+1336.0,14,8,Spring,4,Routine
+99.0,55,4,Winter,2,Routine
+364.0,32,9,Spring,6,Monitor
+109.0,74,4,Spring,4,Routine
+1473.0,11,8,Autumn,4,Routine
+883.0,116,8,Spring,7,Monitor
+698.0,102,7,Winter,3,Routine
+1275.0,80,5,Spring,5,Monitor
+2810.0,89,9,Summer,9,Immediate Action
+1019.0,112,2,Autumn,9,Immediate Action
+311.0,83,7,Autumn,3,Routine
+2450.0,116,9,Summer,8,Immediate Action
+2840.0,85,2,Summer,5,Monitor
+759.0,13,8,Spring,1,Routine
+1101.0,44,2,Spring,8,Immediate Action
+668.0,90,5,Spring,8,Immediate Action
+2540.0,38,0,Summer,7,Monitor
+2389.0,41,2,Autumn,2,Routine
+2582.0,79,7,Winter,4,Routine
+2122.0,16,8,Winter,2,Routine
+2390.0,69,1,Summer,9,Immediate Action
+260.0,60,9,Winter,3,Routine
+187.0,49,2,Summer,7,Monitor
+1644.0,80,2,Summer,1,Routine
+836.0,32,0,Spring,7,Monitor
+2658.0,67,3,Winter,9,Immediate Action
+1111.0,97,8,Autumn,1,Routine
+2422.0,70,3,Spring,2,Routine
+2377.0,5,7,Summer,6,Monitor
+201.0,45,7,Summer,2,Routine
+2095.0,14,9,Spring,2,Routine
+1474.0,16,7,Winter,1,Routine
+169.0,90,5,Spring,2,Routine
+1258.0,90,8,Autumn,4,Routine
+1754.0,87,2,Winter,8,Immediate Action
+1683.0,27,5,Autumn,1,Routine
+1219.0,34,4,Summer,6,Monitor
+1890.0,54,9,Spring,5,Monitor
+1735.0,19,5,Summer,7,Monitor
+1735.0,32,2,Autumn,4,Routine
+2576.0,18,4,Winter,8,Immediate Action
+1509.0,62,4,Winter,9,Immediate Action
+1435.0,68,3,Spring,6,Monitor
+392.0,80,9,Summer,8,Immediate Action
+980.0,17,6,Spring,1,Routine
+980.0,69,4,Summer,1,Routine
+1679.0,9,4,Autumn,1,Routine
+1679.0,89,8,Autumn,6,Monitor
+1064.0,42,1,Summer,7,Monitor
+2705.0,17,6,Spring,6,Monitor
+2639.0,116,9,Spring,2,Routine
+309.0,106,4,Winter,6,Monitor
+1435.0,49,1,Winter,2,Routine
+794.0,14,6,Summer,6,Monitor
+227.0,23,0,Spring,2,Routine
+1485.0,94,1,Summer,5,Monitor
+1950.0,83,2,Autumn,4,Routine
+1858.0,78,5,Autumn,8,Immediate Action
+1010.0,78,2,Spring,4,Routine
+760.0,81,5,Winter,4,Routine
+699.0,56,5,Summer,2,Routine
+2431.0,18,5,Spring,8,Immediate Action
+1188.0,94,4,Winter,6,Monitor
+1223.0,77,4,Spring,4,Routine
+429.0,96,6,Winter,4,Routine
+497.0,26,3,Spring,7,Monitor
+2855.0,76,3,Spring,4,Routine
+1603.0,99,1,Autumn,7,Monitor
+1704.0,93,8,Autumn,1,Routine
+765.0,6,3,Spring,4,Routine
+909.0,65,3,Summer,7,Monitor
+952.0,101,5,Autumn,7,Monitor
+954.0,19,9,Autumn,9,Immediate Action
+141.0,54,8,Autumn,1,Routine
+1872.0,26,6,Winter,8,Immediate Action
+2442.0,44,7,Winter,2,Routine
+814.0,110,1,Spring,5,Monitor
+883.0,83,8,Autumn,2,Routine
+747.0,27,2,Autumn,6,Monitor
+2630.0,112,3,Autumn,1,Routine
+1756.0,81,4,Summer,1,Routine
+2829.0,102,5,Summer,3,Routine
+370.0,34,2,Summer,1,Routine
+1435.0,55,5,Spring,8,Immediate Action
+890.0,41,8,Spring,4,Routine
+1712.0,107,1,Autumn,6,Monitor
+993.0,17,9,Spring,1,Routine
+1236.0,7,6,Summer,1,Routine
+164.0,55,4,Spring,2,Routine
+2045.0,99,0,Summer,5,Monitor
+580.0,19,3,Spring,2,Routine
+206.0,79,9,Summer,8,Immediate Action
+2063.0,22,1,Winter,8,Immediate Action
+1105.0,44,6,Spring,2,Routine
+1155.0,97,5,Spring,3,Routine
+1229.0,77,3,Spring,5,Monitor
+2098.0,115,2,Autumn,7,Monitor
+2049.0,100,1,Winter,1,Routine
+2021.0,29,3,Autumn,7,Monitor
+1583.0,116,5,Spring,4,Routine
+1500.0,45,2,Spring,2,Routine
+2330.0,86,1,Autumn,8,Immediate Action
+123.0,38,0,Winter,7,Monitor
+2827.0,28,7,Spring,1,Routine
+1435.0,47,2,Spring,7,Monitor
+354.0,102,5,Autumn,4,Routine
+2160.0,99,8,Summer,2,Routine
+1081.0,71,3,Autumn,8,Immediate Action
+2335.0,114,6,Spring,2,Routine
+677.0,88,0,Autumn,5,Monitor
+2037.0,108,3,Winter,9,Immediate Action
+2788.0,33,8,Winter,1,Routine
+2077.0,26,8,Autumn,8,Immediate Action
+1330.0,57,2,Summer,6,Monitor
+1154.0,95,8,Winter,3,Routine
+1857.0,115,7,Winter,4,Routine
+248.0,29,7,Summer,9,Immediate Action
+998.0,109,3,Summer,9,Immediate Action
+1538.0,88,2,Spring,9,Immediate Action
+1933.0,6,4,Spring,9,Immediate Action
+1234.0,106,9,Summer,4,Routine
+2565.0,23,8,Spring,6,Monitor
+350.0,22,7,Summer,7,Monitor
+2778.0,69,9,Winter,5,Monitor
+761.0,83,2,Spring,3,Routine
+1499.0,59,7,Spring,9,Immediate Action
+1917.0,49,9,Summer,4,Routine
+1576.0,26,2,Spring,7,Monitor
+25.0,54,1,Summer,3,Routine
+1214.0,66,0,Winter,5,Monitor
+2564.0,75,7,Winter,1,Routine
+383.0,16,3,Spring,9,Immediate Action
+1650.0,61,9,Winter,7,Monitor
+502.0,114,4,Autumn,3,Routine
+77.0,17,3,Spring,2,Routine
+255.0,46,8,Spring,9,Immediate Action
+448.0,48,7,Winter,5,Monitor
+2768.0,10,0,Spring,2,Routine
+2425.0,98,2,Winter,6,Monitor
+1669.0,84,4,Summer,9,Immediate Action
+2580.0,32,9,Autumn,2,Routine
+2430.0,64,3,Autumn,1,Routine
+2439.0,31,2,Spring,3,Routine
+413.0,104,5,Autumn,9,Immediate Action
+1328.0,116,2,Summer,2,Routine
+461.0,39,3,Winter,6,Monitor
+1186.0,17,3,Winter,1,Routine
+703.0,78,7,Summer,1,Routine
+1870.0,111,9,Summer,8,Immediate Action
+293.0,57,4,Autumn,8,Immediate Action
+1260.0,89,3,Winter,2,Routine
+2502.0,67,2,Summer,3,Routine
+704.0,23,8,Summer,4,Routine
+1026.0,88,9,Autumn,9,Immediate Action
+2164.0,115,8,Winter,8,Immediate Action
+1791.0,63,8,Spring,5,Monitor
+132.0,34,1,Spring,1,Routine
+1778.0,114,8,Autumn,2,Routine
+764.0,113,3,Summer,2,Routine
+945.0,108,8,Spring,7,Monitor
+479.0,29,0,Winter,4,Routine
+1235.0,85,9,Winter,9,Immediate Action
+1270.0,34,8,Autumn,1,Routine
+1471.0,78,2,Winter,2,Routine
+1202.0,26,7,Summer,3,Routine
+1240.0,114,3,Spring,4,Routine
+2805.0,43,0,Autumn,5,Monitor
+1539.0,5,8,Autumn,2,Routine
+426.0,75,1,Summer,5,Monitor
+2670.0,71,1,Winter,7,Monitor
+1781.0,90,7,Winter,8,Immediate Action
+2141.0,31,3,Autumn,9,Immediate Action
+2873.0,27,8,Autumn,2,Routine
+1933.0,86,1,Spring,6,Monitor
+2648.0,64,3,Summer,1,Routine
+339.0,16,5,Autumn,8,Immediate Action
+1841.0,46,4,Summer,7,Monitor
+737.0,74,4,Autumn,9,Immediate Action
+268.0,24,5,Winter,3,Routine
+1331.0,24,3,Spring,9,Immediate Action
+1264.0,89,8,Spring,5,Monitor
+1288.0,14,2,Spring,1,Routine
+2515.0,67,5,Summer,7,Monitor
+1158.0,13,8,Summer,4,Routine
+744.0,95,8,Spring,1,Routine
+653.0,20,4,Summer,5,Monitor
+1004.0,46,0,Winter,5,Monitor
+2426.0,110,6,Spring,8,Immediate Action
+906.0,9,1,Autumn,6,Monitor
+831.0,48,3,Winter,6,Monitor
+1465.0,49,8,Winter,6,Monitor
+1247.0,29,8,Autumn,3,Routine
+1700.0,90,7,Spring,5,Monitor
+995.0,49,9,Spring,4,Routine
+1933.0,8,3,Winter,7,Monitor
+2188.0,10,8,Autumn,4,Routine
+738.0,56,8,Winter,7,Monitor
+1869.0,112,6,Winter,1,Routine
+1653.0,43,1,Autumn,2,Routine
+864.0,86,7,Spring,1,Routine
+1802.0,75,0,Winter,4,Routine
+898.0,74,7,Winter,2,Routine
+521.0,21,7,Summer,8,Immediate Action
+2872.0,14,0,Winter,8,Immediate Action
+971.0,6,0,Winter,1,Routine
+90.0,57,6,Winter,9,Immediate Action
+1072.0,11,0,Autumn,1,Routine
+1909.0,68,1,Spring,9,Immediate Action
+50.0,38,5,Spring,2,Routine
+1727.0,65,4,Spring,1,Routine
+1341.0,74,7,Spring,9,Immediate Action
+718.0,97,0,Autumn,5,Monitor
+1933.0,41,6,Spring,2,Routine
+2430.0,51,5,Winter,3,Routine
+1103.0,96,1,Summer,4,Routine
+2626.0,95,6,Autumn,6,Monitor
+1933.0,32,0,Summer,6,Monitor
+1049.0,112,8,Spring,2,Routine
+1048.0,38,3,Winter,8,Immediate Action
+1354.0,20,9,Spring,6,Monitor
+971.0,61,8,Spring,1,Routine
+2842.0,57,3,Summer,4,Routine
+1212.0,114,2,Autumn,4,Routine
+1933.0,59,0,Summer,5,Monitor
+174.0,46,5,Summer,9,Immediate Action
+2440.0,83,4,Autumn,4,Routine
+69.0,30,0,Summer,8,Immediate Action
+556.0,70,0,Summer,5,Monitor
+490.0,103,9,Autumn,4,Routine
+2308.0,119,1,Summer,3,Routine
+1221.0,5,1,Winter,7,Monitor
+1126.0,118,9,Autumn,9,Immediate Action
+918.0,7,3,Winter,1,Routine
+153.0,93,5,Spring,3,Routine
+2673.0,52,0,Spring,5,Monitor
+165.0,101,7,Summer,6,Monitor
+1068.0,67,2,Summer,8,Immediate Action
+2205.0,11,0,Winter,9,Immediate Action
+2602.0,41,7,Summer,7,Monitor
+1707.0,113,4,Winter,1,Routine
+1171.0,47,1,Spring,5,Monitor
+485.0,114,4,Autumn,3,Routine
+553.0,22,0,Autumn,7,Monitor
+2635.0,61,3,Summer,4,Routine
+720.0,46,2,Summer,5,Monitor
+652.0,60,0,Winter,9,Immediate Action
+1933.0,98,5,Autumn,9,Immediate Action
+104.0,105,1,Winter,7,Monitor
+573.0,41,7,Winter,9,Immediate Action
+418.0,103,3,Winter,4,Routine
+276.0,74,2,Winter,2,Routine
+528.0,60,6,Autumn,7,Monitor
+569.0,66,5,Autumn,9,Immediate Action
+1581.0,113,9,Winter,1,Routine
+2498.0,5,8,Summer,9,Immediate Action
+872.0,19,3,Summer,4,Routine
+1490.0,34,3,Autumn,6,Monitor
+798.0,90,6,Summer,5,Monitor
+500.0,57,4,Summer,9,Immediate Action
+569.0,32,2,Autumn,3,Routine
+160.0,93,0,Autumn,4,Routine
+997.0,83,1,Winter,6,Monitor
+1983.0,34,6,Autumn,6,Monitor
+1983.0,25,1,Spring,1,Routine
+1983.0,37,0,Autumn,9,Immediate Action
+1636.0,80,9,Spring,1,Routine
+360.0,91,5,Winter,8,Immediate Action
+278.0,73,1,Winter,7,Monitor
+1159.0,6,4,Summer,2,Routine
+1609.0,49,0,Summer,3,Routine
+897.0,104,2,Summer,2,Routine
+2311.0,78,2,Winter,9,Immediate Action
+1738.0,24,8,Winter,2,Routine
+2465.0,78,0,Summer,2,Routine
+142.0,76,5,Summer,7,Monitor
+1266.0,10,0,Winter,8,Immediate Action
+673.0,35,6,Winter,8,Immediate Action
+758.0,72,5,Autumn,8,Immediate Action
+2206.0,35,1,Summer,9,Immediate Action
+267.0,113,9,Autumn,4,Routine
+939.0,77,9,Summer,2,Routine
+2155.0,49,6,Autumn,5,Monitor
+1479.0,36,7,Autumn,1,Routine
+106.0,82,9,Autumn,2,Routine
+679.0,49,0,Summer,7,Monitor
+1798.0,35,6,Spring,6,Monitor
+569.0,32,3,Summer,7,Monitor
+1357.0,41,6,Winter,6,Monitor
+1856.0,9,5,Winter,3,Routine
+2202.0,13,5,Summer,7,Monitor
+2838.0,117,9,Winter,2,Routine
+1642.0,45,2,Spring,3,Routine
+412.0,38,2,Spring,7,Monitor
+455.0,26,9,Autumn,9,Immediate Action
+585.0,9,5,Winter,1,Routine
+133.0,101,8,Spring,1,Routine
+37.0,84,7,Winter,9,Immediate Action
+911.0,32,3,Autumn,9,Immediate Action
+2592.0,64,2,Autumn,1,Routine
+1918.0,106,0,Summer,2,Routine
+2476.0,6,4,Spring,2,Routine
+2263.0,45,6,Autumn,1,Routine
+1845.0,88,7,Spring,1,Routine
+513.0,50,1,Winter,2,Routine
+1831.0,16,7,Spring,7,Monitor
+458.0,52,1,Summer,2,Routine
+617.0,18,9,Summer,1,Routine
+1147.0,71,0,Winter,9,Immediate Action
+1490.0,115,2,Spring,4,Routine
+1940.0,20,6,Autumn,7,Monitor
+788.0,73,5,Spring,4,Routine
+2545.0,95,8,Autumn,8,Immediate Action
+723.0,15,4,Autumn,5,Monitor
+2313.0,87,5,Spring,2,Routine
+1395.0,38,1,Spring,2,Routine
+1156.0,53,3,Winter,8,Immediate Action
+2534.0,87,3,Spring,3,Routine
+1582.0,112,2,Spring,4,Routine
+650.0,80,1,Spring,3,Routine
+173.0,24,6,Autumn,3,Routine
+1350.0,30,7,Winter,7,Monitor
+2497.0,102,0,Winter,2,Routine
+2342.0,5,8,Spring,9,Immediate Action
+312.0,115,5,Summer,2,Routine
+961.0,91,8,Spring,9,Immediate Action
+2178.0,38,1,Spring,2,Routine
+2538.0,51,9,Winter,3,Routine
+899.0,39,0,Spring,6,Monitor
+1164.0,87,1,Summer,7,Monitor
+1461.0,41,5,Summer,7,Monitor
+1153.0,66,4,Summer,7,Monitor
+1014.0,69,3,Spring,8,Immediate Action
+2187.0,72,6,Autumn,3,Routine
+983.0,66,3,Summer,3,Routine
+1943.0,62,8,Spring,4,Routine
+1585.0,52,9,Winter,4,Routine
+1431.0,101,9,Summer,7,Monitor
+1431.0,5,8,Spring,1,Routine
+905.0,32,5,Winter,8,Immediate Action
+903.0,53,0,Winter,3,Routine
+2117.0,83,1,Summer,1,Routine
+2417.0,68,7,Spring,6,Monitor
+1725.0,44,6,Summer,6,Monitor
+401.0,60,0,Autumn,2,Routine
+2841.0,74,3,Summer,1,Routine
+1149.0,8,5,Summer,5,Monitor
+1245.0,90,6,Summer,8,Immediate Action
+163.0,74,0,Winter,4,Routine
+2100.0,79,2,Winter,5,Monitor
+572.0,84,0,Summer,8,Immediate Action
+1213.0,57,5,Winter,9,Immediate Action
+2523.0,113,6,Summer,9,Immediate Action
+592.0,106,6,Summer,2,Routine
+2690.0,52,1,Winter,5,Monitor
+2722.0,8,9,Winter,8,Immediate Action
+1935.0,100,8,Winter,8,Immediate Action
+67.0,5,2,Winter,3,Routine
+536.0,20,6,Spring,6,Monitor
+2777.0,87,9,Autumn,7,Monitor
+159.0,93,3,Autumn,8,Immediate Action
+481.0,36,0,Spring,6,Monitor
+2036.0,34,2,Summer,1,Routine
+2129.0,68,6,Spring,5,Monitor
+838.0,51,1,Winter,1,Routine
+463.0,46,1,Autumn,6,Monitor
+1714.0,15,0,Summer,9,Immediate Action
+2184.0,92,1,Spring,6,Monitor
+470.0,43,3,Summer,1,Routine
+2381.0,64,8,Winter,6,Monitor
+2720.0,104,3,Autumn,4,Routine
+893.0,48,3,Summer,1,Routine
+1764.0,119,1,Summer,4,Routine
+1353.0,86,9,Spring,3,Routine
+970.0,22,4,Winter,2,Routine
+66.0,75,9,Summer,5,Monitor
+1039.0,86,8,Autumn,7,Monitor
+1303.0,54,6,Summer,4,Routine
+1250.0,89,8,Summer,9,Immediate Action
+1167.0,108,8,Summer,2,Routine
+171.0,19,5,Spring,3,Routine
+1498.0,85,4,Winter,2,Routine
+2603.0,88,0,Summer,1,Routine
+1291.0,101,1,Summer,5,Monitor
+1663.0,43,6,Winter,6,Monitor
+1050.0,76,5,Summer,9,Immediate Action
+1510.0,16,9,Autumn,3,Routine
+1789.0,51,0,Summer,7,Monitor
+1994.0,40,1,Autumn,7,Monitor
+251.0,15,4,Autumn,9,Immediate Action
+1967.0,117,1,Summer,4,Routine
+1607.0,59,6,Spring,3,Routine
+492.0,12,7,Summer,9,Immediate Action
+283.0,46,3,Winter,9,Immediate Action
+423.0,95,8,Summer,5,Monitor
+2877.0,44,1,Spring,5,Monitor
+2189.0,91,0,Spring,5,Monitor
+1152.0,56,1,Winter,7,Monitor
+1713.0,73,4,Autumn,3,Routine
+1454.0,8,4,Summer,9,Immediate Action
+701.0,35,0,Spring,7,Monitor
+1160.0,90,0,Winter,7,Monitor
+828.0,53,2,Spring,5,Monitor
+1081.0,89,7,Spring,8,Immediate Action
+110.0,43,4,Spring,5,Monitor
+1267.0,51,5,Autumn,5,Monitor
+2496.0,38,0,Winter,1,Routine
+498.0,86,7,Winter,6,Monitor
+226.0,43,8,Summer,6,Monitor
+1671.0,93,5,Autumn,7,Monitor
+967.0,116,4,Spring,3,Routine
+1059.0,66,6,Summer,5,Monitor
+2191.0,43,7,Summer,4,Routine
+2845.0,31,1,Spring,2,Routine
+41.0,16,5,Winter,9,Immediate Action
+1779.0,40,6,Summer,8,Immediate Action
+1880.0,79,8,Autumn,4,Routine
+257.0,88,7,Spring,7,Monitor
+2646.0,67,5,Summer,3,Routine
+1129.0,115,6,Winter,1,Routine
+2657.0,69,8,Summer,2,Routine
+2818.0,76,3,Summer,2,Routine
+1552.0,18,6,Summer,1,Routine
+2646.0,115,3,Autumn,4,Routine
+289.0,99,0,Winter,2,Routine
+1326.0,67,0,Winter,7,Monitor
+2039.0,112,1,Winter,8,Immediate Action
+1840.0,67,4,Autumn,2,Routine
+539.0,96,9,Spring,6,Monitor
+2847.0,29,8,Summer,4,Routine
+2646.0,75,2,Summer,9,Immediate Action
+2804.0,33,1,Autumn,7,Monitor
+2183.0,27,4,Autumn,2,Routine
+2646.0,109,5,Autumn,6,Monitor
+2029.0,85,1,Summer,3,Routine
+269.0,33,4,Winter,3,Routine
+1755.0,107,4,Autumn,7,Monitor
+1808.0,42,6,Summer,8,Immediate Action
+88.0,6,0,Spring,6,Monitor
+423.0,52,2,Summer,6,Monitor
+1682.0,88,3,Spring,5,Monitor
+925.0,73,6,Summer,7,Monitor
+882.0,69,6,Spring,2,Routine
+1482.0,98,4,Summer,6,Monitor
+1482.0,35,7,Spring,7,Monitor
+1040.0,102,6,Autumn,8,Immediate Action
+1166.0,46,6,Spring,3,Routine
+953.0,45,3,Summer,7,Monitor
+1115.0,86,2,Winter,5,Monitor
+2623.0,50,9,Spring,4,Routine
+3.0,91,7,Winter,5,Monitor
+1045.0,70,2,Summer,4,Routine
+1550.0,117,2,Autumn,3,Routine
+1299.0,25,7,Winter,1,Routine
+480.0,53,4,Spring,7,Monitor
+1955.0,17,2,Summer,4,Routine
+2119.0,42,5,Autumn,8,Immediate Action
+2193.0,63,3,Autumn,6,Monitor
+1077.0,37,8,Winter,9,Immediate Action
+433.0,35,7,Spring,3,Routine
+433.0,113,1,Summer,4,Routine
+473.0,70,2,Autumn,5,Monitor
+2246.0,32,2,Summer,8,Immediate Action
+1591.0,118,2,Summer,9,Immediate Action
+2320.0,23,2,Autumn,2,Routine
+2325.0,81,6,Spring,2,Routine
+213.0,103,0,Summer,8,Immediate Action
+854.0,115,1,Spring,5,Monitor
+1231.0,78,0,Spring,7,Monitor
+1027.0,82,6,Spring,4,Routine
+2542.0,51,8,Autumn,7,Monitor
+584.0,114,3,Summer,5,Monitor
+996.0,16,9,Autumn,9,Immediate Action
+2176.0,22,1,Autumn,1,Routine
+837.0,60,1,Summer,4,Routine
+57.0,101,7,Summer,2,Routine
+2774.0,86,7,Winter,9,Immediate Action
+1922.0,37,4,Summer,4,Routine
+850.0,37,5,Summer,6,Monitor
+2199.0,30,8,Summer,3,Routine
+2846.0,73,3,Autumn,5,Monitor
+179.0,70,3,Autumn,6,Monitor
+2456.0,32,4,Winter,4,Routine
+97.0,14,1,Summer,3,Routine
+2063.0,117,3,Spring,7,Monitor
+881.0,74,1,Summer,1,Routine
+2686.0,78,0,Autumn,6,Monitor
+2834.0,105,4,Winter,9,Immediate Action
+1041.0,80,5,Summer,7,Monitor
+358.0,80,8,Spring,2,Routine
+2063.0,100,6,Winter,3,Routine
+556.0,90,3,Summer,6,Monitor
+2074.0,17,3,Summer,4,Routine
+2568.0,21,5,Spring,3,Routine
+1921.0,113,6,Summer,9,Immediate Action
+2144.0,97,2,Autumn,6,Monitor
+827.0,61,2,Summer,1,Routine
+2581.0,77,2,Spring,2,Routine
+1175.0,42,9,Autumn,4,Routine
+888.0,112,6,Autumn,9,Immediate Action
+58.0,105,2,Summer,5,Monitor
+1924.0,39,5,Winter,1,Routine
+1323.0,33,8,Spring,4,Routine
+274.0,93,5,Spring,9,Immediate Action
+477.0,15,8,Summer,9,Immediate Action
+1928.0,59,3,Spring,9,Immediate Action
+511.0,35,2,Summer,1,Routine
+2814.0,55,8,Autumn,3,Routine
+2483.0,41,3,Autumn,3,Routine
+511.0,30,6,Winter,9,Immediate Action
+2101.0,73,4,Summer,4,Routine
+2804.0,47,2,Winter,4,Routine
+2457.0,7,3,Summer,6,Monitor
+1187.0,89,7,Autumn,5,Monitor
+478.0,12,4,Spring,4,Routine
+1750.0,91,2,Spring,1,Routine
+94.0,50,5,Winter,7,Monitor
+1970.0,90,8,Winter,9,Immediate Action
+1397.0,25,6,Spring,5,Monitor
+964.0,76,4,Autumn,3,Routine
+107.0,119,0,Winter,4,Routine
+1752.0,95,0,Spring,3,Routine
+2166.0,15,9,Winter,2,Routine
+2256.0,76,6,Winter,4,Routine
+1680.0,68,8,Winter,4,Routine
+84.0,87,2,Winter,9,Immediate Action
+803.0,18,0,Winter,2,Routine
+1657.0,99,2,Autumn,3,Routine
+1157.0,115,4,Spring,7,Monitor
+1903.0,81,6,Winter,6,Monitor
+786.0,114,8,Summer,8,Immediate Action
+1804.0,86,8,Spring,1,Routine
+1522.0,43,4,Summer,5,Monitor
+639.0,26,3,Summer,7,Monitor
+1472.0,109,9,Autumn,9,Immediate Action
+2252.0,7,9,Winter,2,Routine
+2698.0,41,8,Summer,8,Immediate Action
+1348.0,49,2,Autumn,7,Monitor
+2526.0,61,2,Summer,2,Routine
+167.0,63,0,Summer,1,Routine
+2433.0,55,5,Autumn,1,Routine
+231.0,106,0,Autumn,5,Monitor
+1926.0,15,4,Autumn,1,Routine
+1512.0,53,4,Winter,1,Routine
+221.0,19,1,Autumn,6,Monitor
+2124.0,47,1,Winter,3,Routine
+887.0,118,4,Winter,4,Routine
+2378.0,20,2,Winter,2,Routine
+2421.0,110,3,Autumn,9,Immediate Action
+402.0,91,9,Spring,1,Routine
+231.0,114,6,Winter,7,Monitor
+2606.0,69,9,Winter,1,Routine
+1927.0,6,6,Spring,5,Monitor
+745.0,11,6,Winter,1,Routine
+646.0,40,4,Autumn,8,Immediate Action
+389.0,79,3,Winter,7,Monitor
+2046.0,40,8,Autumn,3,Routine
+804.0,67,7,Spring,9,Immediate Action
+1676.0,63,8,Spring,5,Monitor
+855.0,15,8,Spring,5,Monitor
+2520.0,102,8,Winter,7,Monitor
+2520.0,90,7,Winter,4,Routine
+1076.0,116,0,Spring,4,Routine
+2520.0,111,8,Summer,6,Monitor
+1844.0,113,5,Autumn,1,Routine
+1838.0,62,0,Spring,2,Routine
+1194.0,27,0,Summer,5,Monitor
+233.0,20,9,Spring,5,Monitor
+1737.0,87,1,Spring,6,Monitor
+76.0,39,8,Summer,8,Immediate Action
+1850.0,65,0,Autumn,9,Immediate Action
+1850.0,59,8,Summer,6,Monitor
+2794.0,106,3,Spring,1,Routine
+11.0,49,0,Winter,1,Routine
+76.0,64,8,Summer,4,Routine
+1850.0,61,9,Autumn,1,Routine
+1850.0,68,1,Winter,9,Immediate Action
+1850.0,35,4,Winter,3,Routine
+1737.0,87,0,Summer,2,Routine
+1850.0,73,4,Winter,1,Routine
+2094.0,12,6,Summer,2,Routine
+599.0,74,2,Spring,6,Monitor
+1370.0,57,7,Summer,4,Routine
+923.0,111,2,Spring,2,Routine
+640.0,57,0,Summer,8,Immediate Action
+1109.0,46,1,Winter,6,Monitor
+2796.0,73,0,Autumn,7,Monitor
+2796.0,29,2,Spring,5,Monitor
+2386.0,51,3,Autumn,8,Immediate Action
+2217.0,39,4,Summer,9,Immediate Action
+1990.0,88,5,Autumn,1,Routine
+2482.0,59,9,Spring,7,Monitor
+2587.0,93,1,Winter,1,Routine
+1404.0,107,0,Spring,1,Routine
+1503.0,33,7,Autumn,2,Routine
+1720.0,54,5,Summer,2,Routine
+2241.0,13,6,Spring,6,Monitor
+1060.0,27,3,Autumn,3,Routine
+1368.0,52,9,Autumn,4,Routine
+1709.0,42,6,Winter,6,Monitor
+503.0,99,0,Winter,4,Routine
+1545.0,26,1,Summer,8,Immediate Action
+1555.0,55,8,Winter,9,Immediate Action
+2481.0,101,1,Summer,6,Monitor
+936.0,37,5,Spring,9,Immediate Action
+773.0,64,1,Spring,8,Immediate Action
+1658.0,94,1,Winter,2,Routine
+2217.0,101,8,Summer,2,Routine
+2617.0,50,9,Spring,5,Monitor
+1715.0,22,6,Autumn,8,Immediate Action
+2332.0,25,4,Spring,7,Monitor
+2859.0,93,1,Winter,7,Monitor
+1038.0,18,6,Winter,3,Routine
+1007.0,34,8,Winter,5,Monitor
+1990.0,74,2,Autumn,7,Monitor
+1963.0,85,2,Spring,8,Immediate Action
+1578.0,84,0,Winter,7,Monitor
+414.0,71,2,Spring,6,Monitor
+235.0,83,9,Summer,2,Routine
+2197.0,54,7,Winter,7,Monitor
+647.0,66,3,Summer,9,Immediate Action
+2609.0,50,9,Summer,6,Monitor
+559.0,101,3,Winter,9,Immediate Action
+1814.0,83,5,Summer,6,Monitor
+1161.0,8,9,Summer,2,Routine
+1818.0,80,1,Spring,5,Monitor
+1043.0,13,8,Spring,4,Routine
+564.0,58,3,Spring,3,Routine
+117.0,99,4,Winter,2,Routine
+2346.0,36,6,Winter,6,Monitor
+637.0,56,1,Summer,7,Monitor
+1556.0,39,9,Autumn,3,Routine
+885.0,35,0,Autumn,3,Routine
+2419.0,113,4,Spring,3,Routine
+1600.0,45,9,Autumn,6,Monitor
+205.0,108,6,Summer,6,Monitor
+2553.0,21,3,Winter,7,Monitor
+2823.0,34,8,Spring,8,Immediate Action
+1868.0,99,4,Spring,2,Routine
+1355.0,80,6,Autumn,8,Immediate Action
+1535.0,31,8,Winter,2,Routine
+991.0,58,2,Summer,9,Immediate Action
+774.0,102,4,Winter,8,Immediate Action
+762.0,107,6,Spring,3,Routine
+1763.0,21,4,Spring,6,Monitor
+1744.0,90,4,Autumn,3,Routine
+800.0,33,0,Winter,5,Monitor
+26.0,83,8,Spring,2,Routine
+1376.0,5,0,Spring,4,Routine
+1278.0,107,2,Spring,5,Monitor
+1278.0,7,4,Autumn,7,Monitor
+1843.0,11,6,Winter,5,Monitor
+29.0,38,1,Autumn,4,Routine
+586.0,36,6,Autumn,7,Monitor
+1263.0,8,4,Winter,1,Routine
+1599.0,10,0,Autumn,7,Monitor
+2627.0,104,4,Summer,6,Monitor
+2604.0,107,6,Summer,4,Routine
+2529.0,57,6,Autumn,8,Immediate Action
+840.0,57,7,Summer,4,Routine
+420.0,50,9,Autumn,4,Routine
+2529.0,102,1,Autumn,9,Immediate Action
+2411.0,30,1,Autumn,8,Immediate Action
+1107.0,100,1,Winter,7,Monitor
+857.0,91,1,Spring,4,Routine
+331.0,47,2,Spring,2,Routine
+404.0,50,8,Summer,3,Routine
+2165.0,88,0,Spring,5,Monitor
+2429.0,27,7,Summer,4,Routine
+1365.0,109,9,Winter,9,Immediate Action
+1790.0,113,1,Summer,6,Monitor
+705.0,48,7,Autumn,7,Monitor
+1838.0,44,4,Spring,2,Routine
+190.0,7,2,Spring,1,Routine
+2764.0,85,4,Winter,5,Monitor
+2404.0,117,3,Winter,5,Monitor
+2251.0,50,7,Summer,1,Routine
+336.0,68,6,Autumn,1,Routine
+2795.0,48,6,Spring,1,Routine
+2507.0,30,2,Autumn,2,Routine
+1534.0,33,3,Winter,5,Monitor
+2795.0,91,4,Winter,3,Routine
+2505.0,108,0,Summer,8,Immediate Action
+63.0,100,1,Autumn,3,Routine
+1673.0,111,1,Summer,7,Monitor
+2795.0,5,4,Summer,9,Immediate Action
+1544.0,85,0,Winter,8,Immediate Action
+464.0,39,2,Winter,5,Monitor
+2384.0,33,9,Summer,7,Monitor
+95.0,83,5,Summer,7,Monitor
+2578.0,98,4,Winter,9,Immediate Action
+2123.0,114,0,Spring,8,Immediate Action
+2352.0,66,0,Autumn,7,Monitor
+2780.0,44,5,Autumn,1,Routine
+2708.0,16,3,Autumn,7,Monitor
+328.0,30,7,Spring,6,Monitor
+2586.0,25,6,Winter,8,Immediate Action
+1477.0,94,4,Spring,3,Routine
+2257.0,46,5,Summer,4,Routine
+61.0,72,8,Summer,7,Monitor
+1183.0,18,3,Winter,6,Monitor
+51.0,33,6,Spring,7,Monitor
+1711.0,13,2,Spring,1,Routine
+2789.0,117,5,Spring,9,Immediate Action
+1042.0,112,8,Spring,3,Routine
+2577.0,78,1,Winter,2,Routine
+947.0,104,5,Autumn,9,Immediate Action
+750.0,7,6,Spring,8,Immediate Action
+1518.0,57,2,Spring,6,Monitor
+52.0,30,9,Autumn,9,Immediate Action
+2458.0,11,7,Autumn,7,Monitor
+1518.0,15,4,Autumn,4,Routine
+1717.0,35,6,Winter,7,Monitor
+2232.0,54,4,Autumn,9,Immediate Action
+557.0,77,1,Summer,7,Monitor
+261.0,107,4,Summer,7,Monitor
+19.0,109,5,Spring,8,Immediate Action
+2695.0,102,2,Winter,3,Routine
+644.0,33,3,Spring,8,Immediate Action
+1588.0,104,9,Winter,5,Monitor
+805.0,101,9,Summer,3,Routine
+467.0,20,1,Spring,3,Routine
+1736.0,78,8,Winter,3,Routine
+1520.0,43,3,Spring,6,Monitor
+1201.0,56,8,Summer,3,Routine
+199.0,62,8,Winter,9,Immediate Action
+740.0,32,2,Summer,8,Immediate Action
+886.0,84,3,Summer,7,Monitor
+1769.0,48,7,Summer,4,Routine
+1703.0,88,7,Spring,5,Monitor
+2552.0,27,0,Winter,9,Immediate Action
+2260.0,19,9,Winter,9,Immediate Action
+642.0,105,5,Autumn,4,Routine
+1367.0,99,5,Autumn,3,Routine
+2317.0,99,7,Autumn,2,Routine
+39.0,79,2,Winter,9,Immediate Action
+2084.0,27,7,Autumn,5,Monitor
+797.0,69,1,Winter,6,Monitor
+2837.0,11,3,Summer,3,Routine
+797.0,90,3,Spring,7,Monitor
+111.0,38,0,Summer,9,Immediate Action
+111.0,19,5,Spring,1,Routine
+813.0,97,4,Autumn,1,Routine
+2209.0,81,3,Winter,4,Routine
+167.0,54,9,Winter,5,Monitor
+1551.0,18,2,Autumn,2,Routine
+1551.0,14,7,Spring,7,Monitor
+1551.0,22,4,Winter,5,Monitor
+2612.0,35,0,Spring,3,Routine
+2082.0,106,3,Winter,6,Monitor
+307.0,96,1,Spring,7,Monitor
+2341.0,55,0,Winter,7,Monitor
+2688.0,57,6,Autumn,7,Monitor
+91.0,15,6,Winter,1,Routine
+92.0,57,0,Spring,4,Routine
+1873.0,8,5,Spring,1,Routine
+707.0,5,7,Spring,2,Routine
+1956.0,37,8,Summer,8,Immediate Action
+2301.0,65,6,Summer,4,Routine
+1639.0,16,4,Spring,5,Monitor
+1989.0,60,4,Spring,3,Routine
+722.0,24,7,Summer,5,Monitor
+194.0,118,4,Spring,7,Monitor
+341.0,65,8,Winter,3,Routine
+1938.0,15,7,Autumn,2,Routine
+1106.0,117,8,Autumn,9,Immediate Action
+787.0,95,6,Spring,2,Routine
+9.0,53,0,Summer,3,Routine
+1811.0,62,7,Autumn,8,Immediate Action
+1363.0,9,6,Summer,2,Routine
+2218.0,95,6,Spring,2,Routine
+1185.0,10,4,Winter,6,Monitor
+1256.0,61,4,Winter,7,Monitor
+1998.0,79,1,Summer,9,Immediate Action
+2341.0,101,6,Summer,4,Routine
+1992.0,90,3,Winter,8,Immediate Action
+48.0,28,9,Spring,9,Immediate Action
+64.0,23,4,Autumn,3,Routine
+2607.0,110,8,Winter,8,Immediate Action
+1515.0,19,3,Summer,2,Routine
+1760.0,8,8,Spring,8,Immediate Action
+475.0,112,2,Autumn,1,Routine
+297.0,99,1,Winter,1,Routine
+1053.0,102,2,Spring,7,Monitor
+1702.0,12,2,Summer,3,Routine
+2543.0,109,3,Autumn,9,Immediate Action
+1672.0,56,9,Autumn,7,Monitor
+2803.0,24,4,Spring,3,Routine
+2242.0,12,6,Autumn,7,Monitor
+1180.0,19,9,Autumn,7,Monitor
+2078.0,36,0,Spring,3,Routine
+1385.0,68,2,Autumn,4,Routine
+2217.0,12,0,Summer,9,Immediate Action
+209.0,13,3,Summer,2,Routine
+1108.0,48,4,Summer,2,Routine
+1722.0,20,8,Winter,4,Routine
+2521.0,64,9,Spring,6,Monitor
+16.0,41,1,Autumn,1,Routine
+2601.0,98,3,Autumn,9,Immediate Action
+655.0,41,8,Autumn,9,Immediate Action
+2182.0,22,1,Summer,9,Immediate Action
+1902.0,8,6,Autumn,6,Monitor
+641.0,109,1,Autumn,8,Immediate Action
+27.0,19,0,Spring,5,Monitor
+1836.0,46,3,Summer,5,Monitor
+2676.0,10,8,Autumn,7,Monitor
+886.0,20,5,Winter,1,Routine
+399.0,72,7,Summer,4,Routine
+666.0,72,5,Winter,7,Monitor
+23.0,75,5,Winter,2,Routine
+1730.0,47,1,Winter,5,Monitor
+2489.0,62,9,Winter,9,Immediate Action
+2195.0,56,5,Autumn,4,Routine
+2195.0,29,0,Summer,4,Routine
+2819.0,87,6,Spring,4,Routine
+2068.0,73,6,Summer,5,Monitor
+1815.0,30,7,Autumn,5,Monitor
+1051.0,90,3,Summer,1,Routine
+1948.0,25,9,Spring,8,Immediate Action
+540.0,51,0,Winter,8,Immediate Action
+2338.0,89,8,Spring,9,Immediate Action
+1037.0,116,7,Summer,7,Monitor
+1255.0,19,7,Winter,2,Routine
+1835.0,100,6,Spring,3,Routine
+751.0,117,7,Spring,1,Routine
+1239.0,31,9,Summer,3,Routine
+520.0,16,9,Summer,4,Routine
+60.0,50,2,Summer,7,Monitor
+2548.0,115,1,Summer,7,Monitor
+2622.0,52,9,Autumn,4,Routine
+710.0,20,3,Winter,1,Routine
+2318.0,28,1,Spring,2,Routine
+2300.0,103,6,Winter,5,Monitor
+1415.0,91,6,Summer,1,Routine
+662.0,40,6,Summer,2,Routine
+2760.0,14,9,Spring,9,Immediate Action
+2130.0,81,8,Spring,8,Immediate Action
+1378.0,74,0,Winter,4,Routine
+778.0,33,3,Summer,4,Routine
+778.0,64,7,Summer,4,Routine
+1293.0,45,0,Autumn,7,Monitor
+776.0,107,7,Autumn,7,Monitor
+2441.0,14,3,Spring,8,Immediate Action
+2860.0,61,6,Winter,5,Monitor
+154.0,94,1,Autumn,8,Immediate Action
+2713.0,118,1,Winter,2,Routine
+2079.0,43,5,Spring,2,Routine
+119.0,101,9,Winter,1,Routine
+2574.0,9,1,Autumn,7,Monitor
+2291.0,17,8,Spring,2,Routine
+1182.0,111,5,Spring,9,Immediate Action
+18.0,89,1,Autumn,6,Monitor
+2233.0,36,3,Summer,9,Immediate Action
+1182.0,80,9,Spring,9,Immediate Action
+460.0,89,1,Spring,4,Routine
+491.0,21,3,Summer,5,Monitor
+321.0,104,9,Summer,8,Immediate Action
+1238.0,98,2,Winter,1,Routine
+2767.0,40,7,Autumn,7,Monitor
+403.0,61,9,Autumn,7,Monitor
+833.0,61,9,Winter,9,Immediate Action
+2597.0,45,3,Summer,2,Routine
+1080.0,119,8,Winter,7,Monitor
+1334.0,93,4,Spring,1,Routine
+2608.0,65,3,Summer,1,Routine
+65.0,32,7,Spring,9,Immediate Action
+2180.0,35,4,Spring,8,Immediate Action
+2608.0,110,3,Winter,7,Monitor
+1054.0,26,4,Summer,4,Routine
+1987.0,100,0,Autumn,5,Monitor
+662.0,45,9,Autumn,5,Monitor
+2344.0,41,7,Summer,1,Routine
+1864.0,102,5,Summer,7,Monitor
+505.0,106,6,Summer,4,Routine
+1960.0,44,4,Winter,1,Routine
+217.0,79,7,Spring,9,Immediate Action
+1182.0,67,0,Autumn,5,Monitor
+2072.0,73,7,Spring,4,Routine
+83.0,45,6,Spring,5,Monitor
+542.0,93,2,Summer,9,Immediate Action
+262.0,24,1,Winter,9,Immediate Action
+76.0,38,9,Winter,6,Monitor
+1401.0,11,9,Spring,1,Routine
+2231.0,49,1,Autumn,8,Immediate Action
+1333.0,50,8,Summer,1,Routine
+1553.0,81,9,Summer,3,Routine
+11.0,50,1,Autumn,8,Immediate Action
+1850.0,99,2,Autumn,9,Immediate Action
+465.0,116,0,Winter,8,Immediate Action
+989.0,17,4,Summer,3,Routine
+1244.0,57,4,Winter,4,Routine
+1226.0,64,0,Summer,7,Monitor
+749.0,92,8,Summer,1,Routine
+2228.0,94,6,Autumn,3,Routine
+2645.0,10,4,Autumn,4,Routine
+2645.0,94,7,Winter,8,Immediate Action
+102.0,37,5,Autumn,3,Routine
+2644.0,22,1,Summer,5,Monitor
+11.0,109,5,Spring,1,Routine
+807.0,109,6,Autumn,8,Immediate Action
+2645.0,91,6,Summer,5,Monitor
+12.0,65,9,Autumn,9,Immediate Action
+2212.0,77,1,Winter,7,Monitor
+2644.0,53,9,Autumn,3,Routine
+246.0,77,3,Autumn,2,Routine
+2468.0,28,2,Winter,9,Immediate Action
+103.0,53,6,Spring,1,Routine
+2567.0,110,6,Spring,6,Monitor
+2293.0,94,9,Spring,2,Routine
+1729.0,113,4,Autumn,6,Monitor
+1850.0,16,9,Summer,6,Monitor
+76.0,94,0,Autumn,3,Routine
+2825.0,65,1,Summer,2,Routine
+1850.0,59,1,Winter,3,Routine
+380.0,111,8,Summer,2,Routine
+11.0,6,7,Autumn,8,Immediate Action
+1850.0,65,2,Summer,5,Monitor
+2555.0,74,4,Summer,8,Immediate Action
+1708.0,112,0,Summer,8,Immediate Action
+1846.0,79,1,Autumn,4,Routine
+76.0,74,1,Autumn,4,Routine
+1850.0,50,7,Spring,5,Monitor
+2016.0,83,1,Autumn,2,Routine
+439.0,97,8,Autumn,2,Routine
+1140.0,94,5,Summer,6,Monitor
+6.0,97,2,Spring,2,Routine
+361.0,86,1,Winter,7,Monitor
+1819.0,77,6,Summer,7,Monitor
+2796.0,105,6,Autumn,2,Routine
+328.0,14,8,Summer,6,Monitor
+11.0,30,5,Summer,2,Routine
+76.0,44,0,Autumn,9,Immediate Action
+1753.0,84,7,Spring,2,Routine
+32.0,37,3,Summer,3,Routine
+2474.0,80,4,Autumn,9,Immediate Action
+1248.0,62,0,Winter,5,Monitor
+76.0,96,7,Autumn,5,Monitor
+1737.0,74,5,Winter,1,Routine
+1505.0,70,5,Autumn,6,Monitor
+2796.0,78,5,Spring,2,Routine
+2796.0,116,8,Winter,4,Routine
+54.0,47,2,Winter,6,Monitor
+2668.0,67,0,Winter,1,Routine
+1850.0,105,6,Winter,4,Routine
+1737.0,49,7,Summer,5,Monitor
+979.0,8,4,Spring,5,Monitor
+1850.0,91,6,Spring,1,Routine
+979.0,48,8,Autumn,2,Routine
+916.0,63,0,Spring,7,Monitor
+1521.0,113,0,Autumn,3,Routine
+984.0,74,9,Winter,5,Monitor
+979.0,46,3,Winter,9,Immediate Action
+516.0,117,8,Autumn,2,Routine
+1533.0,53,8,Summer,1,Routine
+2214.0,39,7,Spring,2,Routine
+1237.0,79,7,Spring,8,Immediate Action
+1036.0,61,8,Summer,5,Monitor
+2641.0,110,4,Winter,7,Monitor
+1370.0,39,0,Autumn,1,Routine
+1370.0,17,1,Spring,7,Monitor
+1414.0,115,4,Winter,5,Monitor
+2702.0,113,3,Autumn,9,Immediate Action
+2598.0,59,8,Summer,4,Routine
+303.0,45,1,Winter,6,Monitor
+1861.0,33,7,Spring,2,Routine
+2200.0,101,7,Spring,8,Immediate Action
+2642.0,109,8,Spring,4,Routine
+2642.0,84,2,Winter,6,Monitor
+220.0,117,9,Spring,7,Monitor
+1742.0,27,7,Winter,1,Routine
+1526.0,88,5,Summer,6,Monitor
+1941.0,59,5,Spring,3,Routine
+2519.0,62,7,Winter,3,Routine
+1289.0,80,7,Spring,7,Monitor
+2075.0,89,0,Summer,1,Routine
+411.0,31,3,Autumn,2,Routine
+415.0,29,7,Winter,7,Monitor
+281.0,90,0,Spring,8,Immediate Action
+992.0,10,3,Autumn,4,Routine
+43.0,22,8,Summer,3,Routine
+2223.0,110,9,Spring,3,Routine
+657.0,80,6,Autumn,8,Immediate Action
+2453.0,59,3,Summer,8,Immediate Action
+17.0,17,6,Spring,9,Immediate Action
+193.0,16,6,Autumn,5,Monitor
+1785.0,116,9,Winter,2,Routine
+1024.0,8,0,Winter,5,Monitor
+1867.0,53,2,Summer,6,Monitor
+2080.0,23,8,Summer,8,Immediate Action
+533.0,6,9,Autumn,5,Monitor
+17.0,12,8,Autumn,2,Routine
+1197.0,84,6,Autumn,4,Routine
+2802.0,62,2,Winter,4,Routine
+397.0,6,8,Summer,1,Routine
+1402.0,119,3,Summer,3,Routine
+1504.0,7,3,Summer,6,Monitor
+2501.0,78,2,Autumn,3,Routine
+2185.0,60,8,Spring,8,Immediate Action
+2216.0,87,8,Winter,7,Monitor
+211.0,107,9,Spring,2,Routine
+335.0,95,9,Summer,4,Routine
+1516.0,116,8,Spring,5,Monitor
+1803.0,57,2,Spring,1,Routine
+1901.0,115,4,Spring,5,Monitor
+1768.0,88,9,Winter,8,Immediate Action
+2126.0,77,3,Autumn,9,Immediate Action
+1942.0,32,8,Winter,2,Routine
+2069.0,86,7,Winter,9,Immediate Action
+2800.0,115,5,Autumn,4,Routine
+1055.0,65,3,Autumn,3,Routine
+1676.0,109,9,Spring,7,Monitor
+2525.0,84,1,Autumn,3,Routine
+207.0,45,5,Winter,1,Routine
+2714.0,29,6,Autumn,2,Routine
+396.0,111,1,Autumn,2,Routine
+84.0,81,3,Summer,9,Immediate Action
+823.0,75,6,Winter,5,Monitor
+2709.0,117,4,Spring,7,Monitor
+2665.0,101,6,Spring,1,Routine
+1523.0,82,1,Spring,4,Routine
+1665.0,34,6,Summer,1,Routine
+2797.0,104,9,Spring,6,Monitor
+1939.0,96,8,Summer,5,Monitor
+651.0,96,1,Autumn,8,Immediate Action
+1670.0,88,5,Summer,3,Routine
+2227.0,115,8,Autumn,5,Monitor
+1952.0,101,2,Winter,8,Immediate Action
+1411.0,16,7,Spring,8,Immediate Action
+2329.0,38,3,Spring,2,Routine
+216.0,77,2,Summer,9,Immediate Action
+2674.0,38,0,Summer,5,Monitor
+2683.0,77,5,Spring,5,Monitor
+456.0,5,9,Summer,9,Immediate Action
+1142.0,76,7,Spring,6,Monitor
+2675.0,99,1,Summer,4,Routine
+1630.0,119,3,Winter,7,Monitor
+2596.0,116,6,Summer,8,Immediate Action
+2596.0,17,3,Spring,7,Monitor
+549.0,73,0,Spring,3,Routine
+2407.0,113,9,Winter,8,Immediate Action
+545.0,108,0,Autumn,1,Routine
+1934.0,67,2,Summer,1,Routine
+2798.0,18,4,Autumn,9,Immediate Action
+978.0,97,1,Spring,8,Immediate Action
+2797.0,103,0,Autumn,8,Immediate Action
+1502.0,61,8,Autumn,4,Routine
+2554.0,50,5,Autumn,2,Routine
+766.0,95,0,Spring,1,Routine
+1514.0,65,9,Autumn,9,Immediate Action
+1897.0,18,4,Summer,8,Immediate Action
+2334.0,80,7,Summer,8,Immediate Action
+1386.0,34,8,Spring,6,Monitor
+332.0,55,0,Winter,3,Routine
+1859.0,84,7,Summer,5,Monitor
+1860.0,104,4,Summer,3,Routine
+2556.0,70,7,Spring,9,Immediate Action
+1118.0,53,0,Winter,7,Monitor
+777.0,61,7,Spring,5,Monitor
+2408.0,33,1,Winter,9,Immediate Action
+795.0,72,3,Spring,3,Routine
+819.0,85,9,Spring,1,Routine
+1181.0,42,8,Winter,7,Monitor
+1686.0,77,0,Spring,1,Routine
+1758.0,35,0,Summer,3,Routine
+1662.0,102,6,Autumn,8,Immediate Action
+2572.0,26,0,Winter,3,Routine
+347.0,85,8,Winter,3,Routine
+664.0,30,5,Spring,4,Routine
+664.0,71,6,Winter,7,Monitor
+664.0,93,2,Autumn,7,Monitor
+1184.0,77,8,Summer,8,Immediate Action
+821.0,106,8,Autumn,9,Immediate Action
+178.0,63,7,Summer,3,Routine
+320.0,5,2,Winter,3,Routine
+1961.0,19,9,Autumn,2,Routine
+1362.0,7,9,Spring,6,Monitor
+2328.0,19,2,Summer,1,Routine
+1091.0,115,5,Summer,2,Routine
+1770.0,81,9,Autumn,2,Routine
+225.0,96,6,Winter,9,Immediate Action
+1092.0,69,7,Winter,1,Routine
+1517.0,49,9,Autumn,3,Routine
+177.0,34,8,Spring,3,Routine
+1121.0,41,6,Spring,3,Routine
+2826.0,64,2,Winter,7,Monitor
+2434.0,30,9,Autumn,1,Routine
+2259.0,79,1,Summer,9,Immediate Action
+155.0,40,2,Summer,4,Routine
+1276.0,41,0,Autumn,9,Immediate Action
+176.0,41,6,Spring,6,Monitor
+327.0,88,2,Spring,4,Routine
+176.0,57,5,Winter,4,Routine
+1197.0,38,9,Autumn,6,Monitor
+1640.0,41,5,Winter,5,Monitor
+799.0,30,0,Spring,9,Immediate Action
+466.0,57,1,Summer,3,Routine
+1031.0,76,7,Autumn,5,Monitor
+1638.0,114,2,Autumn,9,Immediate Action
+519.0,26,4,Winter,1,Routine
+1625.0,51,6,Winter,2,Routine
+2704.0,43,2,Winter,5,Monitor
+562.0,95,9,Winter,1,Routine
+1254.0,81,6,Spring,7,Monitor
+2218.0,28,8,Winter,2,Routine
+241.0,36,8,Summer,7,Monitor
+286.0,28,6,Spring,1,Routine
+425.0,38,8,Summer,8,Immediate Action
+1701.0,117,7,Winter,1,Routine
+904.0,89,8,Spring,5,Monitor
+373.0,72,8,Summer,3,Routine
+2309.0,38,0,Spring,3,Routine
+1806.0,63,4,Summer,5,Monitor
+963.0,14,8,Winter,4,Routine
+1290.0,18,7,Winter,8,Immediate Action
+2348.0,52,8,Summer,8,Immediate Action
+8.0,89,6,Spring,4,Routine
+1383.0,47,7,Summer,4,Routine
+2349.0,110,8,Autumn,7,Monitor
+1877.0,100,8,Summer,7,Monitor
+1847.0,33,1,Autumn,5,Monitor
+2339.0,117,8,Summer,5,Monitor
+2235.0,80,7,Autumn,6,Monitor
+560.0,35,6,Spring,4,Routine
+135.0,13,4,Summer,3,Routine
+175.0,24,6,Winter,5,Monitor
+558.0,83,6,Summer,7,Monitor
+1241.0,102,4,Winter,5,Monitor
+2285.0,14,7,Summer,8,Immediate Action
+2491.0,72,2,Spring,5,Monitor
+2854.0,8,2,Summer,3,Routine
+2669.0,10,5,Spring,2,Routine
+170.0,24,3,Winter,7,Monitor
+2513.0,37,5,Spring,6,Monitor
+1887.0,115,5,Autumn,3,Routine
+2839.0,36,3,Spring,5,Monitor
+955.0,115,6,Summer,4,Routine
+1067.0,75,7,Autumn,7,Monitor
+1262.0,86,5,Autumn,9,Immediate Action
+374.0,98,0,Summer,8,Immediate Action
+601.0,30,9,Summer,3,Routine
+238.0,29,6,Winter,6,Monitor
+395.0,42,3,Summer,7,Monitor
+33.0,52,2,Autumn,6,Monitor
+719.0,43,1,Autumn,1,Routine
+2853.0,90,8,Winter,1,Routine
+2331.0,81,8,Spring,9,Immediate Action
+782.0,100,2,Autumn,8,Immediate Action
+2210.0,17,1,Autumn,9,Immediate Action
+476.0,32,2,Winter,9,Immediate Action
+756.0,37,9,Autumn,5,Monitor
+384.0,28,7,Autumn,7,Monitor
+2500.0,26,0,Winter,6,Monitor
+1773.0,81,9,Summer,2,Routine
+2579.0,102,6,Winter,4,Routine
+1862.0,17,7,Summer,7,Monitor
+232.0,19,3,Autumn,5,Monitor
+2402.0,70,0,Autumn,2,Routine
+1853.0,5,1,Autumn,7,Monitor
+42.0,93,5,Winter,5,Monitor
+1398.0,78,8,Autumn,5,Monitor
+1743.0,110,1,Winter,5,Monitor
+2557.0,50,8,Summer,3,Routine
+561.0,18,1,Winter,3,Routine
+2766.0,87,2,Summer,2,Routine
+1371.0,28,7,Winter,5,Monitor
+180.0,45,6,Summer,8,Immediate Action
+2572.0,40,0,Autumn,5,Monitor
+972.0,94,8,Spring,8,Immediate Action
+208.0,44,3,Autumn,8,Immediate Action
+739.0,84,6,Winter,8,Immediate Action
+318.0,29,5,Summer,2,Routine
+789.0,39,5,Autumn,4,Routine
+2167.0,38,1,Summer,3,Routine
+1834.0,90,5,Summer,7,Monitor
+1641.0,86,7,Autumn,3,Routine
+450.0,66,3,Winter,7,Monitor
+2410.0,78,4,Summer,5,Monitor
+1721.0,30,8,Autumn,9,Immediate Action
+1761.0,110,1,Spring,5,Monitor
+1226.0,93,2,Winter,7,Monitor
+91.0,57,7,Summer,8,Immediate Action
+781.0,93,1,Spring,3,Routine
+2226.0,82,2,Autumn,3,Routine
+1593.0,41,8,Winter,8,Immediate Action
+294.0,22,9,Spring,8,Immediate Action
+1525.0,30,9,Summer,3,Routine
+602.0,49,5,Autumn,3,Routine
+1127.0,52,4,Autumn,6,Monitor
+2684.0,69,5,Winter,6,Monitor
+1021.0,37,0,Spring,9,Immediate Action
+1489.0,9,4,Summer,6,Monitor
+208.0,15,5,Spring,3,Routine
+2347.0,5,5,Autumn,6,Monitor
+391.0,55,1,Winter,2,Routine
+1747.0,92,9,Winter,2,Routine
+100.0,54,9,Spring,1,Routine
+802.0,66,5,Spring,3,Routine
+1528.0,88,5,Winter,3,Routine
+1065.0,89,6,Autumn,9,Immediate Action
+93.0,18,3,Winter,8,Immediate Action
+337.0,46,5,Autumn,2,Routine
+1997.0,69,5,Spring,4,Routine
+1863.0,40,2,Autumn,8,Immediate Action
+168.0,11,0,Summer,5,Monitor
+1524.0,24,8,Autumn,7,Monitor
+2467.0,108,3,Spring,2,Routine
+138.0,16,4,Summer,6,Monitor
+1947.0,60,7,Autumn,3,Routine
+225.0,68,4,Summer,7,Monitor
+1178.0,14,8,Summer,2,Routine
+849.0,83,5,Autumn,6,Monitor
+2053.0,15,5,Autumn,1,Routine
+1003.0,74,9,Winter,2,Routine
+533.0,50,0,Autumn,9,Immediate Action
+1868.0,99,1,Autumn,5,Monitor
+565.0,93,9,Summer,5,Monitor
+225.0,72,2,Autumn,8,Immediate Action
+442.0,14,0,Spring,2,Routine
+202.0,28,0,Winter,2,Routine
+1358.0,73,0,Summer,2,Routine
+202.0,27,4,Spring,8,Immediate Action
+1233.0,31,5,Winter,6,Monitor
+1374.0,64,8,Spring,5,Monitor
+1139.0,56,3,Autumn,8,Immediate Action
+214.0,28,9,Winter,6,Monitor
+363.0,87,5,Winter,7,Monitor
+1020.0,7,2,Autumn,6,Monitor
+638.0,101,1,Spring,9,Immediate Action
+1032.0,118,0,Spring,3,Routine
+292.0,47,7,Summer,8,Immediate Action
+2028.0,41,5,Autumn,8,Immediate Action
+2463.0,68,6,Summer,5,Monitor
+2554.0,23,9,Summer,6,Monitor
+1042.0,44,0,Autumn,6,Monitor
+2512.0,9,5,Summer,1,Routine
+2253.0,93,3,Spring,1,Routine
+1384.0,109,7,Spring,5,Monitor
+790.0,108,1,Spring,1,Routine
+2869.0,43,9,Spring,9,Immediate Action
+973.0,110,7,Autumn,9,Immediate Action
+219.0,28,9,Autumn,3,Routine
+394.0,111,6,Autumn,2,Routine
+254.0,92,8,Spring,9,Immediate Action
+317.0,100,7,Autumn,9,Immediate Action
+1804.0,31,1,Autumn,6,Monitor
+646.0,114,7,Summer,7,Monitor
+558.0,73,1,Winter,9,Immediate Action
+643.0,52,7,Spring,7,Monitor
+2799.0,42,6,Summer,3,Routine
+117.0,29,8,Summer,5,Monitor
+1759.0,61,9,Autumn,2,Routine
+987.0,26,1,Spring,7,Monitor
+2595.0,73,2,Summer,3,Routine
+1467.0,42,1,Spring,4,Routine
+1520.0,79,2,Summer,2,Routine
+1945.0,46,6,Summer,2,Routine
+1542.0,37,8,Autumn,4,Routine
+2607.0,25,7,Spring,9,Immediate Action
+1339.0,55,0,Winter,1,Routine
+1180.0,79,8,Winter,4,Routine
+2218.0,108,5,Summer,8,Immediate Action
+1657.0,115,5,Autumn,6,Monitor
+56.0,113,9,Spring,2,Routine
+1034.0,60,6,Autumn,8,Immediate Action
+417.0,91,6,Summer,9,Immediate Action
+2424.0,103,7,Spring,8,Immediate Action
+1888.0,24,3,Spring,7,Monitor
+2047.0,9,7,Winter,3,Routine
+2806.0,31,2,Spring,4,Routine
+2204.0,26,0,Spring,6,Monitor
+1590.0,36,8,Spring,7,Monitor
+474.0,58,2,Spring,3,Routine
+488.0,64,0,Winter,2,Routine
+62.0,44,8,Winter,5,Monitor
+2566.0,25,5,Winter,6,Monitor
+2224.0,53,6,Summer,8,Immediate Action
+137.0,76,2,Spring,3,Routine
+846.0,101,7,Summer,5,Monitor
+2067.0,72,7,Spring,5,Monitor
+1372.0,64,3,Spring,1,Routine
+1372.0,50,5,Autumn,9,Immediate Action
+1372.0,60,4,Summer,4,Routine
+1252.0,70,3,Summer,5,Monitor
+1069.0,118,7,Spring,1,Routine
+348.0,60,9,Spring,8,Immediate Action
+2340.0,114,4,Spring,2,Routine
+845.0,40,7,Autumn,1,Routine
+1883.0,37,6,Summer,1,Routine
+140.0,86,1,Spring,6,Monitor
+1169.0,42,6,Winter,8,Immediate Action
+2217.0,105,6,Autumn,4,Routine
+2632.0,16,3,Summer,5,Monitor
+1338.0,71,2,Spring,3,Routine
+2511.0,55,5,Autumn,1,Routine
+2511.0,109,2,Autumn,6,Monitor
+409.0,16,2,Summer,9,Immediate Action
+834.0,59,4,Spring,6,Monitor
+468.0,17,2,Spring,6,Monitor
+2488.0,86,3,Winter,5,Monitor
+198.0,25,5,Autumn,5,Monitor
+2211.0,73,8,Summer,9,Immediate Action
+2591.0,99,0,Spring,7,Monitor
+2285.0,37,8,Spring,1,Routine
+372.0,34,8,Summer,6,Monitor
+1675.0,104,1,Winter,3,Routine
+1195.0,107,7,Spring,1,Routine
+1379.0,119,3,Summer,5,Monitor
+2418.0,84,6,Winter,2,Routine
+525.0,67,7,Spring,1,Routine
+999.0,57,1,Summer,9,Immediate Action
+70.0,18,7,Autumn,5,Monitor
+681.0,5,9,Autumn,1,Routine
+1817.0,116,6,Spring,7,Monitor
+1927.0,7,0,Winter,7,Monitor
+1923.0,26,9,Summer,1,Routine
+22.0,82,2,Spring,6,Monitor
+1757.0,105,5,Winter,9,Immediate Action
+754.0,49,4,Summer,1,Routine
+2356.0,96,8,Winter,4,Routine
+85.0,100,8,Spring,3,Routine
+1165.0,31,5,Winter,8,Immediate Action
+2326.0,78,8,Summer,7,Monitor
+2.0,101,1,Summer,4,Routine
+2590.0,64,3,Spring,2,Routine
+1541.0,16,7,Summer,2,Routine
+2776.0,111,3,Summer,7,Monitor
+1557.0,59,9,Autumn,7,Monitor
+1073.0,59,2,Spring,1,Routine
+249.0,114,8,Winter,8,Immediate Action
+974.0,59,7,Spring,2,Routine
+1836.0,20,7,Spring,7,Monitor
+2485.0,8,4,Winter,6,Monitor
+1180.0,19,1,Summer,3,Routine
+1797.0,115,1,Spring,6,Monitor
+2712.0,105,9,Autumn,6,Monitor
+563.0,22,6,Autumn,6,Monitor
+355.0,116,9,Winter,9,Immediate Action
+250.0,71,2,Autumn,1,Routine
+2696.0,11,5,Autumn,1,Routine
+2266.0,44,0,Summer,8,Immediate Action
+1740.0,53,2,Spring,3,Routine
+2354.0,79,8,Spring,6,Monitor
+2813.0,11,7,Spring,3,Routine
+144.0,55,1,Winter,6,Monitor
+2201.0,10,4,Winter,2,Routine
+279.0,103,4,Autumn,3,Routine
+482.0,114,2,Winter,3,Routine
+1595.0,15,8,Summer,5,Monitor
+182.0,71,5,Spring,7,Monitor
+2551.0,25,4,Winter,4,Routine
+2588.0,78,2,Summer,8,Immediate Action
+2677.0,14,5,Autumn,9,Immediate Action
+2394.0,115,2,Summer,9,Immediate Action
+222.0,64,3,Winter,6,Monitor
+2848.0,77,9,Spring,2,Routine
+1257.0,26,3,Spring,7,Monitor
+330.0,47,2,Autumn,8,Immediate Action
+1389.0,59,7,Spring,4,Routine
+806.0,85,5,Summer,3,Routine
+280.0,98,2,Autumn,8,Immediate Action
+1842.0,112,5,Spring,4,Routine
+1842.0,88,1,Spring,9,Immediate Action
+1842.0,33,3,Winter,5,Monitor
+1842.0,24,0,Summer,1,Routine
+2801.0,106,0,Autumn,7,Monitor
+1851.0,67,9,Autumn,7,Monitor
+1399.0,25,1,Winter,7,Monitor
+2655.0,30,5,Spring,9,Immediate Action
+566.0,45,8,Summer,5,Monitor
+363.0,54,1,Winter,2,Routine
+2811.0,35,9,Summer,4,Routine
+1546.0,76,5,Winter,2,Routine
+282.0,103,3,Winter,2,Routine
+295.0,39,1,Spring,8,Immediate Action
+1390.0,102,6,Autumn,2,Routine
+2452.0,28,9,Summer,2,Routine
+315.0,25,2,Winter,1,Routine
+674.0,106,1,Spring,5,Monitor
+2791.0,103,2,Winter,8,Immediate Action
+2213.0,8,6,Autumn,1,Routine
+14.0,117,5,Summer,3,Routine
+825.0,35,9,Autumn,4,Routine
+285.0,90,5,Winter,6,Monitor
+310.0,67,7,Winter,4,Routine
+767.0,19,8,Summer,6,Monitor
+333.0,9,2,Winter,3,Routine
+342.0,85,1,Winter,7,Monitor
+2832.0,73,4,Autumn,2,Routine
+1554.0,37,9,Autumn,2,Routine
+2121.0,102,6,Spring,4,Routine
+1189.0,42,1,Winter,8,Immediate Action
+2125.0,113,1,Autumn,4,Routine
+784.0,46,9,Summer,5,Monitor
+437.0,116,5,Autumn,6,Monitor
+1726.0,70,1,Autumn,7,Monitor
+2499.0,95,6,Autumn,9,Immediate Action
+487.0,93,7,Autumn,7,Monitor
+1937.0,75,4,Winter,4,Routine
+1854.0,14,8,Winter,3,Routine
+1089.0,55,7,Summer,6,Monitor
+509.0,88,6,Winter,5,Monitor
+2664.0,64,7,Summer,4,Routine
+721.0,7,4,Winter,1,Routine
+1519.0,42,1,Autumn,1,Routine
+234.0,86,2,Spring,7,Monitor
+856.0,45,3,Summer,4,Routine
+1403.0,41,2,Winter,8,Immediate Action
+779.0,80,0,Summer,7,Monitor
+1951.0,16,9,Spring,3,Routine
+1513.0,52,9,Summer,4,Routine
+2099.0,39,8,Summer,3,Routine
+2023.0,111,0,Spring,9,Immediate Action
+2573.0,19,4,Winter,7,Monitor
+410.0,33,7,Summer,1,Routine
+2256.0,25,2,Autumn,2,Routine
+1668.0,40,4,Winter,7,Monitor
+161.0,77,5,Winter,1,Routine
+316.0,100,8,Spring,2,Routine
+329.0,70,0,Autumn,6,Monitor
+1413.0,21,9,Summer,8,Immediate Action
+663.0,29,2,Spring,2,Routine
+966.0,99,3,Summer,2,Routine
+136.0,88,0,Winter,7,Monitor
+2094.0,19,4,Autumn,9,Immediate Action
+172.0,31,5,Summer,2,Routine
+801.0,93,2,Autumn,7,Monitor
+518.0,41,9,Summer,6,Monitor
+2763.0,79,6,Summer,7,Monitor
+2083.0,117,5,Winter,5,Monitor
+1508.0,63,1,Spring,7,Monitor
+2486.0,45,3,Autumn,4,Routine
+2048.0,69,3,Autumn,2,Routine
+1608.0,43,1,Summer,5,Monitor
+1824.0,49,8,Winter,6,Monitor
+597.0,91,7,Summer,1,Routine
+1946.0,32,1,Summer,7,Monitor
+200.0,6,0,Summer,9,Immediate Action
+715.0,113,0,Winter,3,Routine
+31.0,56,0,Spring,7,Monitor
+353.0,44,7,Autumn,7,Monitor
+654.0,58,2,Spring,4,Routine
+10.0,18,3,Winter,9,Immediate Action
+1075.0,115,0,Spring,3,Routine
+71.0,44,3,Winter,6,Monitor
+366.0,12,7,Summer,3,Routine
+2051.0,114,9,Summer,5,Monitor
+2711.0,41,7,Summer,7,Monitor
+1741.0,49,7,Winter,1,Routine
+2436.0,89,0,Autumn,9,Immediate Action
+1837.0,87,6,Autumn,4,Routine
+660.0,94,6,Autumn,3,Routine
+1584.0,106,0,Summer,3,Routine
+1668.0,36,4,Winter,8,Immediate Action
+80.0,84,6,Spring,1,Routine
+2350.0,5,7,Summer,4,Routine
+2258.0,114,5,Autumn,7,Monitor
+1497.0,119,5,Autumn,3,Routine
+1124.0,103,9,Summer,2,Routine
+2659.0,30,3,Summer,7,Monitor
+34.0,52,0,Winter,1,Routine
+35.0,43,4,Winter,7,Monitor
+1589.0,34,0,Autumn,3,Routine
+1832.0,60,4,Summer,1,Routine
+86.0,82,5,Spring,3,Routine
+2687.0,15,6,Winter,9,Immediate Action
+232.0,88,7,Spring,3,Routine
+319.0,82,0,Winter,5,Monitor
+2385.0,97,2,Summer,5,Monitor
+2469.0,118,9,Spring,4,Routine
+1981.0,50,3,Winter,2,Routine
+2351.0,102,9,Spring,4,Routine
+645.0,34,9,Autumn,4,Routine
+2858.0,77,5,Winter,9,Immediate Action
+1225.0,58,2,Winter,6,Monitor
+1022.0,49,0,Winter,4,Routine
+1652.0,59,1,Summer,1,Routine
+1812.0,113,7,Winter,9,Immediate Action
+2492.0,106,6,Spring,3,Routine
+1668.0,85,9,Winter,9,Immediate Action
+1668.0,16,8,Autumn,7,Monitor
+1718.0,63,3,Autumn,8,Immediate Action
+2154.0,83,4,Winter,2,Routine
+2154.0,46,5,Winter,8,Immediate Action
+2517.0,25,6,Summer,4,Routine
+1962.0,91,9,Autumn,7,Monitor
+785.0,20,5,Spring,7,Monitor
+2014.0,32,1,Autumn,5,Monitor
+2131.0,100,8,Spring,2,Routine
+891.0,24,3,Winter,6,Monitor
+517.0,79,0,Winter,3,Routine
+1610.0,98,4,Winter,9,Immediate Action
+937.0,91,4,Autumn,4,Routine
+1801.0,108,2,Autumn,6,Monitor
+296.0,20,1,Spring,1,Routine
+567.0,54,4,Summer,1,Routine
+5.0,37,8,Summer,9,Immediate Action
+2353.0,53,5,Summer,2,Routine
+981.0,82,1,Autumn,6,Monitor
+1179.0,13,3,Summer,2,Routine
+1253.0,31,4,Winter,6,Monitor
+2503.0,51,0,Winter,5,Monitor
+2473.0,28,3,Autumn,6,Monitor
+375.0,100,3,Autumn,6,Monitor
+2230.0,87,4,Winter,5,Monitor
+1224.0,31,9,Summer,2,Routine
+362.0,49,7,Spring,4,Routine
+1731.0,82,7,Summer,1,Routine
+1685.0,38,8,Spring,6,Monitor
+2569.0,14,3,Spring,9,Immediate Action
+2010.0,115,8,Winter,4,Routine
+2009.0,5,2,Summer,8,Immediate Action
+2007.0,48,3,Winter,2,Routine
+1969.0,38,1,Summer,8,Immediate Action
+2008.0,112,9,Winter,4,Routine
+2011.0,103,0,Autumn,6,Monitor
+2012.0,68,9,Spring,2,Routine
+2006.0,12,7,Autumn,8,Immediate Action
+2650.0,30,4,Summer,5,Monitor
+116.0,77,9,Autumn,9,Immediate Action
+768.0,95,3,Autumn,9,Immediate Action
+1009.0,34,5,Winter,5,Monitor
+1273.0,56,9,Autumn,9,Immediate Action
+143.0,64,8,Spring,9,Immediate Action
+829.0,9,1,Spring,3,Routine
+2159.0,72,6,Autumn,3,Routine
+1739.0,54,0,Winter,2,Routine
+2689.0,82,7,Winter,8,Immediate Action
+2157.0,63,6,Summer,2,Routine
+2392.0,93,3,Summer,2,Routine
+1337.0,58,5,Spring,6,Monitor
+1809.0,28,0,Summer,5,Monitor
+2471.0,53,2,Spring,6,Monitor
+2017.0,79,6,Winter,7,Monitor
+2281.0,104,9,Winter,8,Immediate Action
+445.0,13,8,Summer,5,Monitor
+1775.0,93,5,Summer,5,Monitor
+1412.0,56,9,Spring,5,Monitor
+2493.0,54,5,Winter,6,Monitor
+2610.0,45,4,Spring,7,Monitor
+1488.0,114,1,Winter,6,Monitor
+535.0,68,1,Spring,9,Immediate Action
+2110.0,12,1,Spring,7,Monitor
+1949.0,21,1,Summer,4,Routine
+1966.0,81,4,Autumn,7,Monitor
+1892.0,48,1,Winter,2,Routine
+1925.0,55,2,Winter,6,Monitor
+1475.0,37,3,Spring,8,Immediate Action
+2851.0,109,9,Winter,1,Routine
+1387.0,100,6,Winter,2,Routine
+1618.0,84,9,Spring,5,Monitor
+304.0,85,0,Spring,5,Monitor
+2762.0,8,4,Autumn,9,Immediate Action
+1193.0,107,9,Summer,8,Immediate Action
+2081.0,6,9,Autumn,5,Monitor
+352.0,81,8,Winter,5,Monitor
+708.0,63,4,Spring,9,Immediate Action
+1527.0,12,8,Spring,7,Monitor
+444.0,69,9,Autumn,3,Routine
+2198.0,43,8,Winter,1,Routine
+1352.0,80,2,Spring,3,Routine
+1810.0,51,0,Summer,7,Monitor
+440.0,69,7,Spring,3,Routine
+210.0,29,4,Autumn,1,Routine
+2284.0,51,0,Spring,4,Routine
+2772.0,10,7,Spring,5,Monitor
+1131.0,100,3,Autumn,8,Immediate Action
+419.0,19,1,Winter,8,Immediate Action
+1117.0,69,4,Spring,2,Routine
+2013.0,33,3,Spring,6,Monitor
+495.0,108,9,Autumn,3,Routine
+367.0,108,7,Winter,6,Monitor
+1058.0,108,6,Summer,9,Immediate Action
+2541.0,11,4,Summer,5,Monitor
+1480.0,36,3,Summer,6,Monitor
+1476.0,56,8,Summer,9,Immediate Action
+306.0,87,4,Summer,6,Monitor
+1991.0,10,9,Spring,9,Immediate Action
+1249.0,10,1,Winter,6,Monitor
+889.0,83,4,Winter,4,Routine
+661.0,64,7,Winter,4,Routine
+2563.0,100,6,Spring,7,Monitor
+1587.0,97,8,Autumn,7,Monitor
+2156.0,94,5,Spring,4,Routine
+1174.0,23,1,Spring,1,Routine
+2299.0,42,9,Summer,8,Immediate Action
+2663.0,45,5,Summer,8,Immediate Action
+1351.0,74,3,Summer,3,Routine
+2265.0,67,8,Winter,3,Routine
+145.0,112,8,Autumn,9,Immediate Action
+145.0,99,6,Autumn,5,Monitor
+2249.0,100,6,Summer,1,Routine
+920.0,104,1,Spring,2,Routine
+1242.0,77,3,Summer,3,Routine
+2495.0,71,2,Summer,4,Routine
+921.0,39,9,Summer,5,Monitor
+920.0,59,8,Autumn,8,Immediate Action
+921.0,83,4,Spring,6,Monitor
+716.0,71,0,Spring,7,Monitor
+89.0,83,8,Spring,4,Routine
+1986.0,107,6,Winter,8,Immediate Action
+457.0,65,7,Winter,9,Immediate Action
+1646.0,54,5,Winter,2,Routine
+2667.0,100,9,Autumn,7,Monitor
+921.0,63,4,Spring,5,Monitor
+390.0,115,9,Winter,7,Monitor
+2443.0,44,6,Spring,8,Immediate Action
+921.0,91,9,Winter,7,Monitor
+2175.0,6,8,Summer,4,Routine
+735.0,119,1,Winter,5,Monitor
+824.0,69,2,Winter,1,Routine
+982.0,35,7,Winter,8,Immediate Action
+2304.0,117,0,Spring,9,Immediate Action
+735.0,18,7,Spring,6,Monitor
+921.0,108,8,Autumn,7,Monitor
+2262.0,33,7,Summer,9,Immediate Action
+921.0,13,3,Summer,5,Monitor
+735.0,56,6,Summer,4,Routine
+1000.0,115,3,Winter,2,Routine
+2561.0,85,2,Autumn,7,Monitor
+1057.0,50,6,Spring,5,Monitor
+457.0,27,4,Winter,8,Immediate Action
+1706.0,118,3,Spring,7,Monitor
+896.0,75,6,Winter,4,Routine
+186.0,53,8,Spring,4,Routine
+38.0,5,8,Winter,1,Routine
+2403.0,49,3,Spring,2,Routine
+1144.0,51,4,Spring,3,Routine
+735.0,25,7,Winter,4,Routine
+2303.0,63,8,Summer,3,Routine
+527.0,54,8,Summer,1,Routine
+2870.0,90,8,Summer,1,Routine
+2871.0,25,8,Winter,5,Monitor
+1592.0,62,0,Autumn,2,Routine
+1340.0,91,0,Winter,5,Monitor
+1765.0,15,1,Autumn,4,Routine
+1283.0,32,5,Spring,4,Routine
+2290.0,119,2,Winter,1,Routine
+1486.0,81,4,Autumn,6,Monitor
+965.0,65,1,Summer,8,Immediate Action
+2076.0,84,1,Winter,9,Immediate Action
+2558.0,20,1,Summer,5,Monitor
+579.0,29,2,Winter,6,Monitor
+847.0,67,4,Winter,4,Routine
+290.0,56,4,Autumn,8,Immediate Action
+914.0,92,6,Summer,8,Immediate Action
+1965.0,10,5,Summer,7,Monitor
+1133.0,53,2,Summer,8,Immediate Action
+2614.0,114,4,Spring,8,Immediate Action
+1478.0,84,4,Spring,6,Monitor
+2509.0,14,9,Spring,9,Immediate Action
+1280.0,81,4,Summer,9,Immediate Action
+2343.0,6,8,Spring,9,Immediate Action
+2835.0,62,9,Winter,1,Routine
+2307.0,95,6,Spring,4,Routine
+1881.0,81,7,Winter,6,Monitor
+1112.0,73,0,Autumn,3,Routine
+2835.0,51,1,Spring,9,Immediate Action
+314.0,14,0,Autumn,9,Immediate Action
+1136.0,112,7,Summer,9,Immediate Action
+900.0,56,9,Spring,6,Monitor
+1602.0,78,4,Summer,5,Monitor
+1259.0,83,2,Autumn,7,Monitor
+2835.0,86,8,Summer,8,Immediate Action
+1215.0,46,2,Autumn,2,Routine
+381.0,33,5,Summer,6,Monitor
+2288.0,66,4,Summer,6,Monitor
+1787.0,79,0,Winter,7,Monitor
+1643.0,95,7,Winter,8,Immediate Action
+1112.0,32,5,Autumn,3,Routine
+2643.0,114,5,Spring,5,Monitor
+2536.0,94,7,Winter,8,Immediate Action
+2490.0,94,9,Autumn,8,Immediate Action
+2076.0,116,5,Autumn,7,Monitor
+2220.0,104,3,Autumn,6,Monitor
+459.0,93,1,Autumn,8,Immediate Action
+1394.0,105,5,Autumn,2,Routine
+2835.0,11,6,Summer,4,Routine
+2462.0,116,7,Winter,4,Routine
+215.0,99,0,Autumn,5,Monitor
+2679.0,60,5,Autumn,3,Routine
+1598.0,95,0,Winter,5,Monitor
+2106.0,38,7,Summer,7,Monitor
+368.0,44,3,Autumn,6,Monitor
+438.0,13,9,Summer,3,Routine
+2600.0,32,3,Autumn,5,Monitor
+79.0,32,3,Autumn,5,Monitor
+2142.0,73,6,Spring,2,Routine
+1874.0,20,0,Spring,2,Routine
+1619.0,79,0,Autumn,7,Monitor
+848.0,107,2,Autumn,2,Routine
+406.0,33,2,Winter,1,Routine
+1356.0,100,2,Summer,2,Routine
+1381.0,33,3,Spring,7,Monitor
+2179.0,28,8,Spring,4,Routine
+2306.0,114,2,Spring,3,Routine
+554.0,97,1,Summer,7,Monitor
+2532.0,84,5,Spring,4,Routine
+1580.0,27,6,Winter,5,Monitor
+1884.0,23,3,Autumn,4,Routine
+752.0,45,4,Autumn,3,Routine
+1620.0,74,7,Winter,7,Monitor
+2208.0,5,9,Winter,4,Routine
+129.0,84,6,Winter,5,Monitor
+1135.0,109,5,Autumn,2,Routine
+405.0,113,7,Winter,2,Routine
+2174.0,26,9,Winter,7,Monitor
+486.0,114,5,Autumn,3,Routine
+2071.0,7,0,Summer,2,Routine
+1751.0,17,4,Autumn,7,Monitor
+1391.0,35,3,Summer,2,Routine
+1579.0,72,8,Summer,5,Monitor
+792.0,33,7,Summer,1,Routine
+2532.0,76,5,Winter,1,Routine
+1394.0,116,9,Autumn,7,Monitor
+901.0,93,7,Winter,8,Immediate Action
+2829.0,25,6,Summer,2,Routine
+2699.0,102,1,Spring,2,Routine
+365.0,108,6,Summer,1,Routine
+1122.0,71,0,Spring,5,Monitor
+2076.0,58,8,Summer,8,Immediate Action
+2466.0,93,5,Spring,9,Immediate Action
+2391.0,5,5,Summer,2,Routine
+2255.0,105,7,Winter,5,Monitor
+2583.0,21,5,Spring,8,Immediate Action
+2438.0,110,9,Winter,6,Monitor
+407.0,102,1,Autumn,8,Immediate Action
+2275.0,20,7,Summer,5,Monitor
+28.0,8,6,Winter,1,Routine
+2052.0,74,6,Winter,5,Monitor
+914.0,115,0,Spring,2,Routine
+1623.0,59,6,Spring,5,Monitor
+506.0,101,3,Autumn,9,Immediate Action
+1866.0,106,5,Spring,4,Routine
+2514.0,47,4,Winter,5,Monitor
+577.0,44,2,Winter,3,Routine
+649.0,113,3,Summer,5,Monitor
+810.0,42,2,Spring,9,Immediate Action
+817.0,5,5,Spring,2,Routine
+678.0,16,3,Winter,9,Immediate Action
+447.0,100,4,Winter,3,Routine
+2611.0,102,2,Autumn,7,Monitor
+2560.0,69,3,Summer,1,Routine
+1776.0,109,7,Spring,6,Monitor
+2203.0,30,3,Spring,2,Routine
+462.0,51,5,Winter,1,Routine
+1836.0,5,3,Winter,4,Routine
+1361.0,110,0,Winter,6,Monitor
+1274.0,43,3,Winter,1,Routine
+2649.0,14,6,Spring,5,Monitor
+2238.0,115,2,Winter,1,Routine
+28.0,51,9,Winter,3,Routine
+596.0,54,2,Summer,6,Monitor
+2856.0,49,0,Summer,4,Routine
+1243.0,46,9,Spring,9,Immediate Action
+1282.0,42,8,Winter,3,Routine
+2073.0,48,6,Autumn,2,Routine
+2018.0,23,1,Winter,1,Routine
+2504.0,39,0,Autumn,8,Immediate Action
+300.0,30,3,Winter,5,Monitor
+1332.0,12,2,Winter,5,Monitor
+2275.0,31,1,Autumn,5,Monitor
+1132.0,105,5,Spring,1,Routine
+1664.0,97,3,Summer,2,Routine
+1066.0,25,5,Autumn,4,Routine
+157.0,8,4,Spring,6,Monitor
+2769.0,49,6,Autumn,2,Routine
+635.0,62,5,Winter,9,Immediate Action
+832.0,28,5,Autumn,4,Routine
+2616.0,18,0,Summer,5,Monitor
+2376.0,111,8,Summer,5,Monitor
+2857.0,24,7,Summer,3,Routine
+379.0,35,5,Winter,3,Routine
+1346.0,107,8,Summer,9,Immediate Action
+2105.0,117,3,Summer,3,Routine
+1783.0,112,8,Summer,3,Routine
+2594.0,115,9,Spring,9,Immediate Action
+2240.0,61,8,Spring,6,Monitor
+1116.0,10,0,Autumn,1,Routine
+2546.0,105,2,Summer,5,Monitor
+2460.0,31,1,Spring,1,Routine
+1780.0,106,0,Autumn,8,Immediate Action
+1470.0,19,7,Summer,6,Monitor
+2289.0,94,1,Summer,7,Monitor
+1772.0,117,6,Summer,3,Routine
+1078.0,20,8,Summer,5,Monitor
+818.0,10,7,Spring,5,Monitor
+555.0,72,7,Winter,1,Routine
+1833.0,100,0,Winter,3,Routine
+2454.0,7,1,Summer,5,Monitor
+147.0,18,6,Autumn,6,Monitor
+2524.0,63,3,Spring,5,Monitor
+1848.0,21,9,Summer,2,Routine
+2336.0,25,6,Autumn,1,Routine
+2269.0,77,8,Spring,7,Monitor
+1543.0,72,5,Autumn,7,Monitor
+1871.0,14,2,Summer,2,Routine
+1537.0,60,7,Spring,3,Routine
+344.0,74,9,Autumn,7,Monitor
+1723.0,14,1,Spring,7,Monitor
+917.0,53,0,Winter,5,Monitor
+2423.0,68,9,Summer,4,Routine
+1287.0,31,5,Summer,8,Immediate Action
+382.0,34,5,Winter,1,Routine
+436.0,22,6,Autumn,3,Routine
+2221.0,35,5,Spring,9,Immediate Action
+253.0,53,1,Summer,7,Monitor
+2070.0,23,1,Spring,2,Routine
+1491.0,28,9,Winter,4,Routine
+263.0,63,3,Spring,8,Immediate Action
+902.0,40,0,Autumn,8,Immediate Action
+2261.0,107,6,Autumn,5,Monitor
+158.0,116,1,Winter,5,Monitor
+1604.0,60,6,Summer,8,Immediate Action
+1393.0,94,3,Autumn,1,Routine
+822.0,28,1,Spring,9,Immediate Action
+1786.0,109,0,Winter,5,Monitor
+656.0,96,8,Spring,3,Routine
+844.0,94,7,Winter,9,Immediate Action
+1574.0,67,7,Winter,6,Monitor
+189.0,96,0,Spring,2,Routine
+476.0,41,1,Spring,1,Routine
+476.0,57,1,Winter,6,Monitor
+398.0,28,3,Spring,2,Routine
+2288.0,83,1,Spring,1,Routine
+1462.0,113,4,Winter,7,Monitor
+548.0,81,8,Winter,5,Monitor
+2528.0,16,8,Autumn,2,Routine
+1540.0,17,8,Spring,1,Routine
+1930.0,94,4,Spring,9,Immediate Action
+1771.0,78,9,Summer,5,Monitor
+313.0,67,0,Spring,4,Routine
+919.0,14,9,Summer,7,Monitor
+494.0,114,4,Autumn,9,Immediate Action
+1836.0,91,4,Spring,4,Routine
+2445.0,101,9,Spring,8,Immediate Action
+2153.0,59,2,Autumn,6,Monitor
+529.0,61,1,Autumn,6,Monitor
+453.0,67,8,Autumn,2,Routine
+1215.0,7,5,Spring,7,Monitor
+571.0,40,0,Autumn,2,Routine
+2662.0,69,0,Winter,1,Routine
+1958.0,37,0,Spring,9,Immediate Action
+1062.0,37,1,Autumn,9,Immediate Action
+1507.0,5,2,Spring,1,Routine
+1611.0,19,6,Summer,5,Monitor
+2484.0,19,8,Autumn,4,Routine
+1056.0,105,0,Winter,4,Routine
+793.0,79,7,Autumn,2,Routine
+578.0,110,1,Autumn,6,Monitor
+471.0,52,7,Winter,1,Routine
+1885.0,73,8,Spring,2,Routine
+2535.0,117,7,Winter,3,Routine
+2267.0,88,1,Summer,7,Monitor
+483.0,69,1,Winter,4,Routine
+2559.0,36,4,Spring,9,Immediate Action
+1985.0,39,4,Winter,5,Monitor
+2516.0,51,7,Autumn,8,Immediate Action
+1137.0,38,7,Spring,5,Monitor
+1151.0,10,9,Winter,6,Monitor
+1013.0,98,5,Spring,3,Routine
+1705.0,69,8,Summer,9,Immediate Action
+1605.0,48,3,Spring,5,Monitor
+147.0,31,5,Winter,2,Routine
+757.0,48,1,Winter,5,Monitor
+499.0,103,5,Summer,8,Immediate Action
+2528.0,110,1,Autumn,1,Routine
+1821.0,8,6,Summer,9,Immediate Action
+2710.0,104,6,Summer,9,Immediate Action
+2522.0,113,6,Winter,1,Routine
+2692.0,99,6,Spring,4,Routine
+1968.0,44,2,Spring,9,Immediate Action
+2691.0,42,9,Summer,8,Immediate Action
+746.0,108,4,Summer,2,Routine
+443.0,63,7,Autumn,8,Immediate Action
+2455.0,81,9,Autumn,4,Routine
+1780.0,76,3,Summer,1,Routine
+598.0,37,2,Autumn,9,Immediate Action
+2296.0,87,1,Autumn,9,Immediate Action
+152.0,70,1,Summer,4,Routine
+853.0,30,8,Winter,7,Monitor
+1898.0,53,4,Autumn,3,Routine
+2401.0,103,3,Summer,3,Routine
+1648.0,68,9,Autumn,8,Immediate Action
+1018.0,65,7,Autumn,4,Routine
+1251.0,37,9,Summer,2,Routine
+223.0,99,8,Spring,6,Monitor
+188.0,36,0,Summer,2,Routine
+2824.0,60,6,Autumn,2,Routine
+901.0,6,4,Autumn,9,Immediate Action
+1626.0,63,6,Spring,4,Routine
+2113.0,110,3,Summer,1,Routine
+2833.0,52,5,Spring,8,Immediate Action
+2237.0,101,7,Autumn,7,Monitor
+2096.0,26,6,Autumn,3,Routine
+1884.0,113,4,Winter,4,Routine
+2295.0,96,9,Spring,9,Immediate Action
+2020.0,17,1,Spring,7,Monitor
+1005.0,83,9,Summer,5,Monitor
+476.0,16,2,Summer,5,Monitor
+1597.0,97,5,Spring,8,Immediate Action
+613.0,30,8,Spring,1,Routine
+830.0,14,9,Autumn,8,Immediate Action
+2509.0,26,9,Winter,3,Routine
+393.0,89,4,Spring,3,Routine
+614.0,79,6,Autumn,5,Monitor
+2638.0,70,6,Summer,8,Immediate Action
+1349.0,87,6,Spring,9,Immediate Action
+2093.0,100,2,Autumn,2,Routine
+1005.0,40,3,Spring,4,Routine
+1008.0,86,1,Spring,3,Routine
+1104.0,74,5,Autumn,5,Monitor
+938.0,118,2,Winter,5,Monitor
+1723.0,55,3,Summer,4,Routine
+588.0,58,8,Autumn,1,Routine
+2651.0,29,8,Winter,4,Routine
+2666.0,23,3,Autumn,3,Routine
+1623.0,20,9,Autumn,7,Monitor
+2467.0,63,4,Autumn,5,Monitor
+2428.0,106,2,Spring,8,Immediate Action
+493.0,9,3,Summer,9,Immediate Action
+484.0,15,5,Autumn,7,Monitor
+2533.0,78,7,Summer,2,Routine
+2435.0,26,2,Autumn,6,Monitor
+578.0,76,5,Winter,5,Monitor
+1822.0,73,0,Spring,7,Monitor
+1876.0,58,8,Autumn,7,Monitor
+1079.0,60,6,Summer,3,Routine
+1329.0,6,9,Spring,8,Immediate Action
+2761.0,11,9,Winter,1,Routine
+1009.0,118,7,Autumn,5,Monitor
+148.0,59,8,Spring,4,Routine
+264.0,110,1,Summer,1,Routine
+1836.0,25,7,Autumn,5,Monitor
+2771.0,90,8,Spring,8,Immediate Action
+2682.0,73,3,Spring,7,Monitor
+742.0,41,2,Summer,8,Immediate Action
+1232.0,70,3,Winter,9,Immediate Action
+1823.0,32,4,Spring,7,Monitor
+1601.0,41,6,Winter,8,Immediate Action
+2824.0,100,4,Autumn,3,Routine
+499.0,112,3,Spring,9,Immediate Action
+2849.0,11,7,Autumn,8,Immediate Action
+2769.0,110,3,Summer,6,Monitor
+706.0,97,4,Spring,8,Immediate Action
+1724.0,90,6,Winter,4,Routine
+2790.0,115,9,Autumn,7,Monitor
+1009.0,41,3,Winter,3,Routine
+439.0,76,6,Autumn,6,Monitor
+1218.0,56,2,Winter,6,Monitor
+1112.0,111,6,Summer,9,Immediate Action
+815.0,23,7,Winter,7,Monitor
+427.0,119,4,Summer,4,Routine
+543.0,23,5,Winter,2,Routine
+1008.0,83,4,Winter,5,Monitor
+615.0,33,2,Autumn,1,Routine
+2337.0,91,8,Summer,9,Immediate Action
+427.0,105,8,Summer,3,Routine
+301.0,101,5,Summer,6,Monitor
+1002.0,104,2,Winter,2,Routine
+387.0,7,5,Summer,7,Monitor
+162.0,34,0,Summer,8,Immediate Action
+2861.0,75,5,Summer,9,Immediate Action
+1265.0,35,5,Winter,5,Monitor
+796.0,71,6,Winter,9,Immediate Action
+2005.0,97,7,Summer,8,Immediate Action
+2451.0,94,8,Autumn,7,Monitor
+1380.0,65,8,Autumn,9,Immediate Action
+2537.0,59,9,Winter,2,Routine
+2836.0,50,6,Winter,1,Routine
+2616.0,63,2,Autumn,2,Routine
+1784.0,26,6,Summer,5,Monitor
+901.0,90,7,Spring,9,Immediate Action
+2345.0,86,0,Spring,7,Monitor
+150.0,37,3,Winter,3,Routine
+2073.0,19,1,Spring,1,Routine
+555.0,35,4,Summer,6,Monitor
+0.0,63,5,Summer,3,Routine
+2605.0,96,0,Spring,9,Immediate Action
+146.0,63,3,Winter,3,Routine
+775.0,63,9,Winter,3,Routine
+1029.0,103,7,Summer,3,Routine
+2295.0,110,1,Winter,4,Routine
+2423.0,12,3,Autumn,6,Monitor
+1327.0,97,3,Winter,2,Routine
+826.0,92,4,Spring,6,Monitor
+2570.0,85,3,Spring,3,Routine
+253.0,62,7,Winter,5,Monitor
+2181.0,46,2,Winter,8,Immediate Action
+2615.0,38,1,Winter,4,Routine
+275.0,50,3,Spring,3,Routine
+1799.0,98,5,Spring,4,Routine
+131.0,59,2,Autumn,9,Immediate Action
+1878.0,75,5,Spring,8,Immediate Action
+2337.0,117,3,Autumn,1,Routine
+266.0,24,5,Autumn,2,Routine
+2302.0,84,4,Autumn,6,Monitor
+1710.0,12,7,Winter,5,Monitor
+1112.0,100,1,Winter,7,Monitor
+1176.0,109,0,Autumn,1,Routine
+2470.0,36,5,Summer,2,Routine
+2158.0,37,5,Winter,1,Routine
+552.0,30,7,Spring,9,Immediate Action
+212.0,18,9,Spring,8,Immediate Action
+1577.0,74,3,Autumn,7,Monitor
+1805.0,101,8,Winter,6,Monitor
+1150.0,100,1,Spring,9,Immediate Action
+1654.0,107,2,Winter,8,Immediate Action
+1777.0,26,5,Winter,3,Routine
+1033.0,14,7,Autumn,5,Monitor
+2236.0,94,8,Summer,7,Monitor
+590.0,83,2,Winter,2,Routine
+1930.0,25,0,Spring,7,Monitor
+2297.0,84,2,Spring,6,Monitor
+1645.0,117,0,Winter,5,Monitor
+1028.0,18,9,Spring,1,Routine
+1246.0,90,9,Autumn,7,Monitor
+2093.0,87,1,Spring,2,Routine
+988.0,42,6,Summer,6,Monitor
+1666.0,76,6,Autumn,6,Monitor
+1648.0,56,0,Spring,9,Immediate Action
+938.0,38,2,Spring,6,Monitor
+1931.0,83,4,Spring,6,Monitor
+443.0,81,2,Autumn,5,Monitor
+1667.0,18,8,Spring,3,Routine
+1631.0,109,9,Spring,8,Immediate Action
+2305.0,46,0,Spring,5,Monitor
+1549.0,14,8,Autumn,7,Monitor
+1134.0,115,6,Autumn,5,Monitor
+2221.0,45,9,Spring,7,Monitor
+611.0,113,0,Winter,2,Routine
+1762.0,115,7,Winter,7,Monitor
+224.0,41,7,Autumn,7,Monitor
+2275.0,105,3,Spring,3,Routine
+610.0,99,8,Autumn,3,Routine
+743.0,113,5,Spring,1,Routine
+2026.0,45,8,Summer,6,Monitor
+1120.0,22,6,Winter,8,Immediate Action
+2025.0,96,1,Autumn,4,Routine
+1192.0,80,5,Autumn,5,Monitor
+2302.0,115,8,Winter,8,Immediate Action
+13.0,30,7,Spring,6,Monitor
+1345.0,7,5,Spring,2,Routine
+1382.0,67,7,Winter,6,Monitor
+1228.0,100,9,Autumn,5,Monitor
+298.0,70,0,Spring,8,Immediate Action
+166.0,16,5,Spring,2,Routine
+1957.0,60,9,Autumn,4,Routine
+2775.0,103,1,Summer,9,Immediate Action
+1015.0,44,7,Autumn,4,Routine
+2050.0,115,9,Summer,2,Routine
+816.0,24,5,Spring,7,Monitor
+2376.0,113,9,Spring,9,Immediate Action
+2477.0,106,3,Summer,9,Immediate Action
+1035.0,42,4,Winter,4,Routine
+551.0,78,2,Winter,5,Monitor
+1141.0,76,5,Spring,3,Routine
+1271.0,15,0,Autumn,9,Immediate Action
+1030.0,55,2,Winter,7,Monitor
+197.0,107,3,Winter,5,Monitor
+2790.0,98,8,Winter,7,Monitor
+1138.0,89,5,Autumn,8,Immediate Action
+264.0,68,8,Summer,4,Routine
+711.0,51,8,Autumn,3,Routine
+1198.0,109,9,Spring,3,Routine
+2522.0,47,7,Summer,7,Monitor
+1716.0,44,9,Spring,8,Immediate Action
+2001.0,30,1,Summer,5,Monitor
+587.0,95,2,Winter,7,Monitor
+1889.0,52,8,Spring,5,Monitor
+1575.0,59,5,Autumn,9,Immediate Action
+338.0,63,3,Autumn,5,Monitor
+2640.0,83,9,Autumn,3,Routine
+550.0,38,4,Autumn,8,Immediate Action
+24.0,115,3,Winter,5,Monitor
+130.0,113,1,Summer,8,Immediate Action
+1023.0,21,4,Autumn,9,Immediate Action
+128.0,47,1,Winter,9,Immediate Action
+1599.0,49,4,Spring,8,Immediate Action
+1044.0,41,9,Autumn,1,Routine
+1344.0,31,4,Spring,2,Routine
+755.0,66,6,Winter,2,Routine
+452.0,116,5,Spring,7,Monitor
+1782.0,84,0,Spring,2,Routine
+587.0,62,2,Summer,6,Monitor
+2275.0,25,5,Summer,5,Monitor
+2239.0,115,2,Autumn,3,Routine
+1128.0,76,4,Autumn,6,Monitor
+2128.0,59,9,Winter,4,Routine
+2248.0,79,1,Winter,1,Routine
+385.0,93,7,Autumn,2,Routine
+791.0,73,9,Autumn,7,Monitor
+1944.0,44,7,Autumn,5,Monitor
+869.0,116,1,Autumn,6,Monitor
+1606.0,118,6,Spring,5,Monitor
+2865.0,27,0,Autumn,5,Monitor
+2782.0,90,9,Winter,4,Routine
+1696.0,61,8,Summer,6,Monitor
+1463.0,85,2,Spring,5,Monitor
+1375.0,60,1,Spring,8,Immediate Action
+53.0,85,1,Spring,3,Routine
+633.0,78,9,Spring,8,Immediate Action
+686.0,64,4,Autumn,2,Routine
+631.0,19,0,Winter,5,Monitor
+2109.0,116,5,Winter,6,Monitor
+622.0,93,4,Autumn,5,Monitor
+629.0,119,1,Autumn,3,Routine
+1532.0,91,0,Winter,7,Monitor
+621.0,108,4,Spring,6,Monitor
+1532.0,112,9,Autumn,4,Routine
+1442.0,66,9,Winter,2,Routine
+2040.0,58,9,Winter,3,Routine
+1445.0,107,0,Winter,4,Routine
+1921.0,36,6,Summer,8,Immediate Action
+1440.0,63,0,Summer,3,Routine
+1532.0,8,6,Summer,9,Immediate Action
+2272.0,79,0,Winter,3,Routine
+2273.0,24,0,Spring,8,Immediate Action
+688.0,99,9,Summer,5,Monitor
+1692.0,100,3,Summer,7,Monitor
+1692.0,7,5,Summer,4,Routine
+1696.0,20,1,Spring,9,Immediate Action
+1698.0,92,0,Winter,8,Immediate Action
+688.0,112,2,Spring,8,Immediate Action
+530.0,63,7,Winter,3,Routine
+2396.0,42,9,Autumn,3,Routine
+682.0,80,7,Summer,2,Routine
+345.0,78,2,Summer,7,Monitor
+2247.0,21,6,Spring,9,Immediate Action
+2589.0,119,0,Autumn,4,Routine
+2785.0,118,9,Winter,7,Monitor
+2783.0,95,3,Spring,6,Monitor
+1699.0,39,9,Summer,9,Immediate Action
+2672.0,33,3,Autumn,9,Immediate Action
+2273.0,43,2,Spring,1,Routine
+1087.0,74,0,Autumn,4,Routine
+951.0,84,4,Winter,5,Monitor
+2782.0,58,5,Winter,2,Routine
+629.0,45,3,Spring,4,Routine
+1016.0,68,1,Autumn,8,Immediate Action
+2118.0,17,9,Winter,8,Immediate Action
+1294.0,37,9,Winter,4,Routine
+1306.0,81,9,Winter,6,Monitor
+1087.0,34,3,Winter,5,Monitor
+725.0,13,7,Summer,9,Immediate Action
+2044.0,55,1,Autumn,4,Routine
+2118.0,47,7,Spring,1,Routine
+2785.0,40,8,Spring,5,Monitor
+732.0,117,0,Summer,5,Monitor
+1445.0,68,9,Autumn,2,Routine
+772.0,69,6,Autumn,4,Routine
+1977.0,96,7,Autumn,7,Monitor
+1445.0,54,2,Autumn,1,Routine
+1911.0,86,7,Spring,5,Monitor
+2044.0,49,3,Spring,8,Immediate Action
+1493.0,83,7,Summer,2,Routine
+624.0,111,3,Winter,6,Monitor
+1495.0,19,6,Summer,3,Routine
+2864.0,7,4,Summer,1,Routine
+2785.0,105,4,Autumn,7,Monitor
+626.0,113,6,Winter,7,Monitor
+620.0,19,0,Summer,2,Routine
+2059.0,119,7,Summer,1,Routine
+1098.0,80,3,Spring,6,Monitor
+2399.0,117,6,Autumn,2,Routine
+428.0,70,3,Winter,3,Routine
+623.0,9,2,Summer,1,Routine
+870.0,94,0,Summer,1,Routine
+2783.0,65,8,Autumn,9,Immediate Action
+770.0,111,7,Winter,7,Monitor
+1261.0,95,6,Autumn,3,Routine
+2625.0,18,0,Summer,2,Routine
+772.0,81,3,Winter,7,Monitor
+630.0,119,0,Winter,5,Monitor
+1696.0,60,7,Spring,3,Routine
+2787.0,87,4,Spring,7,Monitor
+935.0,91,4,Winter,4,Routine
+1316.0,50,4,Spring,9,Immediate Action
+2745.0,8,3,Summer,2,Routine
+2742.0,100,0,Autumn,1,Routine
+2744.0,101,2,Autumn,5,Monitor
+2746.0,93,2,Autumn,4,Routine
+2743.0,84,0,Autumn,6,Monitor
+2750.0,90,2,Winter,9,Immediate Action
+2739.0,73,8,Summer,3,Routine
+2749.0,37,9,Autumn,7,Monitor
+1827.0,107,1,Summer,2,Routine
+2043.0,39,7,Autumn,6,Monitor
+2044.0,110,0,Autumn,2,Routine
+2757.0,88,0,Autumn,7,Monitor
+2783.0,100,4,Summer,5,Monitor
+2624.0,33,2,Winter,9,Immediate Action
+2785.0,12,6,Spring,4,Routine
+627.0,32,8,Winter,4,Routine
+948.0,40,3,Winter,7,Monitor
+625.0,93,0,Spring,4,Routine
+725.0,119,6,Spring,9,Immediate Action
+2043.0,59,3,Summer,6,Monitor
+2042.0,60,3,Autumn,3,Routine
+2062.0,44,7,Summer,5,Monitor
+931.0,13,3,Summer,3,Routine
+2787.0,44,9,Spring,4,Routine
+873.0,91,1,Autumn,7,Monitor
+428.0,55,9,Spring,1,Routine
+869.0,81,2,Autumn,3,Routine
+871.0,8,0,Winter,1,Routine
+1.0,89,8,Summer,4,Routine
+2654.0,107,6,Winter,1,Routine
+1492.0,71,4,Winter,6,Monitor
+2115.0,93,9,Spring,5,Monitor
+629.0,38,3,Autumn,4,Routine
+2270.0,50,6,Summer,7,Monitor
+1316.0,8,2,Summer,3,Routine
+2314.0,21,9,Winter,6,Monitor
+626.0,110,5,Summer,5,Monitor
+626.0,18,1,Autumn,3,Routine
+1494.0,47,2,Summer,4,Routine
+700.0,108,9,Autumn,9,Immediate Action
+671.0,13,1,Autumn,7,Monitor
+2042.0,6,2,Spring,7,Monitor
+2044.0,49,9,Autumn,1,Routine
+2399.0,53,0,Spring,1,Routine
+530.0,35,5,Winter,3,Routine
+2782.0,71,2,Summer,9,Immediate Action
+2042.0,64,9,Winter,5,Monitor
+2043.0,55,0,Spring,8,Immediate Action
+2043.0,18,1,Spring,9,Immediate Action
+687.0,33,7,Spring,4,Routine
+695.0,34,3,Spring,3,Routine
+944.0,33,1,Winter,4,Routine
+2063.0,116,4,Spring,1,Routine
+1612.0,39,3,Summer,8,Immediate Action
+2044.0,50,7,Autumn,9,Immediate Action
+2443.0,88,7,Spring,2,Routine
+2042.0,81,1,Spring,5,Monitor
+2043.0,34,3,Summer,1,Routine
+2399.0,20,0,Autumn,7,Monitor
+623.0,84,3,Summer,4,Routine
+2033.0,75,6,Spring,4,Routine
+1295.0,64,4,Autumn,1,Routine
+2752.0,68,4,Spring,9,Immediate Action
+2737.0,90,4,Winter,9,Immediate Action
+941.0,105,8,Spring,5,Monitor
+734.0,39,1,Summer,9,Immediate Action
+726.0,59,0,Summer,8,Immediate Action
+729.0,72,0,Summer,8,Immediate Action
+724.0,48,0,Spring,1,Routine
+726.0,67,6,Spring,9,Immediate Action
+730.0,58,1,Autumn,7,Monitor
+2740.0,110,3,Spring,6,Monitor
+727.0,95,2,Spring,9,Immediate Action
+2734.0,29,9,Autumn,8,Immediate Action
+1908.0,26,5,Autumn,9,Immediate Action
+2741.0,112,9,Summer,9,Immediate Action
+2448.0,69,2,Spring,9,Immediate Action
+730.0,55,4,Winter,7,Monitor
+948.0,113,7,Winter,8,Immediate Action
+876.0,105,3,Summer,8,Immediate Action
+2736.0,62,4,Summer,4,Routine
+2751.0,38,5,Autumn,5,Monitor
+1492.0,76,8,Summer,7,Monitor
+2041.0,79,6,Summer,8,Immediate Action
+1319.0,8,8,Spring,3,Routine
+1829.0,86,5,Spring,8,Immediate Action
+1321.0,90,2,Autumn,5,Monitor
+203.0,106,3,Summer,5,Monitor
+730.0,115,3,Winter,9,Immediate Action
+2033.0,76,8,Spring,3,Routine
+944.0,101,0,Autumn,4,Routine
+326.0,23,0,Summer,9,Immediate Action
+863.0,38,9,Spring,1,Routine
+733.0,74,7,Summer,4,Routine
+1613.0,75,1,Summer,7,Monitor
+2754.0,49,1,Autumn,7,Monitor
+2844.0,24,7,Summer,3,Routine
+950.0,103,0,Autumn,7,Monitor
+1909.0,34,9,Summer,1,Routine
+1816.0,116,3,Summer,8,Immediate Action
+950.0,67,2,Autumn,3,Routine
+371.0,29,1,Summer,9,Immediate Action
+376.0,97,5,Summer,7,Monitor
+2058.0,106,1,Spring,6,Monitor
+1911.0,69,9,Summer,7,Monitor
+524.0,94,8,Spring,8,Immediate Action
+1974.0,82,9,Autumn,9,Immediate Action
+369.0,11,1,Autumn,6,Monitor
+1826.0,12,3,Autumn,5,Monitor
+1424.0,79,2,Winter,4,Routine
+770.0,83,6,Spring,4,Routine
+878.0,65,0,Summer,8,Immediate Action
+944.0,31,0,Spring,2,Routine
+2042.0,59,6,Summer,8,Immediate Action
+735.0,42,2,Spring,3,Routine
+878.0,50,6,Autumn,2,Routine
+1911.0,110,0,Summer,3,Routine
+671.0,46,9,Summer,7,Monitor
+859.0,75,7,Spring,7,Monitor
+1904.0,43,7,Spring,3,Routine
+862.0,76,5,Spring,4,Routine
+862.0,73,0,Spring,6,Monitor
+933.0,87,1,Winter,8,Immediate Action
+2756.0,56,9,Winter,3,Routine
+867.0,114,3,Spring,6,Monitor
+1012.0,55,0,Winter,5,Monitor
+1900.0,86,3,Spring,8,Immediate Action
+696.0,86,1,Winter,8,Immediate Action
+2042.0,54,3,Autumn,5,Monitor
+2041.0,53,8,Summer,2,Routine
+2044.0,66,8,Winter,6,Monitor
+244.0,44,5,Winter,2,Routine
+242.0,91,6,Autumn,3,Routine
+2086.0,84,9,Summer,2,Routine
+1563.0,106,6,Summer,3,Routine
+1317.0,32,8,Spring,2,Routine
+686.0,65,0,Winter,6,Monitor
+949.0,102,6,Spring,8,Immediate Action
+1910.0,115,6,Winter,1,Routine
+1203.0,50,9,Spring,8,Immediate Action
+431.0,64,3,Spring,2,Routine
+1914.0,115,8,Spring,5,Monitor
+2136.0,93,5,Winter,9,Immediate Action
+2060.0,11,3,Spring,5,Monitor
+1501.0,59,6,Summer,1,Routine
+1099.0,43,2,Winter,7,Monitor
+2738.0,94,4,Summer,9,Immediate Action
+323.0,37,5,Summer,1,Routine
+2735.0,79,0,Spring,6,Monitor
+1909.0,18,1,Winter,5,Monitor
+931.0,21,8,Winter,8,Immediate Action
+73.0,71,3,Autumn,1,Routine
+1460.0,31,7,Winter,7,Monitor
+1828.0,29,9,Summer,5,Monitor
+734.0,90,4,Winter,7,Monitor
+2034.0,60,8,Summer,9,Immediate Action
+1910.0,7,4,Winter,2,Routine
+2061.0,41,4,Summer,5,Monitor
+1825.0,108,6,Winter,2,Routine
+1627.0,8,7,Summer,4,Routine
+2268.0,108,0,Spring,5,Monitor
+931.0,72,6,Autumn,8,Immediate Action
+2271.0,56,6,Winter,3,Routine
+1447.0,81,9,Autumn,1,Routine
+2783.0,75,2,Summer,6,Monitor
+2043.0,51,3,Autumn,9,Immediate Action
+932.0,65,7,Autumn,5,Monitor
+2785.0,86,5,Summer,6,Monitor
+1911.0,107,5,Autumn,3,Routine
+934.0,19,4,Summer,8,Immediate Action
+727.0,103,5,Spring,8,Immediate Action
+305.0,88,9,Summer,2,Routine
+2044.0,91,1,Autumn,1,Routine
+243.0,26,6,Winter,4,Routine
+2043.0,19,2,Summer,5,Monitor
+2782.0,82,2,Winter,9,Immediate Action
+2137.0,74,6,Spring,8,Immediate Action
+2033.0,70,2,Winter,6,Monitor
+731.0,105,6,Winter,9,Immediate Action
+2091.0,25,5,Winter,6,Monitor
+1162.0,52,9,Autumn,7,Monitor
+1320.0,22,1,Winter,2,Routine
+1311.0,10,5,Summer,8,Immediate Action
+1827.0,76,2,Autumn,7,Monitor
+772.0,29,8,Winter,1,Routine
+1206.0,57,9,Spring,2,Routine
+1322.0,116,2,Summer,6,Monitor
+1209.0,72,4,Autumn,6,Monitor
+2416.0,79,3,Autumn,1,Routine
+1163.0,55,3,Winter,4,Routine
+1307.0,52,4,Summer,2,Routine
+1313.0,20,1,Spring,8,Immediate Action
+1980.0,73,1,Spring,4,Routine
+734.0,9,6,Winter,2,Routine
+1318.0,117,7,Winter,7,Monitor
+1310.0,52,4,Winter,2,Routine
+1310.0,34,5,Autumn,1,Routine
+1320.0,31,3,Winter,1,Routine
+1911.0,19,3,Winter,1,Routine
+944.0,40,9,Autumn,7,Monitor
+634.0,58,0,Spring,9,Immediate Action
+1319.0,27,6,Autumn,5,Monitor
+1660.0,23,3,Autumn,1,Routine
+862.0,59,7,Spring,8,Immediate Action
+2781.0,113,6,Autumn,3,Routine
+2784.0,29,6,Summer,6,Monitor
+862.0,84,9,Spring,7,Monitor
+184.0,44,5,Winter,3,Routine
+185.0,93,8,Spring,8,Immediate Action
+697.0,45,6,Autumn,1,Routine
+1097.0,60,1,Winter,1,Routine
+618.0,53,5,Summer,1,Routine
+1419.0,24,8,Summer,3,Routine
+2148.0,30,4,Winter,1,Routine
+1463.0,19,1,Spring,4,Routine
+2057.0,37,7,Winter,2,Routine
+1616.0,9,3,Spring,4,Routine
+1826.0,118,7,Spring,5,Monitor
+926.0,73,0,Autumn,6,Monitor
+1615.0,12,8,Winter,6,Monitor
+607.0,100,0,Spring,6,Monitor
+606.0,60,0,Autumn,5,Monitor
+1422.0,11,8,Autumn,1,Routine
+1094.0,60,2,Summer,2,Routine
+931.0,107,8,Winter,7,Monitor
+931.0,91,3,Summer,1,Routine
+934.0,34,0,Winter,5,Monitor
+926.0,14,8,Summer,5,Monitor
+2225.0,31,8,Winter,6,Monitor
+929.0,115,4,Winter,2,Routine
+1434.0,10,9,Autumn,2,Routine
+949.0,69,8,Winter,8,Immediate Action
+113.0,5,5,Autumn,6,Monitor
+684.0,41,2,Autumn,6,Monitor
+943.0,112,0,Winter,3,Routine
+959.0,14,5,Autumn,9,Immediate Action
+683.0,11,8,Autumn,6,Monitor
+669.0,47,3,Summer,6,Monitor
+619.0,101,5,Winter,6,Monitor
+687.0,71,5,Autumn,9,Immediate Action
+931.0,104,0,Summer,3,Routine
+1699.0,41,5,Summer,9,Immediate Action
+1501.0,83,9,Spring,5,Monitor
+608.0,29,3,Summer,3,Routine
+522.0,21,0,Winter,4,Routine
+522.0,87,3,Winter,5,Monitor
+1565.0,17,9,Autumn,1,Routine
+184.0,43,6,Autumn,1,Routine
+2151.0,110,2,Spring,1,Routine
+2031.0,15,6,Autumn,6,Monitor
+2383.0,49,2,Spring,5,Monitor
+1564.0,80,2,Winter,2,Routine
+1086.0,32,1,Summer,4,Routine
+931.0,55,1,Summer,9,Immediate Action
+1417.0,45,3,Summer,6,Monitor
+1421.0,64,2,Summer,3,Routine
+1207.0,23,4,Winter,9,Immediate Action
+926.0,5,1,Summer,6,Monitor
+1696.0,64,9,Autumn,6,Monitor
+956.0,9,0,Summer,5,Monitor
+1695.0,57,6,Autumn,8,Immediate Action
+1696.0,27,3,Summer,7,Monitor
+408.0,117,9,Spring,9,Immediate Action
+1099.0,93,9,Winter,6,Monitor
+1456.0,31,0,Summer,8,Immediate Action
+1096.0,82,2,Autumn,4,Routine
+1102.0,17,3,Autumn,4,Routine
+606.0,69,3,Autumn,5,Monitor
+736.0,105,3,Winter,2,Routine
+1921.0,5,4,Winter,1,Routine
+875.0,108,4,Autumn,9,Immediate Action
+926.0,49,9,Winter,8,Immediate Action
+925.0,97,4,Summer,1,Routine
+2748.0,20,4,Spring,2,Routine
+926.0,68,1,Spring,4,Routine
+2274.0,39,7,Autumn,8,Immediate Action
+1343.0,91,6,Autumn,2,Routine
+931.0,89,4,Winter,9,Immediate Action
+930.0,8,4,Spring,3,Routine
+934.0,81,7,Summer,1,Routine
+2747.0,41,7,Spring,6,Monitor
+709.0,67,6,Winter,7,Monitor
+1418.0,44,9,Spring,4,Routine
+49.0,14,3,Spring,9,Immediate Action
+2808.0,83,9,Spring,6,Monitor
+1430.0,60,3,Winter,6,Monitor
+709.0,102,6,Autumn,3,Routine
+115.0,21,8,Summer,9,Immediate Action
+928.0,77,9,Spring,9,Immediate Action
+735.0,32,1,Winter,2,Routine
+1565.0,47,9,Spring,5,Monitor
+2030.0,97,1,Spring,9,Immediate Action
+430.0,15,7,Spring,4,Routine
+346.0,109,3,Winter,7,Monitor
+1693.0,80,6,Spring,5,Monitor
+1895.0,31,0,Summer,5,Monitor
+1694.0,16,8,Spring,2,Routine
+1366.0,37,0,Winter,7,Monitor
+1561.0,23,8,Winter,1,Routine
+1893.0,8,1,Winter,6,Monitor
+1446.0,84,9,Spring,1,Routine
+1896.0,84,5,Summer,6,Monitor
+929.0,95,3,Summer,3,Routine
+1433.0,63,7,Autumn,1,Routine
+2171.0,65,3,Winter,2,Routine
+273.0,21,8,Winter,3,Routine
+1459.0,76,9,Spring,5,Monitor
+609.0,89,2,Winter,7,Monitor
+1001.0,97,8,Summer,7,Monitor
+2150.0,112,4,Summer,6,Monitor
+2733.0,106,9,Summer,5,Monitor
+1893.0,51,0,Autumn,4,Routine
+603.0,71,7,Spring,2,Routine
+1632.0,102,4,Autumn,1,Routine
+1633.0,107,5,Summer,3,Routine
+1566.0,33,0,Autumn,4,Routine
+605.0,63,8,Spring,3,Routine
+1615.0,109,6,Winter,7,Monitor
+1406.0,101,0,Spring,7,Monitor
+693.0,105,8,Winter,7,Monitor
+1634.0,110,3,Winter,2,Routine
+2092.0,97,5,Winter,5,Monitor
+271.0,25,0,Winter,1,Routine
+523.0,84,5,Summer,5,Monitor
+861.0,82,4,Winter,5,Monitor
+433.0,101,7,Autumn,6,Monitor
+2755.0,15,6,Winter,1,Routine
+2151.0,59,3,Winter,8,Immediate Action
+1696.0,88,5,Autumn,4,Routine
+2108.0,105,8,Summer,7,Monitor
+2090.0,32,0,Autumn,5,Monitor
+1615.0,45,1,Winter,6,Monitor
+531.0,32,7,Spring,8,Immediate Action
+1437.0,16,3,Spring,9,Immediate Action
+1311.0,96,3,Summer,9,Immediate Action
+628.0,118,4,Autumn,2,Routine
+1170.0,111,0,Autumn,3,Routine
+2786.0,112,3,Autumn,2,Routine
+1920.0,102,4,Autumn,6,Monitor
+1296.0,38,8,Spring,9,Immediate Action
+2116.0,88,9,Winter,2,Routine
+2114.0,95,8,Autumn,3,Routine
+2032.0,46,5,Winter,5,Monitor
+1314.0,99,3,Winter,5,Monitor
+1312.0,103,8,Autumn,9,Immediate Action
+1444.0,30,8,Summer,3,Routine
+2064.0,47,7,Summer,7,Monitor
+2064.0,25,4,Autumn,4,Routine
+1894.0,86,8,Summer,5,Monitor
+2140.0,96,7,Autumn,6,Monitor
+869.0,107,3,Spring,4,Routine
+2245.0,81,1,Spring,9,Immediate Action
+2446.0,82,1,Summer,7,Monitor
+1570.0,35,9,Spring,5,Monitor
+1464.0,105,7,Summer,2,Routine
+607.0,38,2,Summer,7,Monitor
+868.0,5,4,Autumn,4,Routine
+728.0,19,8,Winter,9,Immediate Action
+2151.0,28,7,Autumn,2,Routine
+1964.0,62,0,Spring,9,Immediate Action
+925.0,39,1,Spring,7,Monitor
+2628.0,47,7,Winter,2,Routine
+865.0,46,1,Winter,7,Monitor
+1978.0,86,0,Spring,8,Immediate Action
+870.0,84,2,Winter,2,Routine
+870.0,66,0,Spring,3,Routine
+1432.0,96,9,Autumn,3,Routine
+433.0,38,1,Summer,5,Monitor
+2059.0,80,3,Autumn,2,Routine
+1976.0,71,9,Summer,4,Routine
+538.0,40,1,Winter,4,Routine
+2107.0,55,7,Winter,1,Routine
+2726.0,21,1,Autumn,7,Monitor
+2064.0,89,2,Spring,2,Routine
+689.0,104,7,Autumn,5,Monitor
+1052.0,7,4,Winter,3,Routine
+1306.0,16,7,Spring,7,Monitor
+2721.0,27,8,Autumn,7,Monitor
+1914.0,48,7,Autumn,8,Immediate Action
+2327.0,64,0,Autumn,7,Monitor
+604.0,68,6,Summer,2,Routine
+1444.0,25,9,Winter,8,Immediate Action
+860.0,68,2,Summer,5,Monitor
+1907.0,92,4,Autumn,8,Immediate Action
+1916.0,19,7,Summer,4,Routine
+1830.0,116,2,Spring,3,Routine
+1318.0,78,1,Spring,1,Routine
+667.0,31,0,Summer,8,Immediate Action
+2723.0,83,5,Summer,2,Routine
+1617.0,108,8,Autumn,9,Immediate Action
+2717.0,23,8,Winter,9,Immediate Action
+632.0,67,8,Summer,7,Monitor
+546.0,51,5,Summer,6,Monitor
+2725.0,84,9,Winter,9,Immediate Action
+949.0,15,0,Autumn,6,Monitor
+68.0,83,3,Winter,9,Immediate Action
+771.0,43,3,Autumn,1,Routine
+1912.0,58,6,Summer,5,Monitor
+1110.0,28,2,Summer,3,Routine
+2091.0,62,4,Winter,9,Immediate Action
+2400.0,37,2,Spring,4,Routine
+2060.0,13,9,Winter,9,Immediate Action
+1494.0,103,9,Winter,4,Routine
+1438.0,87,0,Winter,5,Monitor
+1438.0,36,9,Autumn,9,Immediate Action
+2173.0,34,6,Spring,2,Routine
+265.0,37,0,Winter,2,Routine
+378.0,48,3,Autumn,9,Immediate Action
+2168.0,5,1,Autumn,6,Monitor
+696.0,63,1,Spring,7,Monitor
+1921.0,18,2,Spring,8,Immediate Action
+2726.0,115,7,Spring,7,Monitor
+695.0,96,9,Spring,2,Routine
+1436.0,24,0,Autumn,6,Monitor
+1359.0,78,1,Spring,5,Monitor
+349.0,111,7,Winter,6,Monitor
+532.0,41,5,Winter,8,Immediate Action
+2726.0,26,7,Spring,6,Monitor
+400.0,35,7,Autumn,1,Routine
+1146.0,63,7,Winter,7,Monitor
+2448.0,94,6,Autumn,2,Routine
+2151.0,71,7,Spring,2,Routine
+2277.0,92,1,Autumn,5,Monitor
+1145.0,34,1,Winter,3,Routine
+2064.0,85,4,Winter,1,Routine
+1915.0,70,5,Winter,6,Monitor
+2064.0,107,8,Winter,6,Monitor
+1691.0,68,6,Winter,4,Routine
+594.0,23,6,Autumn,7,Monitor
+1296.0,83,9,Summer,2,Routine
+2618.0,68,1,Autumn,4,Routine
+121.0,58,1,Spring,3,Routine
+1690.0,37,6,Winter,6,Monitor
+1444.0,30,0,Winter,2,Routine
+2866.0,99,1,Summer,1,Routine
+659.0,73,0,Winter,8,Immediate Action
+2380.0,68,8,Summer,5,Monitor
+686.0,41,4,Summer,3,Routine
+1423.0,105,8,Autumn,1,Routine
+1568.0,78,3,Autumn,1,Routine
+735.0,47,9,Autumn,3,Routine
+632.0,70,9,Winter,8,Immediate Action
+2139.0,76,5,Spring,6,Monitor
+866.0,20,2,Winter,5,Monitor
+2680.0,74,6,Summer,6,Monitor
+2843.0,42,5,Spring,7,Monitor
+2681.0,58,4,Autumn,3,Routine
+1429.0,93,5,Spring,4,Routine
+595.0,39,5,Autumn,6,Monitor
+1449.0,53,9,Summer,6,Monitor
+2038.0,52,3,Winter,1,Routine
+356.0,38,2,Winter,5,Monitor
+2169.0,48,6,Spring,6,Monitor
+949.0,92,6,Summer,7,Monitor
+2620.0,15,5,Autumn,3,Routine
+671.0,29,5,Spring,9,Immediate Action
+1911.0,102,2,Summer,1,Routine
+2844.0,9,5,Spring,6,Monitor
+944.0,20,2,Autumn,9,Immediate Action
+2246.0,81,7,Summer,3,Routine
+1099.0,60,1,Summer,8,Immediate Action
+291.0,64,3,Summer,6,Monitor
+1364.0,10,6,Winter,2,Routine
+694.0,82,5,Summer,4,Routine
+2619.0,93,2,Summer,3,Routine
+1455.0,29,8,Spring,3,Routine
+1973.0,55,3,Spring,4,Routine
+1305.0,17,1,Spring,4,Routine
+943.0,84,5,Summer,6,Monitor
+607.0,25,4,Autumn,8,Immediate Action
+940.0,36,6,Winter,9,Immediate Action
+717.0,44,2,Spring,2,Routine
+1661.0,78,9,Summer,6,Monitor
+2278.0,105,6,Summer,7,Monitor
+1615.0,40,2,Winter,6,Monitor
+7.0,117,7,Winter,6,Monitor
+265.0,59,9,Winter,6,Monitor
+1565.0,26,7,Spring,9,Immediate Action
+944.0,104,2,Summer,8,Immediate Action
+2724.0,71,1,Winter,6,Monitor
+2280.0,73,9,Summer,4,Routine
+2243.0,82,7,Autumn,2,Routine
+1913.0,63,3,Summer,4,Routine
+2759.0,105,0,Summer,4,Routine
+1565.0,111,7,Autumn,2,Routine
+2398.0,54,4,Autumn,6,Monitor
+684.0,18,0,Winter,7,Monitor
+1564.0,73,0,Spring,9,Immediate Action
+626.0,71,0,Spring,4,Routine
+1659.0,32,5,Summer,9,Immediate Action
+1570.0,94,6,Summer,3,Routine
+2247.0,43,3,Spring,6,Monitor
+2812.0,7,7,Spring,6,Monitor
+1614.0,50,3,Winter,6,Monitor
+874.0,81,6,Spring,6,Monitor
+1438.0,107,9,Autumn,5,Monitor
+1342.0,35,4,Winter,3,Routine
+729.0,22,0,Winter,7,Monitor
+1459.0,51,9,Winter,5,Monitor
+1443.0,60,4,Autumn,8,Immediate Action
+272.0,97,3,Autumn,7,Monitor
+1300.0,117,8,Spring,9,Immediate Action
+2718.0,100,0,Autumn,7,Monitor
+2310.0,33,1,Spring,4,Routine
+2758.0,86,1,Autumn,1,Routine
+2753.0,37,8,Spring,5,Monitor
+357.0,83,3,Summer,7,Monitor
+2114.0,113,0,Autumn,7,Monitor
+2414.0,57,0,Autumn,3,Routine
+1444.0,79,2,Autumn,6,Monitor
+1309.0,61,3,Autumn,9,Immediate Action
+692.0,46,6,Summer,3,Routine
+878.0,85,0,Autumn,5,Monitor
+877.0,87,2,Autumn,9,Immediate Action
+1302.0,28,2,Winter,9,Immediate Action
+1447.0,54,1,Autumn,9,Immediate Action
+514.0,93,2,Winter,2,Routine
+2398.0,88,0,Spring,6,Monitor
+515.0,114,8,Autumn,8,Immediate Action
+1301.0,95,9,Spring,3,Routine
+1426.0,41,7,Spring,5,Monitor
+2244.0,100,2,Spring,8,Immediate Action
+537.0,103,9,Winter,7,Monitor
+2727.0,18,3,Winter,2,Routine
+1416.0,81,7,Summer,3,Routine
+2728.0,60,3,Summer,6,Monitor
+960.0,15,3,Autumn,6,Monitor
+2139.0,82,4,Winter,8,Immediate Action
+851.0,112,1,Summer,8,Immediate Action
+852.0,88,2,Winter,9,Immediate Action
+441.0,83,9,Winter,6,Monitor
+2134.0,7,8,Summer,1,Routine
+2133.0,9,1,Winter,1,Routine
+1444.0,119,8,Spring,9,Immediate Action
+685.0,85,6,Spring,6,Monitor
+731.0,93,3,Winter,7,Monitor
+2730.0,59,9,Winter,2,Routine
+432.0,17,9,Spring,9,Immediate Action
+1451.0,49,5,Autumn,5,Monitor
+1305.0,114,0,Spring,9,Immediate Action
+1929.0,102,5,Summer,7,Monitor
+1694.0,97,4,Spring,9,Immediate Action
+59.0,88,7,Winter,1,Routine
+55.0,13,6,Spring,7,Monitor
+731.0,12,6,Spring,7,Monitor
+735.0,86,7,Summer,9,Immediate Action
+874.0,39,8,Winter,7,Monitor
+2321.0,38,6,Spring,6,Monitor
+183.0,80,1,Autumn,8,Immediate Action
+2089.0,40,3,Spring,8,Immediate Action
+2444.0,94,2,Winter,2,Routine
+1085.0,78,9,Winter,5,Monitor
+1099.0,12,2,Spring,8,Immediate Action
+68.0,44,1,Summer,9,Immediate Action
+2361.0,94,7,Autumn,6,Monitor
+1570.0,40,4,Winter,5,Monitor
+1560.0,45,1,Spring,9,Immediate Action
+1909.0,31,2,Autumn,4,Routine
+1566.0,104,2,Autumn,7,Monitor
+1570.0,60,9,Summer,5,Monitor
+2245.0,82,8,Summer,6,Monitor
+2478.0,41,1,Spring,4,Routine
+1612.0,12,0,Summer,4,Routine
+2315.0,32,6,Winter,8,Immediate Action
+2322.0,114,6,Spring,9,Immediate Action
+1450.0,72,8,Autumn,5,Monitor
+874.0,116,4,Autumn,5,Monitor
+1315.0,22,0,Autumn,7,Monitor
+2035.0,88,0,Autumn,9,Immediate Action
+2830.0,105,8,Summer,4,Routine
+731.0,14,4,Spring,6,Monitor
+949.0,101,9,Summer,5,Monitor
+2621.0,115,6,Summer,9,Immediate Action
+2678.0,59,9,Winter,5,Monitor
+1529.0,39,2,Autumn,1,Routine
+2277.0,53,9,Spring,2,Routine
+1899.0,44,5,Spring,8,Immediate Action
+1405.0,80,1,Summer,9,Immediate Action
+2085.0,105,2,Autumn,1,Routine
+977.0,70,6,Spring,8,Immediate Action
+1408.0,11,8,Winter,8,Immediate Action
+731.0,62,6,Spring,3,Routine
+2437.0,74,8,Spring,7,Monitor
+2415.0,9,9,Spring,9,Immediate Action
+2432.0,17,9,Spring,3,Routine
+1529.0,31,1,Autumn,6,Monitor
+672.0,45,4,Spring,3,Routine
+2719.0,87,6,Summer,2,Routine
+20.0,58,0,Winter,6,Monitor
+2863.0,71,8,Autumn,3,Routine
+2364.0,93,2,Spring,6,Monitor
+1409.0,60,5,Summer,2,Routine
+1919.0,57,5,Autumn,7,Monitor
+2621.0,53,9,Winter,5,Monitor
+44.0,79,4,Autumn,3,Routine
+1407.0,106,3,Autumn,2,Routine
+2876.0,44,7,Winter,9,Immediate Action
+1453.0,95,9,Winter,5,Monitor
+1410.0,83,6,Summer,5,Monitor
+2170.0,39,2,Summer,7,Monitor
+378.0,105,8,Autumn,1,Routine
+1921.0,119,8,Spring,9,Immediate Action
+619.0,23,9,Winter,3,Routine
+271.0,51,7,Winter,3,Routine
+245.0,106,2,Autumn,2,Routine
+2755.0,24,0,Autumn,3,Routine
+30.0,26,1,Spring,3,Routine
+1428.0,86,3,Autumn,6,Monitor
+1427.0,52,6,Autumn,7,Monitor
+1425.0,69,9,Autumn,5,Monitor
+1906.0,44,1,Autumn,3,Routine
+1905.0,8,7,Winter,9,Immediate Action
+2831.0,41,4,Winter,7,Monitor
+2298.0,108,0,Spring,9,Immediate Action
+2172.0,105,0,Winter,1,Routine
+324.0,111,5,Winter,9,Immediate Action
+949.0,112,7,Winter,5,Monitor
+1298.0,20,1,Spring,9,Immediate Action
+2729.0,76,1,Summer,4,Routine
+2449.0,96,8,Winter,4,Routine
+2172.0,23,0,Spring,5,Monitor
+2370.0,55,6,Summer,3,Routine
+1444.0,28,5,Summer,5,Monitor
+671.0,57,2,Autumn,5,Monitor
+1570.0,41,5,Winter,3,Routine
+75.0,50,4,Spring,7,Monitor
+1419.0,113,0,Winter,5,Monitor
+2637.0,96,9,Winter,2,Routine
+2088.0,6,9,Winter,6,Monitor
+1621.0,51,3,Autumn,6,Monitor
+2371.0,20,8,Spring,6,Monitor
+2358.0,90,7,Autumn,8,Immediate Action
+1558.0,62,3,Spring,5,Monitor
+1457.0,51,6,Spring,1,Routine
+386.0,94,5,Autumn,2,Routine
+1565.0,76,5,Spring,1,Routine
+1570.0,40,1,Spring,2,Routine
+2316.0,88,9,Autumn,6,Monitor
+1570.0,42,8,Winter,6,Monitor
+1464.0,32,0,Autumn,4,Routine
+1444.0,57,6,Autumn,4,Routine
+2365.0,69,1,Autumn,4,Routine
+1979.0,101,6,Autumn,5,Monitor
+1444.0,56,5,Summer,4,Routine
+2359.0,99,0,Summer,3,Routine
+1570.0,45,6,Summer,3,Routine
+1496.0,59,1,Summer,8,Immediate Action
+1569.0,102,9,Summer,8,Immediate Action
+1571.0,46,4,Winter,3,Routine
+2372.0,113,5,Summer,6,Monitor
+1570.0,76,5,Winter,4,Routine
+1570.0,89,0,Spring,2,Routine
+1564.0,100,3,Summer,3,Routine
+1974.0,22,4,Spring,2,Routine
+2479.0,39,7,Spring,8,Immediate Action
+1308.0,11,2,Autumn,3,Routine
+1975.0,82,5,Winter,8,Immediate Action
+87.0,104,8,Summer,9,Immediate Action
+1146.0,87,9,Autumn,2,Routine
+944.0,111,7,Spring,7,Monitor
+2147.0,104,1,Autumn,3,Routine
+2282.0,99,0,Spring,6,Monitor
+1920.0,55,7,Summer,4,Routine
+45.0,87,1,Summer,9,Immediate Action
+2146.0,73,4,Summer,3,Routine
+47.0,49,8,Autumn,4,Routine
+1996.0,21,6,Spring,8,Immediate Action
+1570.0,108,6,Summer,5,Monitor
+1560.0,92,2,Spring,1,Routine
+433.0,9,3,Autumn,6,Monitor
+771.0,74,8,Winter,2,Routine
+728.0,69,2,Winter,5,Monitor
+2367.0,26,6,Summer,4,Routine
+2150.0,30,1,Autumn,2,Routine
+1208.0,37,7,Spring,4,Routine
+2136.0,54,7,Autumn,9,Immediate Action
+1304.0,44,6,Summer,7,Monitor
+1439.0,108,6,Winter,7,Monitor
+942.0,75,9,Summer,2,Routine
+2145.0,18,8,Winter,4,Routine
+46.0,99,0,Summer,6,Monitor
+1564.0,21,8,Winter,2,Routine
+15.0,99,4,Spring,1,Routine
+1566.0,113,7,Winter,7,Monitor
+1559.0,108,5,Winter,7,Monitor
+1146.0,17,4,Summer,6,Monitor
+2190.0,84,0,Spring,2,Routine
+1570.0,98,6,Summer,5,Monitor
+1566.0,40,8,Autumn,9,Immediate Action
+628.0,39,4,Spring,5,Monitor
+2875.0,68,9,Winter,3,Routine
+2448.0,62,6,Autumn,2,Routine
+2163.0,99,8,Spring,1,Routine
+2448.0,105,6,Winter,3,Routine
+861.0,56,3,Winter,9,Immediate Action
+40.0,112,4,Summer,7,Monitor
+2731.0,99,1,Summer,2,Routine
+2850.0,116,2,Summer,1,Routine
+595.0,52,5,Autumn,1,Routine
+2865.0,85,5,Autumn,6,Monitor
+2276.0,46,2,Spring,5,Monitor
+2324.0,95,2,Spring,3,Routine
+1564.0,13,9,Winter,6,Monitor
+325.0,20,3,Summer,9,Immediate Action
+2753.0,61,8,Autumn,6,Monitor
+688.0,71,2,Winter,9,Immediate Action
+1697.0,59,0,Summer,1,Routine
+2310.0,99,8,Spring,8,Immediate Action
+1678.0,27,0,Summer,6,Monitor
+600.0,51,5,Summer,2,Routine
+680.0,60,9,Spring,8,Immediate Action
+2279.0,96,9,Summer,2,Routine
+1677.0,61,9,Summer,3,Routine
+2443.0,78,1,Spring,9,Immediate Action
+2448.0,62,1,Autumn,6,Monitor
+2446.0,98,2,Winter,5,Monitor
+2447.0,99,7,Autumn,7,Monitor
+2448.0,8,1,Winter,7,Monitor
+21.0,100,6,Autumn,7,Monitor
+1209.0,50,9,Autumn,6,Monitor
+1205.0,107,5,Spring,4,Routine
+593.0,63,7,Winter,4,Routine
+1210.0,100,7,Summer,6,Monitor
+1210.0,9,1,Spring,2,Routine
+1204.0,91,2,Spring,5,Monitor
+949.0,32,8,Summer,9,Immediate Action
+593.0,104,8,Spring,8,Immediate Action
+1210.0,72,4,Summer,4,Routine
+1205.0,9,0,Winter,4,Routine
+958.0,64,4,Spring,7,Monitor
+47.0,39,7,Autumn,5,Monitor
+2362.0,112,6,Autumn,5,Monitor
+2382.0,100,0,Summer,7,Monitor
+2357.0,106,3,Winter,8,Immediate Action
+2363.0,38,9,Summer,4,Routine
+1211.0,113,6,Spring,7,Monitor
+2432.0,45,1,Autumn,5,Monitor
+1999.0,42,9,Winter,6,Monitor
+628.0,34,0,Winter,1,Routine
+1564.0,75,0,Autumn,6,Monitor
+1410.0,107,0,Summer,8,Immediate Action
+1407.0,66,5,Winter,2,Routine
+2362.0,8,6,Spring,3,Routine
+1562.0,34,7,Winter,2,Routine
+2042.0,38,3,Autumn,7,Monitor
+1568.0,37,2,Spring,5,Monitor
+2138.0,58,8,Autumn,2,Routine
+687.0,23,6,Autumn,9,Immediate Action
+1408.0,78,5,Summer,3,Routine
+878.0,7,4,Spring,8,Immediate Action
+975.0,5,2,Summer,9,Immediate Action
+74.0,91,1,Summer,1,Routine
+1566.0,27,4,Winter,2,Routine
+1564.0,117,6,Winter,9,Immediate Action
+1560.0,97,9,Autumn,3,Routine
+2369.0,100,8,Autumn,7,Monitor
+36.0,113,2,Autumn,1,Routine
+2375.0,55,4,Winter,1,Routine
+2368.0,52,4,Summer,9,Immediate Action
+2360.0,101,9,Autumn,4,Routine
+1566.0,48,6,Summer,3,Routine
+2362.0,60,7,Autumn,7,Monitor
+1570.0,10,7,Spring,8,Immediate Action
+2365.0,75,2,Autumn,3,Routine
+1573.0,33,0,Summer,2,Routine
+2374.0,110,2,Summer,9,Immediate Action
+2359.0,77,1,Summer,5,Monitor
+1572.0,88,9,Summer,9,Immediate Action
+1570.0,9,8,Summer,8,Immediate Action
+1562.0,31,5,Summer,1,Routine
+2367.0,20,2,Spring,3,Routine
+1571.0,8,5,Autumn,5,Monitor
+2283.0,6,8,Winter,2,Routine
+1570.0,8,6,Winter,9,Immediate Action
+1560.0,21,1,Summer,9,Immediate Action
+2371.0,13,5,Spring,4,Routine
+2373.0,79,1,Autumn,3,Routine
+1570.0,99,4,Summer,3,Routine
+1458.0,47,3,Winter,7,Monitor
+2372.0,88,6,Summer,9,Immediate Action
+2370.0,106,6,Summer,9,Immediate Action
+2636.0,36,3,Autumn,2,Routine
+2358.0,78,1,Winter,5,Monitor
+1570.0,46,9,Spring,2,Routine
+2372.0,91,0,Spring,6,Monitor
+2366.0,44,7,Autumn,4,Routine
+2398.0,82,2,Summer,8,Immediate Action
+2397.0,64,4,Winter,6,Monitor
+2809.0,52,8,Autumn,9,Immediate Action
+2147.0,53,3,Autumn,3,Routine
+1438.0,49,2,Autumn,7,Monitor
+2146.0,44,9,Winter,9,Immediate Action
+2136.0,44,1,Winter,9,Immediate Action
+2681.0,76,4,Spring,7,Monitor
+957.0,90,0,Spring,9,Immediate Action
+1564.0,104,0,Autumn,6,Monitor
+2143.0,114,8,Summer,4,Routine
+956.0,45,4,Summer,7,Monitor
+2087.0,98,9,Winter,1,Routine
+880.0,62,3,Spring,3,Routine
+2132.0,36,4,Winter,3,Routine
+690.0,117,8,Autumn,7,Monitor
+1922.0,50,4,Autumn,1,Routine
+691.0,118,7,Spring,3,Routine
+1788.0,18,0,Winter,8,Immediate Action
+2135.0,46,8,Winter,1,Routine
+2323.0,84,5,Winter,7,Monitor
+2732.0,87,6,Spring,4,Routine
+2146.0,34,8,Spring,4,Routine
+1447.0,22,3,Spring,2,Routine
+1448.0,29,2,Spring,4,Routine
+2152.0,32,0,Spring,6,Monitor
+377.0,9,8,Winter,7,Monitor
+1921.0,41,6,Winter,5,Monitor
+865.0,39,8,Winter,8,Immediate Action
+1441.0,70,8,Autumn,8,Immediate Action
+1973.0,19,4,Spring,9,Immediate Action
+1572.0,38,3,Autumn,8,Immediate Action
+1447.0,83,5,Winter,6,Monitor
+1567.0,101,5,Summer,3,Routine
+2725.0,42,2,Summer,4,Routine

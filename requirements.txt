@@ -1,0 +1,33 @@
+# Core Django packages
+django>=5.2
+channels>=4.0
+daphne
+channels_redis
+
+# Data processing and utilities
+pandas
+numpy
+python-dotenv
+joblib
+requests
+certifi
+urllib3
+
+# Machine Learning packages
+scikit-learn==1.6.1
+xgboost
+
+# AI and Language packages
+openai
+langchain-core
+langchain-community
+langchain-openai
+
+# Vector database and embeddings
+faiss-cpu
+sentence-transformers
+pymilvus>=2.3.4
+
+# NLP packages - Windows compatible approach
+spacy>=3.7,<3.8
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
