@@ -889,16 +889,32 @@ class MaintenancePredictionHandler(BaseModuleHandler):
     @classmethod
     def get_model(cls):
         if cls._model is None:
-            import joblib
-            cls._model = joblib.load(cls._model_path)
+            try:
+                import joblib
+                print(f"[DEBUG] Loading maintenance model from: {cls._model_path}")
+                cls._model = joblib.load(cls._model_path)
+                print(f"[DEBUG] Model loaded successfully: {type(cls._model)}")
+            except Exception as e:
+                print(f"[ERROR] Failed to load maintenance model: {e}")
+                import traceback
+                traceback.print_exc()
+                raise
         return cls._model
 
     @classmethod
     def get_address_map(cls):
         if cls._address_map is None:
-            import json
-            with open(cls._address_map_path, 'r', encoding='utf-8') as f:
-                cls._address_map = json.load(f)
+            try:
+                import json
+                print(f"[DEBUG] Loading address map from: {cls._address_map_path}")
+                with open(cls._address_map_path, 'r', encoding='utf-8') as f:
+                    cls._address_map = json.load(f)
+                print(f"[DEBUG] Address map loaded: {len(cls._address_map)} entries")
+            except Exception as e:
+                print(f"[ERROR] Failed to load address map: {e}")
+                import traceback
+                traceback.print_exc()
+                raise
         return cls._address_map
 
     def encode_fields_for_model(self, fields):
@@ -1026,18 +1042,40 @@ class MaintenancePredictionHandler(BaseModuleHandler):
 
     def run_model(self, fields):
         import pandas as pd
-        model = self.get_model()
         
-        # Prepare input data in the exact format the model expects
-        input_df = pd.DataFrame([{
-            'address': fields.get('address', ''),
-            'age_years': int(fields.get('age_years', 0)),
-            'last_service_years_ago': int(fields.get('last_service_years_ago', 0)),
-            'seasonality': str(fields.get('seasonality', 'winter')).lower()
-        }])
+        print(f"[DEBUG] Maintenance prediction starting with fields: {fields}")
         
-        # Make prediction
-        risk_score = model.predict(input_df)[0]
+        try:
+            model = self.get_model()
+            print(f"[DEBUG] Model loaded successfully: {type(model)}")
+        except Exception as e:
+            print(f"[ERROR] Failed to load maintenance model: {e}")
+            raise
+        
+        try:
+            # Encode fields first to ensure proper address mapping
+            encoded_fields = self.encode_fields_for_model(fields)
+            print(f"[DEBUG] Encoded fields: {encoded_fields}")
+            
+            # Prepare input data in the exact format the model expects
+            input_df = pd.DataFrame([{
+                'address': encoded_fields.get('address', 0),  # Use encoded address
+                'age_years': int(encoded_fields.get('age_years', 0)),
+                'last_service_years_ago': int(encoded_fields.get('last_service_years_ago', 0)),
+                'seasonality': str(encoded_fields.get('seasonality', 'winter')).lower()
+            }])
+            
+            print(f"[DEBUG] Input DataFrame: {input_df}")
+            print(f"[DEBUG] Input DataFrame dtypes: {input_df.dtypes}")
+            
+            # Make prediction
+            risk_score = model.predict(input_df)[0]
+            print(f"[DEBUG] Risk score predicted: {risk_score}")
+        except Exception as e:
+            print(f"[ERROR] Error during model prediction: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
         
         # Map risk score to recommended action with specific recommendations
         if risk_score > 7:
@@ -1085,25 +1123,47 @@ class MaintenancePredictionHandler(BaseModuleHandler):
         # Extract fields from the current message
         candidate_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
         
-        # Merge with last candidate fields to preserve previously collected info
-        merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+        # Filter out any non-maintenance fields from previous conversations
+        # Only keep maintenance-specific fields to avoid confusion
+        maintenance_fields = {}
+        if last_candidate_fields:
+            for k in self.required_fields:
+                if k in last_candidate_fields:
+                    maintenance_fields[k] = last_candidate_fields[k]
+        
+        # Merge with newly extracted fields
         for k, v in candidate_fields.items():
-            if v not in (None, '', 0, 0.0):  # Only update if we have a meaningful value
-                merged_fields[k] = v
+            if k in self.required_fields and v not in (None, '', 0, 0.0):  # Only update maintenance fields
+                maintenance_fields[k] = v
+        
+        print(f"[DEBUG] Maintenance handler - filtered fields: {maintenance_fields}")
+        print(f"[DEBUG] Maintenance handler - required fields: {self.required_fields}")
         
         # Check if user is confirming with complete information
         if self.needs_confirmation(user_message):
-            if all(f in merged_fields and merged_fields[f] not in (None, '', 0, 0.0) for f in self.required_fields):
-                result = self.run_model(merged_fields)
-                return {"response": result, "action": "maintenance_prediction", "fields": merged_fields}
+            if all(f in maintenance_fields and maintenance_fields[f] not in (None, '', 0, 0.0) for f in self.required_fields):
+                try:
+                    print(f"[DEBUG] Running maintenance prediction with fields: {maintenance_fields}")
+                    result = self.run_model(maintenance_fields)
+                    print(f"[DEBUG] Maintenance prediction successful")
+                    return {"response": result, "action": "maintenance_prediction", "fields": maintenance_fields}
+                except Exception as e:
+                    print(f"[ERROR] Maintenance prediction failed: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    error_message = (
+                        "I apologize, but I encountered an error while analyzing your property for maintenance prediction. "
+                        "This could be due to a temporary system issue. Please try again in a moment, or contact support if the problem persists."
+                    )
+                    return {"response": error_message, "action": "error", "fields": maintenance_fields}
             else:
-                missing = [f for f in self.required_fields if f not in merged_fields or merged_fields[f] in (None, '', 0, 0.0)]
-                return {"response": f"I need the following details to predict maintenance risk: {', '.join(missing)}. Please provide them.", "action": "ask_for_info", "fields": merged_fields}
+                missing = [f for f in self.required_fields if f not in maintenance_fields or maintenance_fields[f] in (None, '', 0, 0.0)]
+                return {"response": f"I need the following details to predict maintenance risk: {', '.join(missing)}. Please provide them.", "action": "ask_for_info", "fields": maintenance_fields}
         
         # Check if we have all required fields to ask for confirmation
-        if all(f in merged_fields and merged_fields[f] not in (None, '', 0, 0.0) for f in self.required_fields):
-            summary = self.summarize_fields(merged_fields)
-            return {"response": summary, "action": "chat", "fields": merged_fields}
+        if all(f in maintenance_fields and maintenance_fields[f] not in (None, '', 0, 0.0) for f in self.required_fields):
+            summary = self.summarize_fields(maintenance_fields)
+            return {"response": summary, "action": "chat", "fields": maintenance_fields}
         
         # Otherwise, continue the LLM-driven flow to ask for missing information
         messages = [
@@ -1117,12 +1177,12 @@ class MaintenancePredictionHandler(BaseModuleHandler):
         reply = response.content.strip()
         
         # Extract any additional fields from the LLM response
-        extracted_from_reply = self.extract_fields(reply, conversation_history, merged_fields)
+        extracted_from_reply = self.extract_fields(reply, conversation_history, maintenance_fields)
         for k, v in extracted_from_reply.items():
-            if v not in (None, '', 0, 0.0):
-                merged_fields[k] = v
+            if k in self.required_fields and v not in (None, '', 0, 0.0):  # Only update maintenance fields
+                maintenance_fields[k] = v
         
-        return {"response": reply, "action": "chat", "fields": merged_fields}
+        return {"response": reply, "action": "chat", "fields": maintenance_fields}
 
 # --- Enhanced Intent Detection and Entity Recognition ---
 def detect_intent(user_message, conversation_history=None):
