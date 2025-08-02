@@ -2,7 +2,9 @@ import sys
 import os
 import json
 import numpy as np
+# Add both possible paths for local development and Docker
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../AI Assistant')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../AI_Assistant')))
 from chatbot_integration import predict_rent
 
 def to_native(val):
