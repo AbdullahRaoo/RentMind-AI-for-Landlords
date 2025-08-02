@@ -43,6 +43,7 @@ services:
       - ALLOWED_HOSTS=srv889806.hstgr.cloud,www.srv889806.hstgr.cloud
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=sqlite:///app/db.sqlite3
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-placeholder_key}
     volumes:
       - ./backend/db.sqlite3:/app/db.sqlite3
       - ./backend/media:/app/media
