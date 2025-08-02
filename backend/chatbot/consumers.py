@@ -132,6 +132,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         print("[DEBUG] Received data:", data)
+        print(f"[DEBUG] WebSocket bulletproof version 2.0 active - chatbot_integration status: {'available' if chatbot_integration else 'fallback_mode'}")
         # Handle alert fetch request
         if data.get('type') == 'get_alerts':
             try:
