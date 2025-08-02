@@ -1025,14 +1025,18 @@ class MaintenancePredictionHandler(BaseModuleHandler):
         return any(kw in last_assistant["content"].lower() for kw in confirmation_keywords)
 
     def run_model(self, fields):
+        import pandas as pd
         model = self.get_model()
-        encoded_fields = self.encode_fields_for_model(fields)
+        
+        # Prepare input data in the exact format the model expects
         input_df = pd.DataFrame([{
-            'address': encoded_fields['address'],
-            'age_years': encoded_fields['age_years'],
-            'last_service_years_ago': encoded_fields['last_service_years_ago'],
-            'seasonality': encoded_fields['seasonality']
+            'address': fields.get('address', ''),
+            'age_years': int(fields.get('age_years', 0)),
+            'last_service_years_ago': int(fields.get('last_service_years_ago', 0)),
+            'seasonality': str(fields.get('seasonality', 'winter')).lower()
         }])
+        
+        # Make prediction
         risk_score = model.predict(input_df)[0]
         
         # Map risk score to recommended action with specific recommendations
