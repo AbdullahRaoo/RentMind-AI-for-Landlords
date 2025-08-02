@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
-import importlib.util
 import sys
 import os
 
@@ -19,12 +18,11 @@ def chat_api(request):
         if request.method == "GET":
             # GET request - return API info
             return JsonResponse({
-                'message': 'LandlordBuddy Chat API',
+                'message': 'LandlordBuddy Chat API - SIMPLIFIED VERSION',
                 'status': 'active',
                 'methods': ['GET', 'POST'],
                 'usage': 'POST with JSON: {"message": "your message"}',
-                'python_path': sys.path,
-                'working_directory': os.getcwd()
+                'note': 'Chatbot integration temporarily disabled for debugging'
             })
         
         # Parse request data for POST
@@ -36,9 +34,19 @@ def chat_api(request):
                 'error': 'No message provided'
             }, status=400)
         
-        # Simple echo response for now
+        # Handle "hi" message specifically
+        if user_message.lower() in ['hi', 'hello', 'hey']:
+            return JsonResponse({
+                'response': 'Hello! I\'m LandlordBuddy, your AI assistant for property management. I can help you with rent pricing, tenant screening, and maintenance predictions. What would you like to do today?',
+                'action': 'greeting',
+                'fields': {},
+                'last_intent': None,
+                'intent_completed': True
+            })
+        
+        # Simple echo response for other messages
         return JsonResponse({
-            'response': f'Echo: {user_message}',
+            'response': f'Message received: "{user_message}". The full AI system is temporarily disabled for debugging. The redirect issue has been fixed!',
             'action': 'chat',
             'fields': {},
             'last_intent': None,
