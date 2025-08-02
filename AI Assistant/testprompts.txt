@@ -26,3 +26,174 @@ button for intent
 predictive maintiance (Response)
 Tennant reject/accpted response
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+root@srv889806:/var/www/rentmind# # 1. First, test basic Python execution in the container
+cd /var/www/rentmind
+docker-compose exec backend python3 -c "print('Python is working')"
+
+# 2. Test if we can import basic libraries one by one
+docker-compose exec backend python3 -c "import sys; print(f'Python version: {sys.version}')"
+
+# 3. Test sklearn import specifically
+docker-compose exec backend python3 -c "
+try:
+    import sklearn
+    print('sklearn imported successfully')
+    print(f'sklearn version: {sklearn.__version__}')
+except Exception as e:
+    print(f'sklearn import failed: {e}')
+"
+
+# 4. Test if we can access the model file
+docker-compose exec backend python3 -c "
+import os
+model_path = '/app/predictive_maintenance_ai/models/maintenance_rf_model.pkl'
+print(f'Model file exists: {os.path.exists(model_path)}')
+print(f'Model file size: {os.path.getsize(model_path) if os.path.exists(model_path) else \"N/A\"} bytes')
+"
+
+# 5. Test joblib import
+docker-compose exec backend python3 -c "
+try:
+    import joblib
+    print('joblib imported successfully')
+    print(f'joblib version: {joblib.__version__}')
+except Exception as e:
+    print(f'joblib import failed: {e}')
+"
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+Python is working
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+Python version: 3.11.13 (main, Jul 22 2025, 01:44:25) [GCC 12.2.0]
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+Model file exists: True
+Model file size: 19789322 bytes
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+joblib imported successfully
+joblib version: 1.5.1
+root@srv889806:/var/www/rentmind# # 6. Check if there are any errors in the container logs during the hanging
+cd /var/www/rentmind
+docker-compose exec backend tail -f /var/log/syslog &
+docker-compose logs -f backend
+[1] 782380
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+Attaching to rentmind_backend_1
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+WARNING: The following deploy sub-keys are not supported and have been ignored: resources.reservations.cpus
+backend_1   | 2025-08-02 19:47:36,962 WARNING  spaCy not available - some NLP features will be limited
+backend_1   | 2025-08-02 19:47:36,966 INFO     Loading faiss with AVX512 support.
+backend_1   | 2025-08-02 19:47:37,042 INFO     Successfully loaded faiss with AVX512 support.
+backend_1   | 2025-08-02 19:47:37,048 INFO     Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+backend_1   | 2025-08-02 19:47:37,147 INFO     Starting server at tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:47:37,147 INFO     HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+backend_1   | 2025-08-02 19:47:37,147 INFO     Configuring endpoint tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:47:37,148 INFO     Listening on TCP address 0.0.0.0:8000
+backend_1   | 2025-08-02 19:47:46,718 WARNING  spaCy model not found or spaCy not available. Using basic regex fallback.
+backend_1   | 2025-08-02 19:48:02,060 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:48:04,162 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:48:05,488 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:48:15,396 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:48:16,767 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:48:36,758 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:48:38,442 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:48:44,406 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:48:46,504 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:49:02,216 WARNING  spaCy not available - some NLP features will be limited
+backend_1   | 2025-08-02 19:49:02,220 INFO     Loading faiss with AVX512 support.
+backend_1   | 2025-08-02 19:49:02,262 INFO     Successfully loaded faiss with AVX512 support.
+backend_1   | 2025-08-02 19:49:02,267 INFO     Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+backend_1   | 2025-08-02 19:49:02,354 INFO     Starting server at tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:49:02,354 INFO     HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+backend_1   | 2025-08-02 19:49:02,354 INFO     Configuring endpoint tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:49:02,355 INFO     Listening on TCP address 0.0.0.0:8000
+backend_1   | 2025-08-02 19:53:31,331 WARNING  spaCy not available - some NLP features will be limited
+backend_1   | 2025-08-02 19:53:31,335 INFO     Loading faiss with AVX512 support.
+backend_1   | 2025-08-02 19:53:31,372 INFO     Successfully loaded faiss with AVX512 support.
+backend_1   | 2025-08-02 19:53:31,378 INFO     Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+backend_1   | 2025-08-02 19:53:31,465 INFO     Starting server at tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:53:31,466 INFO     HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+backend_1   | 2025-08-02 19:53:31,466 INFO     Configuring endpoint tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:53:31,466 INFO     Listening on TCP address 0.0.0.0:8000
+backend_1   | 2025-08-02 19:53:50,572 WARNING  spaCy model not found or spaCy not available. Using basic regex fallback.
+backend_1   | 2025-08-02 19:54:04,888 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:54:07,363 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:54:08,555 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:54:13,248 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:54:14,620 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:54:26,802 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:54:28,541 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:54:41,867 WARNING  spaCy not available - some NLP features will be limited
+backend_1   | 2025-08-02 19:54:41,870 INFO     Loading faiss with AVX512 support.
+backend_1   | 2025-08-02 19:54:41,962 INFO     Successfully loaded faiss with AVX512 support.
+backend_1   | 2025-08-02 19:54:41,967 INFO     Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+backend_1   | 2025-08-02 19:54:42,063 INFO     Starting server at tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:54:42,064 INFO     HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+backend_1   | 2025-08-02 19:54:42,064 INFO     Configuring endpoint tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:54:42,065 INFO     Listening on TCP address 0.0.0.0:8000
+backend_1   | 2025-08-02 19:56:48,592 WARNING  spaCy not available - some NLP features will be limited
+backend_1   | 2025-08-02 19:56:48,596 INFO     Loading faiss with AVX512 support.
+backend_1   | 2025-08-02 19:56:48,681 INFO     Successfully loaded faiss with AVX512 support.
+backend_1   | 2025-08-02 19:56:48,686 INFO     Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+backend_1   | 2025-08-02 19:56:48,779 INFO     Starting server at tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:56:48,779 INFO     HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+backend_1   | 2025-08-02 19:56:48,779 INFO     Configuring endpoint tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:56:48,780 INFO     Listening on TCP address 0.0.0.0:8000
+backend_1   | 2025-08-02 19:58:28,957 WARNING  spaCy model not found or spaCy not available. Using basic regex fallback.
+backend_1   | 2025-08-02 19:58:44,168 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:58:47,991 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:58:49,708 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:59:05,992 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:59:07,743 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:59:22,147 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:59:23,444 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 19:59:50,658 WARNING  spaCy not available - some NLP features will be limited
+backend_1   | 2025-08-02 19:59:50,661 INFO     Loading faiss with AVX512 support.
+backend_1   | 2025-08-02 19:59:50,748 INFO     Successfully loaded faiss with AVX512 support.
+backend_1   | 2025-08-02 19:59:50,753 INFO     Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+backend_1   | 2025-08-02 19:59:50,845 INFO     Starting server at tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:59:50,845 INFO     HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+backend_1   | 2025-08-02 19:59:50,845 INFO     Configuring endpoint tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 19:59:50,846 INFO     Listening on TCP address 0.0.0.0:8000
+backend_1   | 2025-08-02 20:00:50,146 WARNING  spaCy not available - some NLP features will be limited
+backend_1   | 2025-08-02 20:00:50,150 INFO     Loading faiss with AVX512 support.
+backend_1   | 2025-08-02 20:00:50,186 INFO     Successfully loaded faiss with AVX512 support.
+backend_1   | 2025-08-02 20:00:50,191 INFO     Failed to load GPU Faiss: name 'GpuIndexIVFFlat' is not defined. Will not load constructor refs for GPU indexes. This is only an error if you're trying to use GPU Faiss.
+backend_1   | 2025-08-02 20:00:50,289 INFO     Starting server at tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 20:00:50,289 INFO     HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+backend_1   | 2025-08-02 20:00:50,289 INFO     Configuring endpoint tcp:port=8000:interface=0.0.0.0
+backend_1   | 2025-08-02 20:00:50,290 INFO     Listening on TCP address 0.0.0.0:8000
+backend_1   | 2025-08-02 20:01:23,065 WARNING  spaCy model not found or spaCy not available. Using basic regex fallback.
+backend_1   | 2025-08-02 20:01:24,670 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 20:01:27,554 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 20:01:29,158 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 20:01:39,656 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 20:01:41,244 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 20:01:51,909 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+backend_1   | 2025-08-02 20:01:53,647 INFO     HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+
+[1]+  Stopped                 docker-compose exec backend tail -f /var/log/syslog
+root@srv889806:/var/www/rentmind#

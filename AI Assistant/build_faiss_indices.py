@@ -4,10 +4,10 @@ sys.path.append(os.path.dirname(__file__))
 from faiss_utils import build_faiss_index
 
 # Paths for cleaned and raw data
-CLEANED_CSV = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/cleaned_rent_data.csv'))
-CLEANED_INDEX = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/cleaned_rent_data.faiss'))
-RAW_CSV = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/rent_ads_rightmove_extended.csv'))
-RAW_INDEX = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/rent_ads_rightmove_extended.faiss'))
+CLEANED_CSV = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/cleaned_rent_data.csv'))
+CLEANED_INDEX = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/cleaned_rent_data.faiss'))
+RAW_CSV = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/rent_ads_rightmove_extended.csv'))
+RAW_INDEX = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/rent_ads_rightmove_extended.faiss'))
 
 def main():
     print('Building FAISS index for cleaned data...')

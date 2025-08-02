@@ -54,7 +54,7 @@ class RentPredictionHandler(BaseModuleHandler):
         "PROPERTY TYPE": ["property type", "type", "apartment", "house", "flat"]
     }
     _model = None
-    _model_path = os.path.join(os.path.dirname(__file__), "../Rent Pricing AI/rent_xgboost_model.json")
+    _model_path = os.path.join(os.path.dirname(__file__), "../Rent_Pricing_AI/rent_xgboost_model.json")
 
     @classmethod
     def get_model(cls):
@@ -182,7 +182,7 @@ class RentPredictionHandler(BaseModuleHandler):
         import json
         import os
         # Load mapping files (cache for performance if needed)
-        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI'))
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI'))
         with open(os.path.join(base_dir, 'address_map.json'), 'r', encoding='utf-8') as f:
             address_map = json.load(f)
         with open(os.path.join(base_dir, 'property_type_map.json'), 'r', encoding='utf-8') as f:
@@ -267,7 +267,7 @@ class RentPredictionHandler(BaseModuleHandler):
         if not last_prediction:
             return "No property prediction found to process this action. Please estimate rent first."
         import os, csv, pandas as pd, json, re
-        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI'))
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI'))
         import json
         with open(os.path.join(base_dir, 'property_type_map.json'), 'r', encoding='utf-8') as f:
             property_type_map = json.load(f)
@@ -308,11 +308,11 @@ class RentPredictionHandler(BaseModuleHandler):
             # ...existing code...
             return "✅ Property and prediction saved!"
         elif action == "compare":
-            data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/cleaned_rent_data.csv'))
+            data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/cleaned_rent_data.csv'))
             df = pd.read_csv(data_path)
             similar = find_similar(df)
             if similar.empty:
-                raw_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/rent_ads_rightmove_extended.csv'))
+                raw_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/rent_ads_rightmove_extended.csv'))
                 if os.path.exists(raw_path):
                     raw_df = pd.read_csv(raw_path)
                     for col in ['subdistrict_code', 'PROPERTY TYPE', 'BEDROOMS', 'SIZE', 'address', 'rent']:
@@ -324,7 +324,7 @@ class RentPredictionHandler(BaseModuleHandler):
                 try:
                     from faiss_utils import semantic_search, load_faiss_index, record_to_text
                     # Load human-readable address map for decoding
-                    address_map_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/address_map_human.json'))
+                    address_map_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/address_map_human.json'))
                     with open(address_map_path, 'r', encoding='utf-8') as f:
                         address_map = json.load(f)
                     # Invert the address map: code (as int, str, float) -> address string
@@ -339,7 +339,7 @@ class RentPredictionHandler(BaseModuleHandler):
                             inv_address_map[str(code)] = addr
                         except Exception:
                             pass
-                    index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/cleaned_rent_data.faiss'))
+                    index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/cleaned_rent_data.faiss'))
                     summary = ""  # Ensure summary is always defined
                     if os.path.exists(index_path):
                         print("[DEBUG] Using FAISS index: cleaned data")
@@ -394,7 +394,7 @@ You are a real estate assistant. Compare the user's property (rent: £{user_rent
                                 f"- Address: {l['address']}, Bedrooms: {l['BEDROOMS']}, Bathrooms: {l['BATHROOMS']}, Size: {l['SIZE']} sq ft, Property Type: {l['PROPERTY TYPE']}, Rent: £{l['rent']}\n"
                             )
                         return out
-                    raw_index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/rent_ads_rightmove_extended.faiss'))
+                    raw_index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/rent_ads_rightmove_extended.faiss'))
                     if os.path.exists(raw_index_path):
                         print("[DEBUG] Using FAISS index: raw data")
                         index = load_faiss_index(raw_index_path)
@@ -425,11 +425,11 @@ You are a real estate assistant. Compare the user's property (rent: £{user_rent
                 if not file_exists:
                     writer.writeheader()
                 writer.writerow(last_prediction)
-            data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/cleaned_rent_data.csv'))
+            data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/cleaned_rent_data.csv'))
             df = pd.read_csv(data_path)
             similar = find_similar(df)
             if similar.empty:
-                raw_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/rent_ads_rightmove_extended.csv'))
+                raw_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/rent_ads_rightmove_extended.csv'))
                 if os.path.exists(raw_path):
                     raw_df = pd.read_csv(raw_path)
                     for col in ['subdistrict_code', 'PROPERTY TYPE', 'BEDROOMS', 'SIZE', 'address', 'rent']:
@@ -439,7 +439,7 @@ You are a real estate assistant. Compare the user's property (rent: £{user_rent
             if similar.empty:
                 try:
                     from faiss_utils import semantic_search, load_faiss_index, record_to_text
-                    address_map_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/address_map_human.json'))
+                    address_map_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/address_map_human.json'))
                     with open(address_map_path, 'r', encoding='utf-8') as f:
                         address_map = json.load(f)
                     inv_address_map = {}
@@ -453,7 +453,7 @@ You are a real estate assistant. Compare the user's property (rent: £{user_rent
                             inv_address_map[str(code)] = addr
                         except Exception:
                             pass
-                    index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/cleaned_rent_data.faiss'))
+                    index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/cleaned_rent_data.faiss'))
                     summary = ""  # Ensure summary is always defined
                     if os.path.exists(index_path):
                         print("[DEBUG] Using FAISS index: cleaned data")
@@ -508,7 +508,7 @@ You are a real estate assistant. Compare the user's property (rent: £{user_rent
                                 f"- Address: {l['address']}, Bedrooms: {l['BEDROOMS']}, Bathrooms: {l['BATHROOMS']}, Size: {l['SIZE']} sq ft, Property Type: {l['PROPERTY TYPE']}, Rent: £{l['rent']}\n"
                             )
                         return out
-                    raw_index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/rent_ads_rightmove_extended.faiss'))
+                    raw_index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/rent_ads_rightmove_extended.faiss'))
                     if os.path.exists(raw_index_path):
                         print("[DEBUG] Using FAISS index: raw data")
                         index = load_faiss_index(raw_index_path)
@@ -868,7 +868,7 @@ class MaintenancePredictionHandler(BaseModuleHandler):
     _model = None
     _address_map = None
     _model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../predictive_maintenance_ai/models/maintenance_rf_model.pkl'))
-    _address_map_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/address_map.json'))
+    _address_map_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/address_map.json'))
     
     def __init__(self):
         """Initialize maintenance prediction handler."""
@@ -1585,7 +1585,7 @@ def migrate_existing_data_to_milvus():
         base_dir = os.path.dirname(__file__)
         
         # Migrate rent data
-        rent_csv = os.path.join(base_dir, '../Rent Pricing AI/data/cleaned_rent_data.csv')
+        rent_csv = os.path.join(base_dir, '../Rent_Pricing_AI/data/cleaned_rent_data.csv')
         if os.path.exists(rent_csv):
             migrate_faiss_to_milvus(
                 faiss_index_path="",  # Not needed for CSV migration
@@ -1595,7 +1595,7 @@ def migrate_existing_data_to_milvus():
             print("Migrated rent data to Milvus")
         
         # Migrate raw rent data
-        raw_rent_csv = os.path.join(base_dir, '../Rent Pricing AI/data/rent_ads_rightmove_extended.csv')
+        raw_rent_csv = os.path.join(base_dir, '../Rent_Pricing_AI/data/rent_ads_rightmove_extended.csv')
         if os.path.exists(raw_rent_csv):
             migrate_faiss_to_milvus(
                 faiss_index_path="",

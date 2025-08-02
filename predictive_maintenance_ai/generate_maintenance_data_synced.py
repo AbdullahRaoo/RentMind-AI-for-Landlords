@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timedelta
 
 # --- Load Rent Pricing Properties (for address sync) ---
-rent_data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent Pricing AI/data/cleaned_rent_data.csv'))
+rent_data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../Rent_Pricing_AI/data/cleaned_rent_data.csv'))
 rent_df = pd.read_csv(rent_data_path)
 
 
