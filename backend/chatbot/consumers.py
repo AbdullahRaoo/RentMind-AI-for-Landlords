@@ -5,12 +5,23 @@ import importlib.util
 import sys
 import os
 
-# Dynamically import chatbot_integration from AI Assistant
-ai_assistant_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../AI Assistant/chatbot_integration.py'))
-spec = importlib.util.spec_from_file_location("chatbot_integration", ai_assistant_path)
-chatbot_integration = importlib.util.module_from_spec(spec)
-sys.modules["chatbot_integration"] = chatbot_integration
-spec.loader.exec_module(chatbot_integration)
+# Dynamically import chatbot_integration from AI Assistant (support both local and Docker paths)
+ai_assistant_paths = [
+    os.path.abspath(os.path.join(os.path.dirname(__file__), '../../AI_Assistant/chatbot_integration.py')),  # Docker path
+    os.path.abspath(os.path.join(os.path.dirname(__file__), '../../AI Assistant/chatbot_integration.py'))   # Local path
+]
+
+chatbot_integration = None
+for ai_assistant_path in ai_assistant_paths:
+    if os.path.exists(ai_assistant_path):
+        spec = importlib.util.spec_from_file_location("chatbot_integration", ai_assistant_path)
+        chatbot_integration = importlib.util.module_from_spec(spec)
+        sys.modules["chatbot_integration"] = chatbot_integration
+        spec.loader.exec_module(chatbot_integration)
+        break
+
+if chatbot_integration is None:
+    raise ImportError("Could not find chatbot_integration.py in any expected location")
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
