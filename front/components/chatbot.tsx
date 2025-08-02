@@ -28,7 +28,10 @@ import {
   DollarSign,
 } from "lucide-react"
 
-const WS_URL = "ws://localhost:8000/ws/chat/"
+// Dynamic WebSocket URL for production
+const WS_URL = typeof window !== 'undefined' 
+  ? `ws://${window.location.hostname}:8000/ws/chat/`
+  : "ws://localhost:8000/ws/chat/"
 
 interface Message {
   sender: "user" | "bot"
@@ -55,7 +58,7 @@ export default function Chatbot() {
     {
       sender: "bot",
       text: "Hi! I am your AI Assistant for Landlords. Ask me about rent esitmation, tenant screening, or check Property Maintaince Alerts!",
-      timestamp: null,
+      timestamp: undefined,
     },
   ])
   const [input, setInput] = useState("")
@@ -268,7 +271,7 @@ export default function Chatbot() {
   // Helper: Extract summary (first 1-2 lines before listings)
   function extractSummary(text: string) {
     const lines = text.split("\n");
-    const summaryLines = [];
+    const summaryLines: string[] = [];
     for (const line of lines) {
       if (line.trim().startsWith("- Address:")) break;
       if (line.trim() !== "") summaryLines.push(line);
