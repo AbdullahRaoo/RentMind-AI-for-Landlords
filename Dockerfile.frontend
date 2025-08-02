@@ -5,17 +5,15 @@ WORKDIR /app
 
 # Copy package files
 COPY front/package*.json ./
-COPY front/pnpm-lock.yaml ./
 
-# Install pnpm and dependencies
-RUN npm install -g pnpm
-RUN pnpm install
+# Install dependencies with npm
+RUN npm install
 
 # Copy frontend code
 COPY front/ .
 
 # Build the application
-RUN pnpm build
+RUN npm run build
 
 # Expose port
 EXPOSE 3000
