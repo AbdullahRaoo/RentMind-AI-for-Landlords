@@ -1,0 +1,32 @@
+# Core Django packages
+django>=5.2
+channels>=4.0
+daphne
+channels_redis
+
+# Data processing and utilities
+pandas
+numpy
+python-dotenv
+joblib
+requests
+certifi
+urllib3
+
+# Machine Learning packages
+scikit-learn==1.6.1
+xgboost
+
+# AI and Language packages
+openai
+langchain-core
+langchain-community
+langchain-openai
+
+# Vector database and embeddings
+faiss-cpu
+sentence-transformers
+pymilvus>=2.3.4
+
+# NLP packages - Ubuntu/Docker compatible
+# Note: spaCy will be handled gracefully in the code if not available

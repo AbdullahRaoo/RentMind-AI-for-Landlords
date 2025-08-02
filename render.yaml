@@ -1,0 +1,38 @@
+# Render deployment configuration
+# Visit: https://render.com
+
+services:
+  # Backend Web Service
+  - type: web
+    name: rentmind-backend
+    env: docker
+    dockerfilePath: ./Dockerfile.backend
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: backend.production_settings
+      - key: ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: rentmind-backend
+          property: host
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: rentmind-redis
+          property: connectionString
+
+  # Frontend Web Service
+  - type: web
+    name: rentmind-frontend
+    env: docker
+    dockerfilePath: ./Dockerfile.frontend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_WS_URL
+        value: wss://rentmind-backend.onrender.com/ws/chat/
+
+  # Redis Service
+  - type: redis
+    name: rentmind-redis
+    ipAllowList: []

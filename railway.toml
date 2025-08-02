@@ -1,0 +1,21 @@
+# Railway deployment configuration
+# Visit: https://railway.app
+
+# Backend service
+[backend]
+name = "rentmind-backend"
+dockerfile = "Dockerfile.backend"
+
+[backend.env]
+DJANGO_SETTINGS_MODULE = "backend.production_settings"
+ALLOWED_HOSTS = "${RAILWAY_STATIC_URL},${RAILWAY_PUBLIC_DOMAIN}"
+REDIS_URL = "${REDIS_URL}"
+
+# Frontend service  
+[frontend]
+name = "rentmind-frontend"
+dockerfile = "Dockerfile.frontend"
+
+[frontend.env]
+NODE_ENV = "production"
+NEXT_PUBLIC_WS_URL = "wss://${RAILWAY_STATIC_URL}/ws/chat/"
