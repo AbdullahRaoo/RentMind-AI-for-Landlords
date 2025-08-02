@@ -28,10 +28,18 @@ import {
   DollarSign,
 } from "lucide-react"
 
-// Dynamic WebSocket URL for production
-const WS_URL = typeof window !== 'undefined' 
-  ? `ws://${window.location.hostname}:8000/ws/chat/`
-  : "ws://localhost:8000/ws/chat/"
+// Dynamic WebSocket URL based on environment
+const getWebSocketURL = () => {
+  if (typeof window === 'undefined') return 'ws://localhost:8000/ws/chat/'
+  
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const hostname = window.location.hostname
+  const port = process.env.NODE_ENV === 'production' ? '' : ':8000'
+  
+  return `${protocol}//${hostname}${port}/ws/chat/`
+}
+
+const WS_URL = getWebSocketURL()
 
 interface Message {
   sender: "user" | "bot"
@@ -271,7 +279,7 @@ export default function Chatbot() {
   // Helper: Extract summary (first 1-2 lines before listings)
   function extractSummary(text: string) {
     const lines = text.split("\n");
-    const summaryLines: string[] = [];
+    const summaryLines = [];
     for (const line of lines) {
       if (line.trim().startsWith("- Address:")) break;
       if (line.trim() !== "") summaryLines.push(line);

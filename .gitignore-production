@@ -1,0 +1,66 @@
+# Production .gitignore - exclude development/training files
+
+# Virtual environment
+ailord/
+venv/
+env/
+.env
+
+# Data generation and training files
+predictive_maintenance_ai/generate_maintenance_data.py
+predictive_maintenance_ai/generate_maintenance_data_synced.py
+predictive_maintenance_ai/train_maintenance_model.py
+predictive_maintenance_ai/train_xgb_model.py
+predictive_maintenance_ai/test_maintenance_model.py
+predictive_maintenance_ai/preprocess_data.py
+
+# Rent AI training files
+Rent Pricing AI/train_model.py
+Rent Pricing AI/preprocess.py
+Rent Pricing AI/preprocess_address_map.py
+Rent Pricing AI/preprocess_property_type_map_human.py
+
+# Data files (keep only essential JSON files for models)
+Rent Pricing AI/data/
+predictive_maintenance_ai/data/
+
+# Test and demo files
+AI Assistant/build_faiss_indices.py
+AI Assistant/demo_enhanced_features.py
+AI Assistant/setup_enhanced_features.py
+AI Assistant/test_greeting.py
+AI Assistant/test_maintenance.py
+AI Assistant/testprompts.txt
+test_maintenance_enhanced.py
+test_tenant_screening.py
+
+# Development files
+AI Assistant/conversation_intelligence.py
+front.zip
+
+# Database files
+backend/db.sqlite3
+
+# Cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.coverage
+.pytest_cache/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
