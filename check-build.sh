@@ -33,6 +33,18 @@ find . -maxdepth 3 -name "index.html" 2>/dev/null
 find . -maxdepth 3 -name "page.html" 2>/dev/null
 
 echo ""
-echo "📊 Directory sizes:"
+echo "� Static files in current build:"
+find .next/static/ -name "*.css" -o -name "*.js" | head -10
+
+echo ""
+echo "🔍 Server app directory contents:"
+ls -la .next/server/app/ 2>/dev/null || echo ".next/server/app directory not found"
+
+echo ""
+echo "�📊 Directory sizes:"
 du -sh .next/ 2>/dev/null || echo ".next size: unknown"
 du -sh out/ 2>/dev/null || echo "out size: unknown"
+
+echo ""
+echo "🔍 Build configuration check:"
+grep -E "(output|distDir)" next.config.mjs 2>/dev/null || echo "No next.config.mjs found"
