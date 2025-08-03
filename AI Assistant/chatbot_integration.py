@@ -110,9 +110,7 @@ class RentPredictionHandler(BaseModuleHandler):
         from pydantic import BaseModel, Field, ValidationError
         from langchain_core.prompts import ChatPromptTemplate
         import re
-        # Only attempt extraction if the intent is rent prediction
-        if detect_intent(user_message, conversation_history) != "rent_prediction":
-            return last_candidate_fields or {}
+        
         class RentFields(BaseModel):
             address: str = Field(..., description="The property address or location")
             subdistrict_code: str = Field(..., description="The subdistrict code or postcode")
@@ -122,17 +120,27 @@ class RentPredictionHandler(BaseModuleHandler):
             PROPERTY_TYPE: str = Field(..., description="Property type (e.g. flat, house, apartment)")
 
         parser = PydanticOutputParser(pydantic_object=RentFields)
-        # Compose the full conversation for context
-        all_text = "\n".join([m["content"] for m in conversation_history if m["role"] in ("user", "assistant")])
-        all_text += "\n" + user_message
+        
+        # Filter conversation to only rent prediction related messages (last 6 messages max)
+        rent_messages = []
+        recent_messages = conversation_history[-6:] if len(conversation_history) > 6 else conversation_history
+        
+        for msg in recent_messages:
+            content_lower = msg["content"].lower()
+            if any(keyword in content_lower for keyword in ["rent", "prediction", "property", "address", "bedroom", "bathroom", "size", "flat", "house", "apartment", "subdistrict", "postcode"]):
+                rent_messages.append(msg)
+        
+        # Add current message
+        filtered_text = "\n".join([f"{m['role']}: {m['content']}" for m in rent_messages])
+        filtered_text += f"\nuser: {user_message}"
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for landlords. Extract the following fields from the conversation and user message. If a field is missing, use an empty string or 0. Output only the JSON object as specified by the schema: {format_instructions}"),
-            ("user", "Conversation so far:\n{conversation}\nUser message:\n{user_message}")
+            ("system", "You are an expert assistant for rent prediction ONLY. Extract ONLY rent prediction fields from the conversation: address, subdistrict_code, BEDROOMS, BATHROOMS, SIZE, PROPERTY_TYPE. DO NOT extract any other fields like credit score, income, employment, maintenance info, etc. If a field is missing, use an empty string or 0. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("user", "Rent prediction conversation:\n{conversation}\nCurrent message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
         prompt_value = prompt.format_prompt(
-            conversation=all_text,
+            conversation=filtered_text,
             user_message=user_message,
             format_instructions=format_instructions
         )
@@ -647,22 +655,36 @@ class TenantScreeningHandler(BaseModuleHandler):
         from pydantic import BaseModel, Field, ValidationError
         from langchain_core.prompts import ChatPromptTemplate
         import re
+        
         class TenantFields(BaseModel):
             credit_score: int = Field(0, description="Applicant's credit score")
             income: float = Field(0, description="Applicant's monthly income")
             rent: float = Field(0, description="Monthly rent for the property")
             employment_status: str = Field("", description="Employment status (e.g., employed, unemployed)")
             eviction_record: bool = Field(False, description="True if applicant has prior eviction, else False")
+        
         parser = PydanticOutputParser(pydantic_object=TenantFields)
-        all_text = "\n".join([m["content"] for m in conversation_history if m["role"] in ("user", "assistant")])
-        all_text += "\n" + user_message
+        
+        # Filter conversation to only tenant screening related messages (last 6 messages max)
+        tenant_messages = []
+        recent_messages = conversation_history[-6:] if len(conversation_history) > 6 else conversation_history
+        
+        for msg in recent_messages:
+            content_lower = msg["content"].lower()
+            if any(keyword in content_lower for keyword in ["tenant", "screening", "credit", "income", "rent", "employment", "eviction", "unemployed", "employed"]):
+                tenant_messages.append(msg)
+        
+        # Add current message
+        filtered_text = "\n".join([f"{m['role']}: {m['content']}" for m in tenant_messages])
+        filtered_text += f"\nuser: {user_message}"
+        
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record. DO NOT extract any other fields. If a field is missing, use 0, empty string, or False. Output only the JSON object as specified by the schema: {format_instructions}"),
-            ("user", "Conversation so far:\n{conversation}\nUser message:\n{user_message}")
+            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record. DO NOT extract any other fields like address, property age, maintenance, etc. If a field is missing, use 0, empty string, or False. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("user", "Tenant screening conversation:\n{conversation}\nCurrent message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
         prompt_value = prompt.format_prompt(
-            conversation=all_text,
+            conversation=filtered_text,
             user_message=user_message,
             format_instructions=format_instructions
         )
@@ -1522,20 +1544,38 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
         }
     elif intent == "rent_prediction":
         handler = RentPredictionHandler()
-        result = handler.handle(conversation_history, user_message, last_candidate_fields)
+        # Filter fields to only rent prediction fields
+        rent_fields = {}
+        if last_candidate_fields:
+            for field in handler.required_fields:
+                if field in last_candidate_fields:
+                    rent_fields[field] = last_candidate_fields[field]
+        result = handler.handle(conversation_history, user_message, rent_fields)
         # If model was run, mark intent as completed
         if result.get("action") == "screen_tenant" or result.get("action") == "rent_prediction":
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
     elif intent == "tenant_screening":
         handler = TenantScreeningHandler()
-        result = handler.handle(conversation_history, user_message, last_candidate_fields)
+        # Filter fields to only tenant screening fields
+        tenant_fields = {}
+        if last_candidate_fields:
+            for field in handler.required_fields:
+                if field in last_candidate_fields:
+                    tenant_fields[field] = last_candidate_fields[field]
+        result = handler.handle(conversation_history, user_message, tenant_fields)
         if result.get("action") == "screen_tenant":
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
     elif intent == "maintenance_prediction":
         handler = MaintenancePredictionHandler()
-        result = handler.handle(conversation_history, user_message, last_candidate_fields)
+        # Filter fields to only maintenance prediction fields
+        maintenance_fields = {}
+        if last_candidate_fields:
+            for field in handler.required_fields:
+                if field in last_candidate_fields:
+                    maintenance_fields[field] = last_candidate_fields[field]
+        result = handler.handle(conversation_history, user_message, maintenance_fields)
         if result.get("action") == "maintenance_prediction" or result.get("action") == "maintenance_alerts":
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
