@@ -112,12 +112,12 @@ class RentPredictionHandler(BaseModuleHandler):
         import re
         
         class RentFields(BaseModel):
-            address: str = Field(..., description="The property address or location")
-            subdistrict_code: str = Field(..., description="The subdistrict code or postcode")
-            BEDROOMS: int = Field(..., description="Number of bedrooms")
-            BATHROOMS: int = Field(..., description="Number of bathrooms")
-            SIZE: float = Field(..., description="Size in square feet")
-            PROPERTY_TYPE: str = Field(..., description="Property type (e.g. flat, house, apartment)")
+            address: str = Field("", description="The property address or location")
+            subdistrict_code: str = Field("", description="The subdistrict code or postcode")
+            BEDROOMS: int = Field(0, description="Number of bedrooms")
+            BATHROOMS: int = Field(0, description="Number of bathrooms")
+            SIZE: float = Field(0.0, description="Size in square feet")
+            PROPERTY_TYPE: str = Field("", description="Property type (e.g. flat, house, apartment)")
 
         parser = PydanticOutputParser(pydantic_object=RentFields)
         
@@ -153,7 +153,8 @@ class RentPredictionHandler(BaseModuleHandler):
         try:
             parsed = parser.parse(content)
             fields = parsed.dict()
-        except ValidationError:
+        except (ValidationError, Exception) as e:
+            print(f"[DEBUG] Pydantic parsing failed for rent fields: {e}. Using fallback extraction.")
             # Fallback: try regex extraction as before
             fields = dict(last_candidate_fields) if last_candidate_fields else {}
             markdown_field_pattern = re.compile(r"(?:^|\n)[\-\d\.\*\s]*\*?\*?([A-Za-z0-9_\s]+?)\*?\*?\s*[:：]\s*([\w\-,.\/()'’\s]+)", re.IGNORECASE)
@@ -697,7 +698,8 @@ class TenantScreeningHandler(BaseModuleHandler):
         try:
             parsed = parser.parse(content)
             fields = parsed.dict()
-        except ValidationError:
+        except (ValidationError, Exception) as e:
+            print(f"[DEBUG] Pydantic parsing failed for tenant fields: {e}. Using fallback extraction.")
             # Fallback: regex extraction as before
             fields = dict(last_candidate_fields) if last_candidate_fields else {}
             markdown_field_pattern = re.compile(r"(?:^|\n)[\-\d\.\*\s]*\*?\*?([A-Za-z0-9_\s]+?)\*?\*?\s*[:：]\s*([\w\-,.\/()'’\s]+)", re.IGNORECASE)
@@ -1285,7 +1287,9 @@ def llm_detect_intent(conversation_history, user_message):
 def user_requests_intent_switch(user_message):
     msg = user_message.lower()
     switch_phrases = [
-        "forget it", "let's do", "i want to do", "switch to", "change to", "do rent instead", "do tenant instead", "do maintenance instead", "not this", "wrong task", "that's not what i meant", "i want rent", "i want tenant", "i want maintenance"
+        "forget it", "let's do", "i want to do", "switch to", "change to", "do rent instead", "do tenant instead", "do maintenance instead", "not this", "wrong task", "that's not what i meant", "i want rent", "i want tenant", "i want maintenance",
+        "can you do rent", "can you do tenant", "can you do maintenance", "rent prediction", "tenant screening", "maintenance prediction",
+        "help with rent", "help with tenant", "help with maintenance"
     ]
     return any(phrase in msg for phrase in switch_phrases)
 
@@ -1502,7 +1506,7 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
         print(f"Total cost: ${summary['total_cost']:.6f}")
         print(f"Average cost per call: ${summary['avg_cost_per_call']:.6f}")
     
-    # If user requests to switch/cancel, re-detect intent
+    # If user requests to switch/cancel, re-detect intent and reset fields
     if user_requests_intent_switch(user_message):
         detected_intent = llm_detect_intent(conversation_history, user_message)
         if isinstance(detected_intent, dict):
@@ -1510,11 +1514,13 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
         else:
             intent = detected_intent
         intent_completed = False
+        # Clear fields when switching intents
+        last_candidate_fields = {}
     elif last_intent and not intent_completed:
         # Persist the last intent until the flow is completed
         intent = last_intent
     else:
-        # No active intent or just completed, detect new intent
+        # No active intent or just completed, detect new intent and clear fields
         detected_intent = llm_detect_intent(conversation_history, user_message)
         
         # Handle case where llm_detect_intent returns a dict (enhanced) or string (fallback)
@@ -1524,6 +1530,9 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
             intent = detected_intent
             
         intent_completed = False
+        # Clear fields when starting new intent
+        if intent != last_intent:
+            last_candidate_fields = {}
 
     confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
     is_confirmation = user_message.strip().lower() in confirmation_phrases
