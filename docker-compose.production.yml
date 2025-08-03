@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: rentmind_backend
+    environment:
+      - DJANGO_SETTINGS_MODULE=backend.settings
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEBUG=False
+    volumes:
+      - ./logs:/app/logs
+      - ./media:/app/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - rentmind_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: rentmind_frontend
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - rentmind_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: rentmind_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - rentmind_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: rentmind_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./letsencrypt:/etc/letsencrypt
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - rentmind_network
+
+volumes:
+  redis_data:
+
+networks:
+  rentmind_network:
+    driver: bridge
