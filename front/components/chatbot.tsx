@@ -28,7 +28,7 @@ import {
   DollarSign,
 } from "lucide-react"
 
-const WS_URL = "ws://localhost:8000/ws/chat/"
+const WS_URL = "ws://srv889806.hstgr.cloud:8000/ws/chat/"
 
 interface Message {
   sender: "user" | "bot"
