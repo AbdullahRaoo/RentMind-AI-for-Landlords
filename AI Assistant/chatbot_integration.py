@@ -889,12 +889,13 @@ class TenantScreeningHandler(BaseModuleHandler):
             summary = f"😬 **Not looking promising...** {tenant_reference} doesn't quite make the cut. Here's what's concerning:"
         
         md = f"{summary}\n\n**📋 Screening Results:**\n\n"
-        md += f"**🎯 Final Call:** {result['recommendation'].title()}\n"
+        md += f"**🎯 Final Call:** {result['recommendation'].title()}\n\n"
         md += f"**⚠️ Risk Level:** {result['risk_score']}\n\n"
-        md += f"**🔍 Here's the breakdown:**\n"
+        md += f"**🔍 Here's the breakdown:**\n\n"
         for line in result['explanation'].split('\n'):
             if line.strip():  # Only add non-empty lines
-                md += f"• {line.strip()}\n"
+                md += f"- • {line.strip()}\n\n"
+        md += "\n"  # Add extra space after breakdown
         return md
 
     def handle(self, conversation_history, user_message, last_candidate_fields=None):
@@ -1015,9 +1016,9 @@ class TenantScreeningHandler(BaseModuleHandler):
             }
             
             for k in self.required_fields:
-                prompt += f"• {field_descriptions[k]}\n"
+                prompt += f"- • {field_descriptions[k]}\n"
             
-            prompt += "\nOnce you drop a couple of these details on me, I'll whip up a preliminary screening for you! 🚀"
+            prompt += "\n\nOnce you drop a couple of these details on me, I'll whip up a preliminary screening for you! 🚀"
             
             return {
                 "response": prompt,
@@ -2021,7 +2022,7 @@ def test_enhanced_features():
             if analysis.entities:
                 print(f"📝 Extracted Entities:")
                 for entity in analysis.entities:
-                    print(f"   • {entity.label}: {entity.text} (confidence: {entity.confidence:.2f})")
+                    print(f"   - • {entity.label}: {entity.text} (confidence: {entity.confidence:.2f})")
             
             if len(analysis.intents) > 1:
                 other_intents = [f"{intent.type.value} ({intent.confidence:.2f})" 
