@@ -415,8 +415,8 @@ class RentPredictionHandler(BaseModuleHandler):
                         # LLM summary
                         llm = ChatOpenAI(model="gpt-4", temperature=0.3, openai_api_key=openai_api_key)
                         summary_prompt = f"""
-You are a real estate assistant. Compare the user's property (rent: £{user_rent}) to these similar listings (rents: {[l['rent'] for l in similar_listings]}). In 1-2 sentences, summarize if the user's price is above, below, or in line with the local market, and mention any notable differences in features if possible. Be concise and helpful.
-"""
+                            You are a real estate assistant. Compare the user's property (rent: £{user_rent}) to these similar listings (rents: {[l['rent'] for l in similar_listings]}). In 1-2 sentences, summarize if the user's price is above, below, or in line with the local market, and mention any notable differences in features if possible. Be concise and helpful.
+                            """
                         summary_response = invoke_with_tracking(
                             llm,
                             [HumanMessage(content=summary_prompt)],
@@ -534,8 +534,8 @@ You are a real estate assistant. Compare the user's property (rent: £{user_rent
                         # LLM summary
                         llm = ChatOpenAI(model="gpt-4", temperature=0.3, openai_api_key=openai_api_key)
                         summary_prompt = f"""
-You are a real estate assistant. Compare the user's property (rent: £{user_rent}) to these similar listings (rents: {[l['rent'] for l in similar_listings]}). In 1-2 sentences, summarize if the user's price is above, below, or in line with the local market, and mention any notable differences in features if possible. Be concise and helpful.
-"""
+                            You are a real estate assistant. Compare the user's property (rent: £{user_rent}) to these similar listings (rents: {[l['rent'] for l in similar_listings]}). In 1-2 sentences, summarize if the user's price is above, below, or in line with the local market, and mention any notable differences in features if possible. Be concise and helpful.
+                            """
                         summary_response = invoke_with_tracking(
                             llm,
                             [HumanMessage(content=summary_prompt)],
@@ -631,22 +631,25 @@ class TenantScreeningHandler(BaseModuleHandler):
         "employment_status": ["employment status", "job", "occupation", "employed", "unemployed", "self-employed", "work status"],
         "eviction_record": ["eviction record", "prior eviction", "evicted", "has eviction", "any eviction", "eviction", "has prior eviction", "previous eviction", "eviction history"]
     }
+    
     def __init__(self):
         self.system_prompt = (
-            "You are LandlordBuddy, an expert and professional AI assistant for landlords. "
-            "You support rent pricing, tenant screening, and maintenance prediction. "
-            "For tenant screening, your job is to gather all required info (credit score, income, rent, employment status, eviction record), confirm with the user, and then run the official tenant screening script. "
-            "NEVER provide your own evaluation, summary, or advice. "
-            "If the script cannot be run (e.g., missing info), politely say: 'Sorry, I couldn't run the tenant screening script because some required information is missing. Please provide all the details.' "
-            "If the script runs, present its output in a user-friendly, markdown-formatted way, and elaborate only to clarify the script's result, not to add your own judgment. "
-            "You don't use words like script, model, or AI. "
-            "You are a friendly, professional assistant, not a chatbot. "
-            "Be concise, professional, and interactive. "
-            "Never say 'please wait', 'processing', or imply that you will automatically proceed. Only ask for confirmation and wait for the user's explicit confirmation before running the script. "
-            "Never mention or ask for tenant name, rental history, or any extra fields. "
-            "Only summarize the required fields and ask for confirmation. "
-            "When starting tenant screening, always ask for all required information at once, listing each required field (credit score, income, rent, employment status, eviction record) in a clear, markdown-formatted list. "
-            "Do not ask for fields one by one. If any are missing, ask for all missing fields together in a single message. "
+            "You are LandlordBuddy, a friendly and knowledgeable AI companion for landlords! "
+            "Think of me as your trusted sidekick who's here to help with rent pricing, tenant screening, and maintenance predictions. "
+            "When it comes to tenant screening, I'm like your personal detective - I gather all the essential clues (credit score, income, rent amount, employment situation, and any eviction history), "
+            "chat with you about what we've found, and then run our comprehensive tenant evaluation process. "
+            "Here's the thing - I never jump to my own conclusions or give you my personal take on things. That's not my style! "
+            "If our evaluation can't run because we're missing some key pieces of the puzzle, I'll simply let you know: "
+            "'Looks like we're missing some crucial details to run a proper tenant screening. Mind filling in the gaps?' "
+            "When our evaluation is complete, I'll present the findings in a clean, easy-to-read format and help clarify what it all means - "
+            "but I stick to explaining the results, not adding my own spin on things. "
+            "I keep things natural and conversational - no robotic 'processing' talk or mentions of scripts and models. "
+            "I'm your professional yet approachable partner in this! "
+            "I love being efficient and interactive, so I won't keep you waiting with unnecessary delays. "
+            "I always check with you before diving into the evaluation - your confirmation is my green light! "
+            "I focus on what really matters - those five key areas I mentioned - and keep things streamlined. "
+            "When we start a new screening, I'll lay out everything we need in one go, nice and organized. "
+            "No back-and-forth hunting for details one piece at a time - that's just inefficient! "
         )
         self.chat = ChatOpenAI(model="gpt-4", temperature=0.7, openai_api_key=openai_api_key)
 
@@ -663,6 +666,7 @@ class TenantScreeningHandler(BaseModuleHandler):
             rent: float = Field(0, description="Monthly rent for the property")
             employment_status: str = Field("", description="Employment status (e.g., employed, unemployed)")
             eviction_record: bool = Field(False, description="True if applicant has prior eviction, else False")
+            tenant_name: str = Field("", description="Tenant's name if mentioned")
         
         parser = PydanticOutputParser(pydantic_object=TenantFields)
         
@@ -675,17 +679,20 @@ class TenantScreeningHandler(BaseModuleHandler):
             if any(keyword in content_lower for keyword in ["tenant", "screening", "credit", "income", "rent", "employment", "eviction", "unemployed", "employed"]):
                 tenant_messages.append(msg)
         
-        # Add current message
-        filtered_text = "\n".join([f"{m['role']}: {m['content']}" for m in tenant_messages])
-        filtered_text += f"\nuser: {user_message}"
+        # Always include current message and add some context to ensure proper extraction
+        all_text = "\n".join([f"{m['role']}: {m['content']}" for m in tenant_messages])
+        all_text += f"\nuser: {user_message}"
+        
+        # Add explicit context that this is for tenant screening to help LLM focus
+        context_text = "Context: This is a tenant screening conversation. Extract tenant screening fields (credit_score, income, rent, employment_status, eviction_record).\n" + all_text
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record. DO NOT extract any other fields like address, property age, maintenance, etc. If a field is missing, use 0, empty string, or False. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record, and tenant_name if mentioned. DO NOT extract any other fields like address, property age, maintenance, etc. If a field is missing, use 0, empty string, or False. If a tenant name is mentioned, extract it. Output only the JSON object as specified by the schema: {format_instructions}"),
             ("user", "Tenant screening conversation:\n{conversation}\nCurrent message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
         prompt_value = prompt.format_prompt(
-            conversation=filtered_text,
+            conversation=context_text,
             user_message=user_message,
             format_instructions=format_instructions
         )
@@ -702,7 +709,8 @@ class TenantScreeningHandler(BaseModuleHandler):
             print(f"[DEBUG] Pydantic parsing failed for tenant fields: {e}. Using fallback extraction.")
             # Fallback: regex extraction as before
             fields = dict(last_candidate_fields) if last_candidate_fields else {}
-            markdown_field_pattern = re.compile(r"(?:^|\n)[\-\d\.\*\s]*\*?\*?([A-Za-z0-9_\s]+?)\*?\*?\s*[:：]\s*([\w\-,.\/()'’\s]+)", re.IGNORECASE)
+            all_text = context_text + f"\n{user_message}"
+            markdown_field_pattern = re.compile(r"(?:^|\n)[\-\d\.\*\s]*\*?\*?([A-Za-z0-9_\s]+?)\*?\*?\s*[:：]\s*([\w\-,.\/()''\s]+)", re.IGNORECASE)
             for match in markdown_field_pattern.finditer(all_text):
                 raw_field, value = match.group(1).strip(), match.group(2).strip()
                 for canonical, synonyms in self.FIELD_SYNONYMS.items():
@@ -723,7 +731,7 @@ class TenantScreeningHandler(BaseModuleHandler):
                 if field in fields:
                     continue
                 for syn in synonyms:
-                    pattern = rf"(?:{syn})\s*[:=\-]?\s*([\w\-,.\/()'’\s]+)"
+                    pattern = rf"(?:{syn})\s*[:=\-]?\s*([\w\-,.\/()''\s]+)"
                     match = re.search(pattern, all_text, re.IGNORECASE)
                     if match:
                         value = match.group(1).strip()
@@ -737,9 +745,15 @@ class TenantScreeningHandler(BaseModuleHandler):
                             value = any(word in value for word in ["yes", "true", "prior", "evict", "bad", "negative"])
                         fields[field] = value
                         break
-        # Only keep required fields and ensure correct types
+        
+        # Only keep required fields and ensure correct types, plus tenant_name
         clean_fields = {}
-        for k in self.required_fields:
+        for k in self.required_fields + ["tenant_name"]:
+            if k == "tenant_name":
+                v = fields.get(k, "")
+                clean_fields[k] = str(v).strip()
+                continue
+                
             v = fields.get(k, 0 if k in ["credit_score", "income", "rent"] else (False if k == "eviction_record" else ""))
             # Special handling for income: if string like '50 a month', extract number
             if k == "income" and isinstance(v, str):
@@ -767,14 +781,87 @@ class TenantScreeningHandler(BaseModuleHandler):
             clean_fields[k] = v
         return clean_fields
 
-    def summarize_fields(self, fields):
-        summary = "**Tenant Screening Details:**\n\n"
-        for k in fields:
-            v = fields.get(k, "[missing]")
-            if k == "eviction_record":
-                v = "Yes" if v is True else ("No" if v is False else v)
-            summary += f"- **{k.replace('_', ' ').title()}**: {v}\n"
-        summary += "\nIs this correct? Please confirm so I can screen the tenant."
+    def summarize_fields(self, fields, user_provided=None, show_result=False):
+        """
+        Summarize fields for display with more conversational language
+        user_provided: list of fields actually provided by user (not assumed)
+        show_result: if True, don't add confirmation text (we're showing final result)
+        """
+        if user_provided is None:
+            user_provided = []
+        assumed_fields = [k for k in self.required_fields if k not in user_provided]
+        
+        if show_result:
+            summary = "**Here's what we're working with:**\n\n"
+        elif assumed_fields:
+            summary = "**Here's the picture so far (I've filled in some gaps with typical values):**\n\n"
+        else:
+            summary = "**Perfect! Here's everything we've got:**\n\n"
+        
+        # Format each field with more conversational language
+        for k in self.required_fields:
+            v = fields.get(k, None)
+            assumed = k in assumed_fields
+            if k == "credit_score":
+                if v not in (None, '', 0, 0.0):
+                    if assumed and not show_result:
+                        summary += f"- **Credit Score:** {v} _(I'm using a typical score since we don't have this one)_\n"
+                    else:
+                        summary += f"- **Credit Score:** {v}\n"
+                else:
+                    summary += f"- **Credit Score:** _(we'll need this one)_\n"
+            elif k == "income":
+                if v not in (None, '', 0, 0.0):
+                    if assumed and not show_result:
+                        summary += f"- **Monthly Income:** £{float(v):,.2f} _(estimated typical income)_\n"
+                    else:
+                        summary += f"- **Monthly Income:** £{float(v):,.2f}\n"
+                else:
+                    summary += f"- **Monthly Income:** _(still need this detail)_\n"
+            elif k == "rent":
+                if v not in (None, '', 0, 0.0):
+                    if assumed and not show_result:
+                        summary += f"- **Monthly Rent:** £{float(v):,.2f} _(using average rent estimate)_\n"
+                    else:
+                        summary += f"- **Monthly Rent:** £{float(v):,.2f}\n"
+                else:
+                    summary += f"- **Monthly Rent:** _(missing this piece)_\n"
+            elif k == "employment_status":
+                if v not in (None, '', False, 'unknown', ''):
+                    if assumed and not show_result:
+                        summary += f"- **Employment:** {v} _(my best guess based on what we know)_\n"
+                    else:
+                        summary += f"- **Employment:** {v}\n"
+                else:
+                    summary += f"- **Employment:** _(would love to know this)_\n"
+            elif k == "eviction_record":
+                if v is False:
+                    if assumed and not show_result:
+                        summary += f"- **Eviction History:** Clean record _(assuming no issues unless told otherwise)_\n"
+                    else:
+                        summary += f"- **Eviction History:** Clean record\n"
+                elif v is True:
+                    summary += f"- **Eviction History:** Has prior evictions\n"
+                else:
+                    summary += f"- **Eviction History:** _(need to check this)_\n"
+        
+        # More conversational confirmation text
+        if not show_result:
+            missing_to_show = [k for k in self.required_fields if k not in user_provided]
+            if missing_to_show:
+                summary += "\n💡 _Want a spot-on screening? Just share these missing bits with me:_ "
+                field_names = {
+                    "credit_score": "**Credit Score**",
+                    "income": "**Income**", 
+                    "rent": "**Rent Amount**",
+                    "employment_status": "**Job Status**",
+                    "eviction_record": "**Eviction History**"
+                }
+                summary += ", ".join([f"_{field_names.get(k, k.replace('_', ' ').title())}_" for k in missing_to_show])
+                summary += "\n\n_Or we can roll with what we have - just give me the thumbs up!_ 👍"
+            else:
+                summary += "\n\nLooks good to me! Ready to dive into the screening? Just say the word! 🚀"
+        
         return summary
 
     def run_model(self, fields):
@@ -784,91 +871,239 @@ class TenantScreeningHandler(BaseModuleHandler):
         rent = float(fields.get("rent", 0) or 0)
         employment_status = str(fields.get("employment_status", "")).strip() or "unknown"
         eviction_record = bool(fields.get("eviction_record", False))
+        tenant_name = str(fields.get("tenant_name", "")).strip()
+        
         print("Starting script with fields:", fields)
         print(f"Credit Score: {credit_score}, Income: {income}, Rent: {rent}, Employment Status: {employment_status}, Eviction Record: {eviction_record}")
         result = screen_tenant(credit_score, income, rent, employment_status, eviction_record)
-        print("DOne with script")
-        # Compose a brief summary based on recommendation
+        print("Done with script")
+        
+        # More engaging and conversational result summaries
+        tenant_reference = tenant_name if tenant_name else "your applicant"
         summary = ""
         if result['recommendation'].lower() in ['approve', 'accept', 'approved', 'accepted']:
-            summary = "✅ **Tenant Approved:** This applicant meets the screening criteria."
+            summary = f"🎉 **Great news!** {tenant_reference} gets the green light! Here's the scoop:"
         elif result['recommendation'].lower() == 'review':
-            summary = "⚠️ **Tenant Requires Further Review:** Some risk factors were detected."
+            summary = f"🤔 **Hmm, this one needs a closer look...** {tenant_reference} has some yellow flags we should chat about:"
         else:
-            summary = "❌ **Tenant Rejected:** This applicant does not meet the screening criteria."
-        md = f"{summary}\n\n**Tenant Screening Result:**\n\n"
-        md += f"- **Recommendation:** {result['recommendation']}\n"
-        md += f"- **Risk Score:** {result['risk_score']}\n"
-        md += f"- **Details:**\n"
+            summary = f"😬 **Not looking promising...** {tenant_reference} doesn't quite make the cut. Here's what's concerning:"
+        
+        md = f"{summary}\n\n**📋 Screening Results:**\n\n"
+        md += f"**🎯 Final Call:** {result['recommendation'].title()}\n"
+        md += f"**⚠️ Risk Level:** {result['risk_score']}\n\n"
+        md += f"**🔍 Here's the breakdown:**\n"
         for line in result['explanation'].split('\n'):
-            md += f"  - {line}\n"
+            if line.strip():  # Only add non-empty lines
+                md += f"• {line.strip()}\n"
         return md
 
     def handle(self, conversation_history, user_message, last_candidate_fields=None):
-        # Always merge new extracted fields with last candidate fields, only for required fields
+        print(f"[DEBUG] TenantScreeningHandler.handle called with: {user_message}")
+        print(f"[DEBUG] Last candidate fields: {last_candidate_fields}")
+        
+        # Only use tenant screening fields for logic (preserve tenant_name in merged_fields)
         new_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
+        print(f"[DEBUG] Extracted new fields: {new_fields}")
         
-        # Only work with tenant screening fields - filter out any other fields
-        merged_fields = {}
-        if last_candidate_fields:
-            for k in self.required_fields:
-                if k in last_candidate_fields:
-                    merged_fields[k] = last_candidate_fields[k]
-        
-        # Update with new tenant fields
-        for k in self.required_fields:
+        merged_fields = {k: v for k, v in (last_candidate_fields or {}).items() if k in self.required_fields + ["tenant_name"] and v not in (None, '', 0, 0.0, False)}
+        for k in self.required_fields + ["tenant_name"]:
             v = new_fields.get(k, None)
-            if v not in (None, '', 0, 0.0, False):
+            if k == "tenant_name":
+                if v and str(v).strip():
+                    merged_fields[k] = str(v).strip()
+            elif v not in (None, '', 0, 0.0, False):
                 merged_fields[k] = v
         
-        # Ensure all required fields exist with defaults
-        tenant_fields = {}
+        print(f"[DEBUG] Merged fields: {merged_fields}")
+
+        # Robust eviction record extraction: check user message for negative/false/no eviction record
+        eviction_phrases = [
+            "no eviction", "no prior eviction", "never evicted", "no eviction record", 
+            "eviction record is false", "no enviction", "no inviction", "no eviction history", 
+            "false", "none", "never"
+        ]
+        user_message_lower = user_message.lower()
+        if any(phrase in user_message_lower for phrase in eviction_phrases):
+            merged_fields["eviction_record"] = False
+
+        # Infer employment status from income
+        if merged_fields.get("income", 0) not in (None, '', 0, 0.0):
+            if merged_fields.get("employment_status", "") in (None, '', 0, 0.0):
+                merged_fields["employment_status"] = "employed"
+
+        # Track which fields were actually provided by the user vs. inferred/assumed
+        user_provided = []
         for k in self.required_fields:
-            if k in ["credit_score", "income", "rent"]:
-                tenant_fields[k] = merged_fields.get(k, 0)
-            elif k == "eviction_record":
-                tenant_fields[k] = merged_fields.get(k, False)
-            else:  # employment_status
-                tenant_fields[k] = merged_fields.get(k, "")
-        
-        # --- After user confirmation, always run the script if all required fields are present ---
-        if self.needs_confirmation(user_message):
-            if all(self._is_field_filled(k, tenant_fields.get(k)) for k in self.required_fields):
-                result = self.run_model(tenant_fields)
-                return {"response": result, "action": "screen_tenant", "fields": tenant_fields}
+            v = merged_fields.get(k, None)
+            # Check if this field appears to be user-provided in current or previous messages
+            field_keywords = self.FIELD_SYNONYMS.get(k, [k])
+            
+            # Check current message for field mentions
+            current_has_field = any(keyword.lower() in user_message.lower() for keyword in field_keywords)
+            
+            # Check recent conversation for field mentions
+            recent_has_field = False
+            if conversation_history:
+                recent_messages = conversation_history[-5:]  # Check last 5 messages
+                for msg in recent_messages:
+                    if msg["role"] == "user":
+                        if any(keyword.lower() in msg["content"].lower() for keyword in field_keywords):
+                            recent_has_field = True
+                            break
+            
+            # Special handling for different field types
+            if k == "eviction_record":
+                # Check for eviction-related phrases in current message
+                eviction_mentions = ["eviction", "evicted", "prior eviction", "previous eviction", "eviction record", "eviction history"]
+                current_mentions_eviction = any(phrase in user_message.lower() for phrase in eviction_mentions)
+                
+                if current_mentions_eviction or current_has_field or recent_has_field:
+                    user_provided.append(k)
+                elif any(phrase in user_message_lower for phrase in eviction_phrases):
+                    user_provided.append(k)
+            elif k == "employment_status":
+                # Only consider provided if explicitly mentioned (not just inferred from income)
+                employment_mentions = ["employed", "unemployed", "job", "work", "employment", "self-employed", "occupation"]
+                current_mentions_employment = any(phrase in user_message.lower() for phrase in employment_mentions)
+                
+                if current_mentions_employment or current_has_field or recent_has_field:
+                    user_provided.append(k)
             else:
-                return {
-                    "response": "Sorry, I couldn't run the tenant screening script because some required information is missing. Please provide all the details (credit score, income, rent, employment status, and eviction record).",
-                    "action": "ask_for_info",
-                    "fields": tenant_fields
-                }
+                # For credit_score, income, rent - if value exists and was mentioned, consider it provided
+                if v not in (None, '', 0, 0.0, False) and (current_has_field or recent_has_field):
+                    user_provided.append(k)
         
-        # Otherwise, continue the LLM-driven flow
+        print(f"[DEBUG] User provided fields: {user_provided}")
+
+        # Find missing fields
+        missing = []
+        for k in self.required_fields:
+            v = merged_fields.get(k, None)
+            if k == "eviction_record":
+                if v is None:
+                    missing.append(k)
+            elif k == "employment_status":
+                if v in (None, '', False, 'unknown', ''):
+                    missing.append(k)
+            else:
+                if v in (None, '', 0, 0.0, False):
+                    missing.append(k)
+
+        # If not enough info, ask for more with conversational flair
+        if len(user_provided) < 2:
+            conversation_starters = [
+                "Alright, let's get this tenant screening party started! 🎉",
+                "Time to put on my detective hat and screen this tenant! 🕵️",
+                "Let's dive into some tenant screening magic! ✨",
+                "Ready to uncover the mystery of this potential tenant? 🔍"
+            ]
+            import random
+            starter = random.choice(conversation_starters)
+            
+            prompt = (
+                f"{starter}\n\n"
+                "I'll need some key details about your applicant to work my screening magic. "
+                "Just share at least **two** of these with me and I can get started:\n\n"
+            )
+            
+            field_descriptions = {
+                "credit_score": "**Credit Score** - What's their credit situation like?",
+                "income": "**Monthly Income** - How much are they bringing in each month?",
+                "rent": "**Rent Amount** - What's the monthly rent for this property?",
+                "employment_status": "**Job Status** - Are they employed, self-employed, or between jobs?",
+                "eviction_record": "**Eviction History** - Any past evictions we should know about?"
+            }
+            
+            for k in self.required_fields:
+                prompt += f"• {field_descriptions[k]}\n"
+            
+            prompt += "\nOnce you drop a couple of these details on me, I'll whip up a preliminary screening for you! 🚀"
+            
+            return {
+                "response": prompt,
+                "action": "ask_for_info",
+                "fields": merged_fields
+            }
+
+        # If we have at least 2 fields, show estimated screening with results
+        if len(user_provided) >= 2:
+            # Fill in missing fields with defaults for estimation
+            avg_defaults = {
+                "credit_score": 650,
+                "income": 2500.0,
+                "rent": 1200.0,
+                "employment_status": "employed",
+                "eviction_record": False
+            }
+            estimate_fields = dict(merged_fields)
+            for k in missing:
+                estimate_fields[k] = avg_defaults[k]
+
+            # Show the details used for screening + result with more personality
+            result_md = self.run_model(estimate_fields)
+            
+            # Add missing fields note at the bottom with conversational touch
+            missing_to_show = [k for k in missing if k != "employment_status" or merged_fields.get("income", 0) in (None, '', 0, 0.0)]
+            
+            response = result_md
+            
+            if missing_to_show:
+                response += "\n\n---\n\n"
+                response += "💭 **Want an even sharper analysis?** Drop me these details and I'll give you the full picture: "
+                field_names = {
+                    "credit_score": "**credit score**",
+                    "income": "**income**", 
+                    "rent": "**rent amount**",
+                    "employment_status": "**employment status**",
+                    "eviction_record": "**eviction history**"
+                }
+                response += ", ".join([f"{field_names.get(k, k.replace('_', ' '))}" for k in missing_to_show])
+                response += " and I'll re-run everything! 🎯"
+            
+            return {
+                "response": response,
+                "action": "show_estimate_with_result",
+                "fields": estimate_fields
+            }
+
+        # Fallback to LLM conversation
         messages = [
             {"role": "system", "content": self.system_prompt}
         ]
         for msg in conversation_history:
             messages.append({"role": msg["role"], "content": msg["content"]})
         messages.append({"role": "user", "content": user_message})
-        
+
         response = invoke_with_tracking(
             self.chat,
             [HumanMessage(content=m["content"]) for m in messages],
             "Tenant Screening - Conversation"
         )
         reply = response.content.strip()
+
+        # Remove any problematic phrases and replace with more conversational alternatives
+        replacements = {
+            "please wait": "hang tight",
+            "processing": "working on it",
+            "hold on": "give me a sec",
+            "one moment": "just a moment",
+            "I'll process": "I'll work on",
+            "wait a moment": "bear with me",
+            "it's important to exercise caution": "worth being careful here",
+            "you may wish to consider": "you might want to think about",
+            "you may want to explore": "might be worth looking into",
+            "consider requesting a guarantor": "maybe ask for a guarantor",
+            "By considering these factors": "Looking at all this",
+            "Tips for Landlord": "Quick thoughts",
+            "Based on the information provided": "From what you've told me",
+            "Summary:": "Here's the deal:"
+        }
         
-        # Remove any LLM advice/summary or extra fields
-        for phrase in [
-            "please wait", "processing", "hold on", "one moment", "I'll process", "wait a moment",
-            "it's important to exercise caution", "you may wish to consider", "you may want to explore",
-            "consider requesting a guarantor", "By considering these factors", "Tips for Landlord",
-            "Based on the information provided", "Summary:"
-        ]:
-            reply = reply.replace(phrase, "")
-            reply = reply.replace(phrase.capitalize(), "")
-        
-        # Remove lines with extra fields
+        for old_phrase, new_phrase in replacements.items():
+            reply = reply.replace(old_phrase, new_phrase)
+            reply = reply.replace(old_phrase.capitalize(), new_phrase.capitalize())
+
+        # Remove lines with extra fields we don't want
         lines = reply.split('\n')
         filtered_lines = []
         for line in lines:
@@ -876,16 +1111,8 @@ class TenantScreeningHandler(BaseModuleHandler):
                 continue
             filtered_lines.append(line)
         reply = '\n'.join(filtered_lines)
-        
-        # Extract fields from reply and merge again
-        reply_fields = self.extract_fields(reply, conversation_history, tenant_fields)
-        for k in self.required_fields:
-            v = reply_fields.get(k, None)
-            if v not in (None, '', 0, 0.0, False):
-                tenant_fields[k] = v
-        
-        # Always return only tenant screening fields
-        return {"response": reply, "action": "chat", "fields": tenant_fields}
+
+        return {"response": reply, "action": "chat", "fields": merged_fields}
 
     def _is_field_filled(self, key, value):
         if key in ["credit_score", "income", "rent"]:
@@ -895,6 +1122,14 @@ class TenantScreeningHandler(BaseModuleHandler):
         if key == "employment_status":
             return bool(value and str(value).strip())
         return value not in (None, '', False)
+
+    def needs_confirmation(self, user_message):
+        confirmation_keywords = [
+            "yes", "correct", "confirm", "ok", "okay", "proceed", "continue", "that's right",
+            "sounds good", "let's go", "do it", "sure", "absolutely", "yep", "yeah", 
+            "thumbs up", "green light", "go ahead", "let's roll", "perfect"
+        ]
+        return any(kw in user_message.lower().strip() for kw in confirmation_keywords)
 
     def should_run_model(self, conversation_history, candidate_fields):
         # Only run the model if all required fields are present and the last assistant message explicitly asks for confirmation
@@ -906,15 +1141,12 @@ class TenantScreeningHandler(BaseModuleHandler):
         if not last_assistant:
             return False
         confirmation_keywords = [
-            "please confirm", "is this information correct", "is this correct", "can you confirm", "are these details correct", "please confirm so i can screen the tenant"
+            "please confirm", "is this information correct", "is this correct", "can you confirm", 
+            "are these details correct", "ready to dive into the screening", "just say the word",
+            "give me the thumbs up", "just give me the thumbs up"
         ]
         return any(kw in last_assistant["content"].lower() for kw in confirmation_keywords)
 
-# --- Predictive Maintenance Integration ---
-
-
-
-# --- Predictive Maintenance Handler with Address Mapping ---
 class MaintenancePredictionHandler(BaseModuleHandler):
     def batch_alerts(self, as_json=False):
         """

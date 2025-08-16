@@ -28,3 +28,12 @@ button for intent
 predictive maintiance (Response)
 Tennant reject/accpted response
 
+
+
+
+
+
+I think the assistant should use default avg values (better if those default values somehow matches the values the user have provided ) and give an estimate such that "A 'propertytype' with 'noofbeds', 'oterInfo' and as you didn't provided the 'noofbathrooms' I suppose 2 'similarlyforothers' should have a rent of XXX ranging from XXX-XXXX (this estimation has a confidence score of XX)
+if you'd like a more precise estimation do let me know!
+
+and then ask for the missing information
