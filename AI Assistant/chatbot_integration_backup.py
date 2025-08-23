@@ -6,28 +6,39 @@ import pandas as pd
 import numpy as np
 import xgboost as xgb
 import joblib
+import time
 from datetime import datetime
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
-import re
-import json
-import os
 
 # Import our new modules
 from milvus_utils import get_milvus_store
 from conversation_intelligence import get_conversation_intelligence, IntentType
+from cost_tracker import track_langchain_response, print_session_summary, get_session_summary
 
 load_dotenv()
 
 # Set OpenAI API key
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-# Optimized model configurations
-EXTRACTION_MODEL = "gpt-3.5-turbo"  # Cheaper for data extraction
-CONVERSATION_MODEL = "gpt-4o-mini"  # Efficient for conversations
-SUMMARY_MODEL = "gpt-3.5-turbo"    # Cost-effective for summaries
+# Wrapper function to track API calls
+def invoke_with_tracking(chat_instance, messages, context="API Call"):
+    """
+    Wrapper function to invoke LangChain ChatOpenAI with cost tracking
+    """
+    start_time = time.time()
+    response = chat_instance.invoke(messages)
+    duration = time.time() - start_time
+    
+    # Extract model name from the chat instance
+    model_name = getattr(chat_instance, 'model_name', 'gpt-4')
+    
+    # Track the response
+    track_langchain_response(response, model_name, context, duration)
+    
+    return response
 
 # --- Modular Conversational Engine ---
 
@@ -73,16 +84,25 @@ class RentPredictionHandler(BaseModuleHandler):
         return cls._model
 
     def __init__(self):
-        # Optimized shorter prompt - same functionality, 50% fewer tokens
         self.system_prompt = (
-            "You are LandlordBuddy, a friendly AI assistant for rent pricing. "
-            "Required info: address, postcode, bedrooms, bathrooms, size (sq ft), property type. "
-            "Ask for missing info casually. When complete, summarize in markdown and ask for confirmation. "
-            "Be flexible with user input format. Keep responses concise and helpful."
+            "You are LandlordBuddy, an expert and friendly AI assistant for landlords. "
+            "You support rent pricing, tenant screening, and maintenance prediction. "
+            "If the user asks for a feature you support, guide them to provide all required info. "
+            "If info is missing, ask for it in a friendly, casual way. "
+            "You must be flexible in understanding user input: users may provide information in any format, not just JSON or structured lists. "
+            "You should do your best to interpret and extract the required details for rent prediction even if the user uses casual language, synonyms, or different phrasings. "
+            "For example, if the user says 'avg distance', 'average station distance', 'station distance', or any similar phrase, you should map it to 'avg_distance_to_nearest_station'. "
+            "Similarly, for all required fields, try to match and extract the information even if the user does not use the exact field names. "
+            "The required information for rent prediction is: address, subdistrict_code, BEDROOMS, BATHROOMS, SIZE (in sq ft), PROPERTY TYPE. "
+            "When you have all the required information, summarize the details in a clear, markdown-formatted list (not JSON or code block), and politely ask the user to confirm if the details are correct for rent estimation. "
+            "Do NOT say you will provide the rent estimate later or mention any limitations. Wait for user confirmation before proceeding. "
+            "Once the user confirms, proceed to provide the rent prediction and explanation using the model results, in clear markdown. "
+            "If the request is not supported, politely say so. "
+            "Never mention OpenAI or your own limitations. "
+            "Always keep the conversation natural and helpful. "
+            "Respond in markdown."
         )
-        self.chat = ChatOpenAI(model=CONVERSATION_MODEL, temperature=0.7, openai_api_key=openai_api_key)
-        # Separate extraction client for data parsing
-        self.extraction_chat = ChatOpenAI(model=EXTRACTION_MODEL, temperature=0, openai_api_key=openai_api_key)
+        self.chat = ChatOpenAI(model="gpt-4", temperature=0.7, openai_api_key=openai_api_key)
 
     def extract_fields(self, user_message, conversation_history, last_candidate_fields=None):
         # Use LangChain's PydanticOutputParser for robust extraction
@@ -90,38 +110,51 @@ class RentPredictionHandler(BaseModuleHandler):
         from pydantic import BaseModel, Field, ValidationError
         from langchain_core.prompts import ChatPromptTemplate
         import re
-        # Only attempt extraction if the intent is rent prediction
-        if detect_intent(user_message, conversation_history) != "rent_prediction":
-            return last_candidate_fields or {}
+        
         class RentFields(BaseModel):
-            address: str = Field(..., description="The property address or location")
-            subdistrict_code: str = Field(..., description="The subdistrict code or postcode")
-            BEDROOMS: int = Field(..., description="Number of bedrooms")
-            BATHROOMS: int = Field(..., description="Number of bathrooms")
-            SIZE: float = Field(..., description="Size in square feet")
-            PROPERTY_TYPE: str = Field(..., description="Property type (e.g. flat, house, apartment)")
+            address: str = Field("", description="The property address or location")
+            subdistrict_code: str = Field("", description="The subdistrict code or postcode")
+            BEDROOMS: int = Field(0, description="Number of bedrooms")
+            BATHROOMS: int = Field(0, description="Number of bathrooms")
+            SIZE: float = Field(0.0, description="Size in square feet")
+            PROPERTY_TYPE: str = Field("", description="Property type (e.g. flat, house, apartment)")
 
         parser = PydanticOutputParser(pydantic_object=RentFields)
-        # Compose the full conversation for context
-        all_text = "\n".join([m["content"] for m in conversation_history if m["role"] in ("user", "assistant")])
-        all_text += "\n" + user_message
+        
+        # Filter conversation to only rent prediction related messages (last 6 messages max)
+        rent_messages = []
+        recent_messages = conversation_history[-6:] if len(conversation_history) > 6 else conversation_history
+        
+        for msg in recent_messages:
+            content_lower = msg["content"].lower()
+            if any(keyword in content_lower for keyword in ["rent", "prediction", "property", "address", "bedroom", "bathroom", "size", "flat", "house", "apartment", "subdistrict", "postcode"]):
+                rent_messages.append(msg)
+        
+        # Add current message
+        filtered_text = "\n".join([f"{m['role']}: {m['content']}" for m in rent_messages])
+        filtered_text += f"\nuser: {user_message}"
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for landlords. Extract the following fields from the conversation and user message. If a field is missing, use an empty string or 0. Output only the JSON object as specified by the schema: {format_instructions}"),
-            ("user", "Conversation so far:\n{conversation}\nUser message:\n{user_message}")
+            ("system", "You are an expert assistant for rent prediction ONLY. Extract ONLY rent prediction fields from the conversation: address, subdistrict_code, BEDROOMS, BATHROOMS, SIZE, PROPERTY_TYPE. DO NOT extract any other fields like credit score, income, employment, maintenance info, etc. If a field is missing, use an empty string or 0. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("user", "Rent prediction conversation:\n{conversation}\nCurrent message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
         prompt_value = prompt.format_prompt(
-            conversation=all_text,
+            conversation=filtered_text,
             user_message=user_message,
             format_instructions=format_instructions
         )
-        response = self.chat.invoke([HumanMessage(content=prompt_value.to_string())])
+        response = invoke_with_tracking(
+            self.chat,
+            [HumanMessage(content=prompt_value.to_string())],
+            "Rent Prediction - Field Extraction"
+        )
         content = response.content.strip()
         try:
             parsed = parser.parse(content)
             fields = parsed.dict()
-        except ValidationError:
+        except (ValidationError, Exception) as e:
+            print(f"[DEBUG] Pydantic parsing failed for rent fields: {e}. Using fallback extraction.")
             # Fallback: try regex extraction as before
             fields = dict(last_candidate_fields) if last_candidate_fields else {}
             markdown_field_pattern = re.compile(r"(?:^|\n)[\-\d\.\*\s]*\*?\*?([A-Za-z0-9_\s]+?)\*?\*?\s*[:：]\s*([\w\-,.\/()'’\s]+)", re.IGNORECASE)
@@ -384,7 +417,11 @@ class RentPredictionHandler(BaseModuleHandler):
                         summary_prompt = f"""
 You are a real estate assistant. Compare the user's property (rent: £{user_rent}) to these similar listings (rents: {[l['rent'] for l in similar_listings]}). In 1-2 sentences, summarize if the user's price is above, below, or in line with the local market, and mention any notable differences in features if possible. Be concise and helpful.
 """
-                        summary_response = llm.invoke([HumanMessage(content=summary_prompt)])
+                        summary_response = invoke_with_tracking(
+                            llm,
+                            [HumanMessage(content=summary_prompt)],
+                            "Rent Comparison - Market Summary (Save)"
+                        )
                         summary = summary_response.content.strip()
                         out = "✅ Property and prediction saved!\n"  # Separate line
                         out += summary + "\n\n"  # LLM summary replaces section title
@@ -499,7 +536,11 @@ You are a real estate assistant. Compare the user's property (rent: £{user_rent
                         summary_prompt = f"""
 You are a real estate assistant. Compare the user's property (rent: £{user_rent}) to these similar listings (rents: {[l['rent'] for l in similar_listings]}). In 1-2 sentences, summarize if the user's price is above, below, or in line with the local market, and mention any notable differences in features if possible. Be concise and helpful.
 """
-                        summary_response = llm.invoke([HumanMessage(content=summary_prompt)])
+                        summary_response = invoke_with_tracking(
+                            llm,
+                            [HumanMessage(content=summary_prompt)],
+                            "Rent Comparison - Market Summary (Compare)"
+                        )
                         summary = summary_response.content.strip()
                         out += summary + "\n\n"  # LLM summary replaces section title
                         for l in similar_listings:
@@ -572,7 +613,11 @@ You are a real estate assistant. Compare the user's property (rent: £{user_rent
         for msg in conversation_history:
             messages.append({"role": msg["role"], "content": msg["content"]})
         messages.append({"role": "user", "content": user_message})
-        response = self.chat.invoke([HumanMessage(content=m["content"]) for m in messages])
+        response = invoke_with_tracking(
+            self.chat,
+            [HumanMessage(content=m["content"]) for m in messages],
+            "Rent Prediction - Conversation"
+        )
         reply = response.content.strip()
         extracted = self.extract_fields(reply, conversation_history, candidate_fields)
         return {"response": reply, "action": "chat", "fields": extracted}
@@ -611,31 +656,50 @@ class TenantScreeningHandler(BaseModuleHandler):
         from pydantic import BaseModel, Field, ValidationError
         from langchain_core.prompts import ChatPromptTemplate
         import re
+        
         class TenantFields(BaseModel):
             credit_score: int = Field(0, description="Applicant's credit score")
             income: float = Field(0, description="Applicant's monthly income")
             rent: float = Field(0, description="Monthly rent for the property")
             employment_status: str = Field("", description="Employment status (e.g., employed, unemployed)")
             eviction_record: bool = Field(False, description="True if applicant has prior eviction, else False")
+        
         parser = PydanticOutputParser(pydantic_object=TenantFields)
-        all_text = "\n".join([m["content"] for m in conversation_history if m["role"] in ("user", "assistant")])
-        all_text += "\n" + user_message
+        
+        # Filter conversation to only tenant screening related messages (last 6 messages max)
+        tenant_messages = []
+        recent_messages = conversation_history[-6:] if len(conversation_history) > 6 else conversation_history
+        
+        for msg in recent_messages:
+            content_lower = msg["content"].lower()
+            if any(keyword in content_lower for keyword in ["tenant", "screening", "credit", "income", "rent", "employment", "eviction", "unemployed", "employed"]):
+                tenant_messages.append(msg)
+        
+        # Add current message
+        filtered_text = "\n".join([f"{m['role']}: {m['content']}" for m in tenant_messages])
+        filtered_text += f"\nuser: {user_message}"
+        
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record. DO NOT extract any other fields. If a field is missing, use 0, empty string, or False. Output only the JSON object as specified by the schema: {format_instructions}"),
-            ("user", "Conversation so far:\n{conversation}\nUser message:\n{user_message}")
+            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record. DO NOT extract any other fields like address, property age, maintenance, etc. If a field is missing, use 0, empty string, or False. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("user", "Tenant screening conversation:\n{conversation}\nCurrent message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
         prompt_value = prompt.format_prompt(
-            conversation=all_text,
+            conversation=filtered_text,
             user_message=user_message,
             format_instructions=format_instructions
         )
-        response = self.chat.invoke([HumanMessage(content=prompt_value.to_string())])
+        response = invoke_with_tracking(
+            self.chat,
+            [HumanMessage(content=prompt_value.to_string())],
+            "Tenant Screening - Field Extraction"
+        )
         content = response.content.strip()
         try:
             parsed = parser.parse(content)
             fields = parsed.dict()
-        except ValidationError:
+        except (ValidationError, Exception) as e:
+            print(f"[DEBUG] Pydantic parsing failed for tenant fields: {e}. Using fallback extraction.")
             # Fallback: regex extraction as before
             fields = dict(last_candidate_fields) if last_candidate_fields else {}
             markdown_field_pattern = re.compile(r"(?:^|\n)[\-\d\.\*\s]*\*?\*?([A-Za-z0-9_\s]+?)\*?\*?\s*[:：]\s*([\w\-,.\/()'’\s]+)", re.IGNORECASE)
@@ -787,7 +851,11 @@ class TenantScreeningHandler(BaseModuleHandler):
             messages.append({"role": msg["role"], "content": msg["content"]})
         messages.append({"role": "user", "content": user_message})
         
-        response = self.chat.invoke([HumanMessage(content=m["content"]) for m in messages])
+        response = invoke_with_tracking(
+            self.chat,
+            [HumanMessage(content=m["content"]) for m in messages],
+            "Tenant Screening - Conversation"
+        )
         reply = response.content.strip()
         
         # Remove any LLM advice/summary or extra fields
@@ -947,7 +1015,11 @@ class MaintenancePredictionHandler(BaseModuleHandler):
             format_instructions=format_instructions
         )
         try:
-            response = self.chat.invoke([HumanMessage(content=prompt_value.to_string())])
+            response = invoke_with_tracking(
+                self.chat,
+                [HumanMessage(content=prompt_value.to_string())],
+                "Maintenance Prediction - Field Extraction"
+            )
             content = response.content.strip()
             parsed = parser.parse(content)
             fields = parsed.dict()
@@ -1108,7 +1180,11 @@ class MaintenancePredictionHandler(BaseModuleHandler):
             messages.append({"role": msg["role"], "content": msg["content"]})
         messages.append({"role": "user", "content": user_message})
         
-        response = self.chat.invoke([HumanMessage(content=m["content"]) for m in messages])
+        response = invoke_with_tracking(
+            self.chat,
+            [HumanMessage(content=m["content"]) for m in messages],
+            "Maintenance Prediction - Conversation"
+        )
         reply = response.content.strip()
         
         # Extract any additional fields from the LLM response
@@ -1121,102 +1197,6 @@ class MaintenancePredictionHandler(BaseModuleHandler):
 
 # --- Enhanced Intent Detection and Entity Recognition ---
 def detect_intent(user_message, conversation_history=None):
-    """
-    Robust intent detection using keyword matching first, then AI fallback.
-    This reduces API calls significantly.
-    """
-    message_lower = user_message.lower()
-    
-    # Rent prediction keywords
-    rent_keywords = [
-        'rent', 'price', 'pricing', 'estimate', 'cost', 'how much',
-        'bedrooms', 'bathrooms', 'size', 'sq ft', 'square feet',
-        'property type', 'flat', 'house', 'apartment', 'address',
-        'location', 'postcode', 'ub8', 'subdistrict'
-    ]
-    
-    # Tenant screening keywords
-    tenant_keywords = [
-        'tenant', 'screen', 'screening', 'credit score', 'income',
-        'employment', 'eviction', 'applicant', 'qualify', 'approve',
-        'reject', 'background check', 'rental history'
-    ]
-    
-    # Maintenance prediction keywords
-    maintenance_keywords = [
-        'maintenance', 'repair', 'service', 'predict', 'age',
-        'years old', 'last service', 'season', 'winter', 'summer',
-        'spring', 'autumn', 'risk', 'alert', 'breakdown'
-    ]
-    
-    # Count keyword matches
-    rent_score = sum(1 for kw in rent_keywords if kw in message_lower)
-    tenant_score = sum(1 for kw in tenant_keywords if kw in message_lower)
-    maintenance_score = sum(1 for kw in maintenance_keywords if kw in message_lower)
-    
-    # If clear winner (score >= 2), return immediately
-    if rent_score >= 2 and rent_score > tenant_score and rent_score > maintenance_score:
-        return "rent_prediction"
-    if tenant_score >= 2 and tenant_score > rent_score and tenant_score > maintenance_score:
-        return "tenant_screening"
-    if maintenance_score >= 2 and maintenance_score > rent_score and maintenance_score > tenant_score:
-        return "maintenance_prediction"
-    
-    # Check conversation context for additional clues
-    if conversation_history:
-        recent_context = " ".join([msg.get("content", "") for msg in conversation_history[-3:]])
-        context_lower = recent_context.lower()
-        
-        if any(kw in context_lower for kw in rent_keywords[:5]):  # Core rent keywords
-            return "rent_prediction"
-        if any(kw in context_lower for kw in tenant_keywords[:5]):  # Core tenant keywords
-            return "tenant_screening"
-        if any(kw in context_lower for kw in maintenance_keywords[:5]):  # Core maintenance keywords
-            return "maintenance_prediction"
-    
-    # Fallback to AI only if really ambiguous (saves tokens)
-    if rent_score + tenant_score + maintenance_score == 0:
-        try:
-            llm = ChatOpenAI(model=EXTRACTION_MODEL, temperature=0, openai_api_key=openai_api_key)
-            prompt = f"Intent classification. User message: '{user_message}'. Response format: rent_prediction OR tenant_screening OR maintenance_prediction OR general_chat"
-            response = llm.invoke([HumanMessage(content=prompt)])
-            intent = response.content.strip().lower()
-            if intent in ["rent_prediction", "tenant_screening", "maintenance_prediction"]:
-                return intent
-        except Exception:
-            pass
-    
-    return "general_chat"
-
-def extract_with_regex_first(text, field_patterns):
-    """
-    Fast regex-based extraction before using AI. Reduces API calls by 70%.
-    """
-    extracted = {}
-    
-    for field, patterns in field_patterns.items():
-        for pattern in patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                value = match.group(1).strip()
-                # Clean and validate value
-                if field in ['bedrooms', 'bathrooms', 'age_years', 'last_service_years_ago', 'credit_score']:
-                    try:
-                        extracted[field] = int(float(value))
-                    except:
-                        continue
-                elif field in ['size', 'income', 'rent']:
-                    try:
-                        extracted[field] = float(value)
-                    except:
-                        continue
-                elif field == 'eviction_record':
-                    extracted[field] = any(word in value.lower() for word in ['yes', 'true', 'prior', 'evict'])
-                else:
-                    extracted[field] = value
-                break
-    
-    return extracted
     """
     Enhanced intent detection using the new conversation intelligence system.
     Falls back to basic keyword matching if enhanced system is unavailable.
@@ -1287,7 +1267,11 @@ def llm_detect_intent(conversation_history, user_message):
             "Only output the intent keyword.\n"
             f"Conversation:\n{context}\nUser message:\n{user_message}\nIntent:"
         )
-        response = chat.invoke([HumanMessage(content=prompt)])
+        response = invoke_with_tracking(
+            chat,
+            [HumanMessage(content=prompt)],
+            "Intent Detection - Fallback"
+        )
         intent = response.content.strip().lower()
         if "greeting" in intent or "hello" in intent or "hi" in intent:
             return "greeting"
@@ -1303,7 +1287,9 @@ def llm_detect_intent(conversation_history, user_message):
 def user_requests_intent_switch(user_message):
     msg = user_message.lower()
     switch_phrases = [
-        "forget it", "let's do", "i want to do", "switch to", "change to", "do rent instead", "do tenant instead", "do maintenance instead", "not this", "wrong task", "that's not what i meant", "i want rent", "i want tenant", "i want maintenance"
+        "forget it", "let's do", "i want to do", "switch to", "change to", "do rent instead", "do tenant instead", "do maintenance instead", "not this", "wrong task", "that's not what i meant", "i want rent", "i want tenant", "i want maintenance",
+        "can you do rent", "can you do tenant", "can you do maintenance", "rent prediction", "tenant screening", "maintenance prediction",
+        "help with rent", "help with tenant", "help with maintenance"
     ]
     return any(phrase in msg for phrase in switch_phrases)
 
@@ -1507,7 +1493,20 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
     Modular conversational engine for LandlordBuddy.
     Routes to the correct module handler based on detected intent.
     """
-    # If user requests to switch/cancel, re-detect intent
+    # Add call counter for cost tracking
+    if not hasattr(conversational_engine, 'call_count'):
+        conversational_engine.call_count = 0
+    conversational_engine.call_count += 1
+    
+    # Print cost summary every 10 calls
+    if conversational_engine.call_count % 10 == 0:
+        print(f"\n[COST SUMMARY] After {conversational_engine.call_count} calls:")
+        summary = get_session_summary()
+        print(f"Total API calls: {summary['total_calls']}")
+        print(f"Total cost: ${summary['total_cost']:.6f}")
+        print(f"Average cost per call: ${summary['avg_cost_per_call']:.6f}")
+    
+    # If user requests to switch/cancel, re-detect intent and reset fields
     if user_requests_intent_switch(user_message):
         detected_intent = llm_detect_intent(conversation_history, user_message)
         if isinstance(detected_intent, dict):
@@ -1515,11 +1514,13 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
         else:
             intent = detected_intent
         intent_completed = False
+        # Clear fields when switching intents
+        last_candidate_fields = {}
     elif last_intent and not intent_completed:
         # Persist the last intent until the flow is completed
         intent = last_intent
     else:
-        # No active intent or just completed, detect new intent
+        # No active intent or just completed, detect new intent and clear fields
         detected_intent = llm_detect_intent(conversation_history, user_message)
         
         # Handle case where llm_detect_intent returns a dict (enhanced) or string (fallback)
@@ -1529,6 +1530,9 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
             intent = detected_intent
             
         intent_completed = False
+        # Clear fields when starting new intent
+        if intent != last_intent:
+            last_candidate_fields = {}
 
     confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
     is_confirmation = user_message.strip().lower() in confirmation_phrases
@@ -1549,20 +1553,38 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
         }
     elif intent == "rent_prediction":
         handler = RentPredictionHandler()
-        result = handler.handle(conversation_history, user_message, last_candidate_fields)
+        # Filter fields to only rent prediction fields
+        rent_fields = {}
+        if last_candidate_fields:
+            for field in handler.required_fields:
+                if field in last_candidate_fields:
+                    rent_fields[field] = last_candidate_fields[field]
+        result = handler.handle(conversation_history, user_message, rent_fields)
         # If model was run, mark intent as completed
         if result.get("action") == "screen_tenant" or result.get("action") == "rent_prediction":
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
     elif intent == "tenant_screening":
         handler = TenantScreeningHandler()
-        result = handler.handle(conversation_history, user_message, last_candidate_fields)
+        # Filter fields to only tenant screening fields
+        tenant_fields = {}
+        if last_candidate_fields:
+            for field in handler.required_fields:
+                if field in last_candidate_fields:
+                    tenant_fields[field] = last_candidate_fields[field]
+        result = handler.handle(conversation_history, user_message, tenant_fields)
         if result.get("action") == "screen_tenant":
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
     elif intent == "maintenance_prediction":
         handler = MaintenancePredictionHandler()
-        result = handler.handle(conversation_history, user_message, last_candidate_fields)
+        # Filter fields to only maintenance prediction fields
+        maintenance_fields = {}
+        if last_candidate_fields:
+            for field in handler.required_fields:
+                if field in last_candidate_fields:
+                    maintenance_fields[field] = last_candidate_fields[field]
+        result = handler.handle(conversation_history, user_message, maintenance_fields)
         if result.get("action") == "maintenance_prediction" or result.get("action") == "maintenance_alerts":
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
@@ -1615,7 +1637,11 @@ For each, provide:
 
 Then, compare these rents to the predicted range: £{rent_range[0]}–£{rent_range[1]} and state if the prediction is in line with the market, too high, or too low.
 """
-    response = llm.invoke([HumanMessage(content=prompt)])
+    response = invoke_with_tracking(
+        llm,
+        [HumanMessage(content=prompt)],
+        "Market Comparison Analysis"
+    )
     return response.content.strip()
 
 from faiss_utils import semantic_search, load_faiss_index, record_to_text

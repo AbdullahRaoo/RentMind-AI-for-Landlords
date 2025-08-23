@@ -28,8 +28,7 @@ import {
   DollarSign,
 } from "lucide-react"
 
-// const WS_URL = "ws://srv889806.hstgr.cloud/ws/chat/"
-const WS_URL = "ws://localhost:8001/ws/chat/"
+const WS_URL = "ws://localhost:8000/ws/chat/"
 
 interface Message {
   sender: "user" | "bot"
@@ -56,7 +55,7 @@ export default function Chatbot() {
     {
       sender: "bot",
       text: "Hi! I am your AI Assistant for Landlords. Ask me about rent esitmation, tenant screening, or check Property Maintaince Alerts!",
-      timestamp: null,
+      timestamp: undefined,
     },
   ])
   const [input, setInput] = useState("")
