@@ -838,45 +838,51 @@ class RentPredictionHandler(BaseModuleHandler):
         return any(indicator in msg for indicator in comparison_indicators)
 
     def extract_areas_from_query(self, user_message):
-        """Extract area names from comparison query"""
+        """Extract area names from comparison query with improved cleaning"""
         import re
+        
+        # Clean the message first - remove question words and comparison phrases
+        clean_message = user_message.lower()
+        removal_phrases = ['which area have more rent', 'which area has more rent', 'which area', 'have more rent', 'has more rent', 'more rent']
+        for phrase in removal_phrases:
+            clean_message = clean_message.replace(phrase, ' ')
         
         # Pattern 1: "area1 or area2"
         or_pattern = r'(\w+(?:\s+\w+)*)\s+or\s+(\w+(?:\s+\w+)*)'
-        or_match = re.search(or_pattern, user_message, re.IGNORECASE)
+        or_match = re.search(or_pattern, clean_message, re.IGNORECASE)
         if or_match:
-            return [or_match.group(1).strip(), or_match.group(2).strip()]
+            return [or_match.group(1).strip().title(), or_match.group(2).strip().title()]
         
         # Pattern 2: "between area1 and area2"
         between_pattern = r'between\s+(\w+(?:\s+\w+)*)\s+and\s+(\w+(?:\s+\w+)*)'
-        between_match = re.search(between_pattern, user_message, re.IGNORECASE)
+        between_match = re.search(between_pattern, clean_message, re.IGNORECASE)
         if between_match:
-            return [between_match.group(1).strip(), between_match.group(2).strip()]
+            return [between_match.group(1).strip().title(), between_match.group(2).strip().title()]
         
         # Pattern 3: "area1 vs area2" or "area1 versus area2"
         vs_pattern = r'(\w+(?:\s+\w+)*)\s+(?:vs|versus)\s+(\w+(?:\s+\w+)*)'
-        vs_match = re.search(vs_pattern, user_message, re.IGNORECASE)
+        vs_match = re.search(vs_pattern, clean_message, re.IGNORECASE)
         if vs_match:
-            return [vs_match.group(1).strip(), vs_match.group(2).strip()]
+            return [vs_match.group(1).strip().title(), vs_match.group(2).strip().title()]
         
-        # Fallback: try to extract area names mentioned in the message
-        words = user_message.split()
+        # Enhanced fallback: extract remaining meaningful words as potential areas
+        words = clean_message.split()
         potential_areas = []
-        for i, word in enumerate(words):
-            if word[0].isupper() and len(word) > 2:
-                # Check if next word is also capitalized (multi-word area)
-                if i + 1 < len(words) and words[i + 1][0].isupper():
-                    potential_areas.append(f"{word} {words[i + 1]}")
-                else:
-                    potential_areas.append(word)
+        skip_words = {'which', 'area', 'have', 'more', 'rent', 'higher', 'vs', 'versus', 'or', 'and', 'between', 'the', 'a', 'an', ''}
+        
+        for word in words:
+            cleaned_word = word.strip()
+            if cleaned_word and len(cleaned_word) > 1 and cleaned_word.lower() not in skip_words:
+                potential_areas.append(cleaned_word.title())
         
         return potential_areas[:2] if len(potential_areas) >= 2 else potential_areas
 
     def search_rent_data_by_area(self, area_name):
-        """Search rent data for properties in a specific area"""
+        """Search rent data for properties in a specific area with fuzzy matching"""
         import pandas as pd
         import json
         import os
+        import difflib
         
         try:
             # Load the address mapping
@@ -884,16 +890,50 @@ class RentPredictionHandler(BaseModuleHandler):
             with open(address_map_path, 'r') as f:
                 address_map = json.load(f)
             
-            # Find addresses containing the area name
+            # Find addresses containing the area name with fuzzy matching
             matching_addresses = {}
-            area_lower = area_name.lower()
+            area_lower = area_name.lower().strip()
             
+            # Direct matches first
             for address, address_id in address_map.items():
                 if area_lower in address.lower():
                     matching_addresses[address_id] = address
             
+            # If no direct matches, try fuzzy matching
             if not matching_addresses:
+                # Get all unique area names from addresses
+                all_areas = set()
+                for address in address_map.keys():
+                    # Extract area names (words that are likely area names)
+                    parts = address.lower().replace(',', ' ').split()
+                    for part in parts:
+                        if len(part) > 2 and not part.isdigit():
+                            all_areas.add(part)
+                
+                # Find closest matches using fuzzy string matching
+                close_matches = difflib.get_close_matches(area_lower, all_areas, n=3, cutoff=0.6)
+                
+                if close_matches:
+                    print(f"[DEBUG] No exact match for '{area_name}', using fuzzy matches: {close_matches}")
+                    for address, address_id in address_map.items():
+                        for match in close_matches:
+                            if match in address.lower():
+                                matching_addresses[address_id] = address
+                                break
+            
+            # If still no matches, try partial matching with individual words
+            if not matching_addresses:
+                area_words = area_lower.split()
+                for address, address_id in address_map.items():
+                    address_lower = address.lower()
+                    if any(word in address_lower for word in area_words if len(word) > 2):
+                        matching_addresses[address_id] = address
+            
+            if not matching_addresses:
+                print(f"[DEBUG] No matches found for area: {area_name}")
                 return None
+            
+            print(f"[DEBUG] Found {len(matching_addresses)} matching addresses for '{area_name}'")
             
             # Load rent data
             rent_data_path = os.path.join(os.path.dirname(__file__), "../Rent Pricing AI/data/cleaned_rent_data.csv")
@@ -903,6 +943,7 @@ class RentPredictionHandler(BaseModuleHandler):
             area_data = df[df['address'].isin(matching_addresses.keys())]
             
             if area_data.empty:
+                print(f"[DEBUG] No rent data found for matching addresses")
                 return None
             
             # Calculate statistics
@@ -991,13 +1032,13 @@ class RentPredictionHandler(BaseModuleHandler):
         response += f"**{higher_area}** has higher average rent than **{lower_area}**\n\n"
         response += f"### 📊 **Key Statistics:**\n\n"
         response += f"**{area1}:**\n"
-        response += f"• Average rent: **£{area1_avg:.0f}**/month\n"
-        response += f"• Properties analyzed: {area1_data['property_count']}\n"
-        response += f"• Rent range: £{area1_data['min_rent']:.0f} - £{area1_data['max_rent']:.0f}\n\n"
+        response += f"- • Average rent: **£{area1_avg:.0f}**/month\n"
+        response += f"- • Properties analyzed: {area1_data['property_count']}\n"
+        response += f"- • Rent range: £{area1_data['min_rent']:.0f} - £{area1_data['max_rent']:.0f}\n\n"
         response += f"**{area2}:**\n"
-        response += f"• Average rent: **£{area2_avg:.0f}**/month\n"
-        response += f"• Properties analyzed: {area2_data['property_count']}\n"
-        response += f"• Rent range: £{area2_data['min_rent']:.0f} - £{area2_data['max_rent']:.0f}\n\n"
+        response += f"- • Average rent: **£{area2_avg:.0f}**/month\n"
+        response += f"- • Properties analyzed: {area2_data['property_count']}\n"
+        response += f"- • Rent range: £{area2_data['min_rent']:.0f} - £{area2_data['max_rent']:.0f}\n\n"
         response += f"### 💰 **Difference:**\n"
         response += f"**{higher_area}** is **£{difference:.0f}** ({percentage_diff:.1f}%) more expensive per month\n\n"
         
@@ -1008,15 +1049,15 @@ class RentPredictionHandler(BaseModuleHandler):
             if area1_data['sample_properties']:
                 response += f"**{area1}:**\n"
                 for prop in area1_data['sample_properties'][:2]:
-                    response += f"• {prop['bedrooms']}bed, {prop['bathrooms']}bath - £{prop['rent']}\n"
+                    response += f"- • {prop['bedrooms']}bed, {prop['bathrooms']}bath - £{prop['rent']}\n"
                 response += "\n"
             
             if area2_data['sample_properties']:
                 response += f"**{area2}:**\n"
                 for prop in area2_data['sample_properties'][:2]:
-                    response += f"• {prop['bedrooms']}bed, {prop['bathrooms']}bath - £{prop['rent']}\n"
+                    response += f"- • {prop['bedrooms']}bed, {prop['bathrooms']}bath - £{prop['rent']}\n"
         
-        response += f"\n*Data based on actual rental listings in our database*"
+        response += f"\n\n*Data based on actual rental listings in our database*"
         
         return response
 
@@ -1189,7 +1230,7 @@ class TenantScreeningHandler(BaseModuleHandler):
         context_text = "Context: This is a tenant screening conversation. Extract tenant screening fields (credit_score, income, rent, employment_status, eviction_record).\n" + all_text
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record, and tenant_name if mentioned. IMPORTANT INCOME CONVERSION RULES: 1) If extracting annual salary/income (like €45000 per year), CONVERT to MONTHLY by dividing by 12. 2) If currency is EUR/€, convert to GBP using rate 0.86 (1 EUR = 0.86 GBP). 3) Always output income as monthly amount in GBP. 4) CALCULATE THE ACTUAL NUMBERS - do not output formulas like '(45000/12)*0.86', output the final calculated result like '3225.0'. CONTEXT AWARENESS: If the assistant just asked for a specific field (like 'monthly rent') and the user provides a number, that number refers to the requested field. For employment_status: if person works at a company or has a job, use 'employed'. DO NOT extract any other fields like address, property age, maintenance, etc. If a field is missing, use 0, empty string, or False. If a tenant name is mentioned, extract it. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record, and tenant_name if mentioned. **CRITICAL INCOME EXTRACTION RULE - READ CAREFULLY**: By default, ALL income numbers are MONTHLY amounts. Do NOT assume yearly based on amount size. ONLY convert to monthly if user explicitly says 'per year', 'annual', 'yearly', 'annually'. **Examples**: 'earning 45000' = 45000 MONTHLY (output: 45000), 'earning 45000 per year' = 45000/12 = 3750 MONTHLY (output: 3750), 'income 1500 per month' = 1500 MONTHLY (output: 1500), 'salary 100000' = 100000 MONTHLY (output: 100000). Currency: EUR to GBP = multiply by 0.86. For employment: working/job = 'employed'. Output final MONTHLY amount only. NO FORMULAS in output. Output JSON: {format_instructions}"),
             ("user", "Tenant screening conversation:\n{conversation}\nCurrent message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
@@ -1314,10 +1355,15 @@ class TenantScreeningHandler(BaseModuleHandler):
                     summary += f"- **Credit Score:** _(we'll need this one)_\n"
             elif k == "income":
                 if v not in (None, '', 0, 0.0):
+                    income_type = fields.get("income_type", "monthly")
                     if assumed and not show_result:
                         summary += f"- **Monthly Income:** £{float(v):,.2f} _(estimated typical income)_\n"
                     else:
-                        summary += f"- **Monthly Income:** £{float(v):,.2f}\n"
+                        if income_type == "yearly":
+                            yearly_amount = float(v) * 12
+                            summary += f"- **Monthly Income:** £{float(v):,.2f} _(converted from £{yearly_amount:,.0f} yearly)_\n"
+                        else:
+                            summary += f"- **Monthly Income:** £{float(v):,.2f} _(monthly)_\n"
                 else:
                     summary += f"- **Monthly Income:** _(still need this detail)_\n"
             elif k == "rent":
@@ -1396,38 +1442,89 @@ class TenantScreeningHandler(BaseModuleHandler):
         md += f"**🔍 Here's the breakdown:**\n\n"
         for line in result['explanation'].split('\n'):
             if line.strip():  # Only add non-empty lines
-                md += f"• {line.strip()}\n"
-        md += "\n"  # Add extra space after breakdown
+                md += f"- • {line.strip()}\n"
+        md += "\n\n"  # Add extra space after breakdown
         return md
 
     def handle(self, conversation_history, user_message, last_candidate_fields=None):
         print(f"[DEBUG] TenantScreeningHandler.handle called with: {user_message}")
         print(f"[DEBUG] Last candidate fields: {last_candidate_fields}")
         
-        # Only use tenant screening fields for logic (preserve tenant_name in merged_fields)
+        # Enhanced context understanding for completion signals
+        completion_signals = [
+            "these are all the info", "that's all the info", "this is all i have", "that's everything",
+            "i don't have anything else", "no more info", "that's it", "nothing else",
+            "go ahead", "proceed", "let's do it", "run the screening", "that's all",
+            "can you screen", "please screen", "do the screening", "check this tenant"
+        ]
+        
+        user_msg_lower = user_message.lower().strip()
+        is_completion_signal = any(signal in user_msg_lower for signal in completion_signals)
+        
+        print(f"[DEBUG] Is completion signal: {is_completion_signal}")
+        
+        # Only use tenant screening fields for logic (preserve tenant_name and income_type in merged_fields)
         new_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
         print(f"[DEBUG] Extracted new fields: {new_fields}")
         
-        merged_fields = {k: v for k, v in (last_candidate_fields or {}).items() if k in self.required_fields + ["tenant_name"] and v not in (None, '', 0, 0.0, False)}
-        for k in self.required_fields + ["tenant_name"]:
-            v = new_fields.get(k, None)
-            if k == "tenant_name":
-                if v and str(v).strip():
-                    merged_fields[k] = str(v).strip()
-            elif v not in (None, '', 0, 0.0, False):
-                merged_fields[k] = v
+        # Check if this is a new tenant (different name mentioned)
+        new_tenant_name = new_fields.get("tenant_name", "").strip().lower()
+        old_tenant_name = (last_candidate_fields or {}).get("tenant_name", "").strip().lower()
+        is_new_tenant = new_tenant_name and old_tenant_name and new_tenant_name != old_tenant_name
+        
+        # Also check for phrases that indicate a new screening
+        new_screening_phrases = [
+            "okay so this", "so this", "this tenant", "new tenant", "another tenant",
+            "different tenant", "next applicant", "this applicant", "okay so", "so "
+        ]
+        indicates_new_screening = any(phrase in user_message.lower() for phrase in new_screening_phrases)
+        
+        if is_new_tenant or (indicates_new_screening and new_tenant_name):
+            print(f"[DEBUG] New tenant screening detected - resetting fields")
+            # Start fresh for new tenant, only keep the new fields
+            merged_fields = {k: v for k, v in new_fields.items() if k in self.required_fields + ["tenant_name", "income_type"] and v not in (None, '', 0, 0.0, False)}
+        else:
+            # Normal merge logic
+            merged_fields = {k: v for k, v in (last_candidate_fields or {}).items() if k in self.required_fields + ["tenant_name", "income_type"] and v not in (None, '', 0, 0.0, False)}
+            for k in self.required_fields + ["tenant_name", "income_type"]:
+                v = new_fields.get(k, None)
+                if k == "tenant_name" or k == "income_type":
+                    if v and str(v).strip():
+                        merged_fields[k] = str(v).strip()
+                elif k == "eviction_record":
+                    if v is not None:
+                        merged_fields[k] = bool(v)
+                elif v is not None and v not in ('', 0, 0.0):
+                    merged_fields[k] = v
         
         print(f"[DEBUG] Merged fields: {merged_fields}")
 
-        # Robust eviction record extraction: check user message for negative/false/no eviction record
+        # Enhanced eviction record extraction: check user message for negative/false/no eviction record
         eviction_phrases = [
             "no eviction", "no prior eviction", "never evicted", "no eviction record", 
             "eviction record is false", "no enviction", "no inviction", "no eviction history", 
-            "false", "none", "never"
+            "clean record", "never been evicted", "no evictions"
+        ]
+        positive_eviction_phrases = [
+            "has eviction", "prior eviction", "evicted before", "eviction record", "previous eviction",
+            "been evicted", "eviction history", "has been evicted", "yes eviction", "previously evicted",
+            "previously envicted", "was evicted", "he's evicted", "she's evicted", "they're evicted"
         ]
         user_message_lower = user_message.lower()
+        eviction_explicitly_mentioned = False
+        
+        print(f"[DEBUG] Checking eviction phrases in: '{user_message_lower}'")
+        
         if any(phrase in user_message_lower for phrase in eviction_phrases):
             merged_fields["eviction_record"] = False
+            eviction_explicitly_mentioned = True
+            print(f"[DEBUG] Found negative eviction phrase, set eviction_record=False, explicitly_mentioned=True")
+        elif any(phrase in user_message_lower for phrase in positive_eviction_phrases):
+            merged_fields["eviction_record"] = True
+            eviction_explicitly_mentioned = True
+            print(f"[DEBUG] Found positive eviction phrase, set eviction_record=True, explicitly_mentioned=True")
+        
+        print(f"[DEBUG] After eviction check: eviction_explicitly_mentioned={eviction_explicitly_mentioned}, eviction_record={merged_fields.get('eviction_record')}")
 
         # Infer employment status from income
         if merged_fields.get("income", 0) not in (None, '', 0, 0.0):
@@ -1481,13 +1578,8 @@ class TenantScreeningHandler(BaseModuleHandler):
                 if current_has_field or recent_has_field:
                     user_provided.append(k)
             elif k == "eviction_record":
-                # Check for eviction-related phrases in current message
-                eviction_mentions = ["eviction", "evicted", "prior eviction", "previous eviction", "eviction record", "eviction history"]
-                current_mentions_eviction = any(phrase in user_message.lower() for phrase in eviction_mentions)
-                
-                if current_mentions_eviction or current_has_field or recent_has_field:
-                    user_provided.append(k)
-                elif any(phrase in user_message_lower for phrase in eviction_phrases):
+                # Only consider it provided if explicitly mentioned (not just defaulted)
+                if eviction_explicitly_mentioned:
                     user_provided.append(k)
             elif k == "employment_status":
                 # Enhanced employment detection - include company mentions and job-related terms
@@ -1501,12 +1593,62 @@ class TenantScreeningHandler(BaseModuleHandler):
         
         print(f"[DEBUG] User provided fields: {user_provided}")
 
-        # Find missing fields
+        # Enhanced handling for completion signals
+        if is_completion_signal:
+            print("[DEBUG] Processing completion signal")
+            if len(user_provided) >= 2:  # We have enough for screening
+                # Fill in missing fields with defaults for estimation
+                avg_defaults = {
+                    "credit_score": 650,
+                    "income": 2500.0,
+                    "rent": 1200.0,
+                    "employment_status": "employed",
+                    "eviction_record": False
+                }
+                estimate_fields = dict(merged_fields)
+                missing = []
+                for k in self.required_fields:
+                    if k not in user_provided:
+                        estimate_fields[k] = avg_defaults[k]
+                        missing.append(k)
+
+                # Show the screening result
+                result_md = self.run_model(estimate_fields)
+                
+                if missing:
+                    response = f"Got it! Based on what you've shared, here's the screening:\n\n{result_md}"
+                    response += "\n\n---\n\n"
+                    response += "💡 **Want a more precise analysis?** If you have these details, I can refine the results: "
+                    field_names = {
+                        "credit_score": "**credit score**",
+                        "income": "**monthly income**", 
+                        "rent": "**rent amount**",
+                        "employment_status": "**employment status**",
+                        "eviction_record": "**eviction history**"
+                    }
+                    response += ", ".join([f"{field_names.get(k, k.replace('_', ' '))}" for k in missing])
+                else:
+                    response = f"Perfect! Here's the complete screening based on all the information you provided:\n\n{result_md}"
+                
+                return {
+                    "response": response,
+                    "action": "screening_complete",
+                    "fields": estimate_fields
+                }
+            else:
+                return {
+                    "response": f"I understand you want to proceed with the screening! However, I need at least **2 key details** to give you meaningful results. So far I have: {', '.join(user_provided) if user_provided else 'no key details yet'}.\n\nCould you share **1-2 more** from this list?\n\n- • **Monthly Income**\n- • **Credit Score**\n- • **Monthly Rent**\n- • **Employment Status**\n- • **Eviction History**\n\nOnce I have a couple of these, I can run a solid screening for you! 🎯",
+                    "action": "need_more_info",
+                    "fields": merged_fields
+                }
+
+        # Find missing fields - be more careful about eviction record
         missing = []
         for k in self.required_fields:
             v = merged_fields.get(k, None)
             if k == "eviction_record":
-                if v is None:
+                # Only consider it missing if not explicitly mentioned
+                if not eviction_explicitly_mentioned:
                     missing.append(k)
             elif k == "employment_status":
                 if v in (None, '', False, 'unknown', ''):
@@ -1568,7 +1710,7 @@ class TenantScreeningHandler(BaseModuleHandler):
                 prompt = (
                     f"✨ {acknowledgment}\n\n"
                     f"That's helpful! Just need **one more detail** from this list:\n\n"
-                    f"• **Monthly Income** or **Credit Score** or **Employment Status**\n\n"
+                    f"- **Monthly Income** or **Credit Score** or **Employment Status**\n\n"
                     f"Any of these will let me start the screening process! 🚀"
                 )
             
@@ -1604,7 +1746,7 @@ class TenantScreeningHandler(BaseModuleHandler):
             }
             
             for k in self.required_fields:
-                prompt += f"• {field_descriptions[k]}\n"
+                prompt += f"- • {field_descriptions[k]}\n"
             
             prompt += "\nOnce you drop a couple of these details on me, I'll whip up a preliminary screening for you! 🚀"
             
@@ -1616,6 +1758,19 @@ class TenantScreeningHandler(BaseModuleHandler):
 
         # If we have at least 2 fields, show estimated screening with results
         if len(user_provided) >= 2:
+            # Calculate what fields were actually missing from user input vs. estimated
+            estimated_fields = []
+            for k in self.required_fields:
+                if k not in user_provided:
+                    # Only add to estimated if we don't have explicit info
+                    if k == "eviction_record" and not eviction_explicitly_mentioned:
+                        estimated_fields.append(k)
+                    elif k == "employment_status" and merged_fields.get(k) == "employed":
+                        # This was likely inferred from income, don't count as estimated for now
+                        pass  
+                    elif k in ["credit_score", "income", "rent"] and merged_fields.get(k, 0) == 0:
+                        estimated_fields.append(k)
+            
             # Fill in missing fields with defaults for estimation
             avg_defaults = {
                 "credit_score": 650,
@@ -1631,28 +1786,41 @@ class TenantScreeningHandler(BaseModuleHandler):
             # Show the details used for screening + result with more personality
             result_md = self.run_model(estimate_fields)
             
-            # Add missing fields note at the bottom with conversational touch
-            missing_to_show = [k for k in missing if k != "employment_status" or merged_fields.get("income", 0) in (None, '', 0, 0.0)]
+            # Modify the breakdown to show estimated vs provided values
+            if estimated_fields and "Here's the breakdown:" in result_md:
+                # Add notes about estimated values in the breakdown
+                breakdown_replacements = {}
+                if "credit_score" in estimated_fields:
+                    breakdown_replacements["Credit score 650"] = "Credit score 650 _(estimated typical score)_"
+                if "eviction_record" in estimated_fields:
+                    breakdown_replacements["No prior eviction record"] = "No prior eviction record _(assumed - not provided)_"
+                
+                for old_text, new_text in breakdown_replacements.items():
+                    if old_text in result_md:
+                        result_md = result_md.replace(old_text, new_text)
             
             response = result_md
             
-            if missing_to_show:
+            if estimated_fields:
                 response += "\n\n---\n\n"
-                response += "💭 **Want an even sharper analysis?** Drop me these details and I'll give you the full picture: "
+                response += "� **Note:** I used typical values for missing details - "
                 field_names = {
-                    "credit_score": "**credit score**",
+                    "credit_score": "**credit score (used 650)**",
                     "income": "**income**", 
                     "rent": "**rent amount**",
                     "employment_status": "**employment status**",
-                    "eviction_record": "**eviction history**"
+                    "eviction_record": "**eviction history (assumed no record)**"
                 }
-                response += ", ".join([f"{field_names.get(k, k.replace('_', ' '))}" for k in missing_to_show])
-                response += " and I'll re-run everything! 🎯"
+                estimated_list = [field_names.get(k, k.replace('_', ' ')) for k in estimated_fields]
+                response += ", ".join(estimated_list)
+                response += ". Want to provide the actual values for a more precise screening? 🎯"
             
             return {
                 "response": response,
                 "action": "show_estimate_with_result",
-                "fields": estimate_fields
+                "fields": estimate_fields,
+                "last_intent": "tenant_screening",
+                "intent_completed": False
             }
 
         # Fallback to LLM conversation
@@ -2248,10 +2416,10 @@ class MaintenancePredictionHandler(BaseModuleHandler):
             md += f"{i}. {rec}\n"
         
         md += f"\n**🔍 The breakdown:**\n"
-        md += f"• Property age: {fields.get('age_years', 0)} years\n"
-        md += f"• Last maintenance: {fields.get('last_service_years_ago', 0)} years ago\n"
-        md += f"• Current season: {fields.get('seasonality', 'Unknown')}\n"
-        md += f"• Location factors: {fields.get('address', 'Generic area')}\n\n"
+        md += f"- Property age: {fields.get('age_years', 0)} years\n"
+        md += f"- Last maintenance: {fields.get('last_service_years_ago', 0)} years ago\n"
+        md += f"- Current season: {fields.get('seasonality', 'Unknown')}\n"
+        md += f"- Location factors: {fields.get('address', 'Generic area')}\n\n"
         
         explanation = (
             "**How this was calculated:**\n"
@@ -2490,7 +2658,7 @@ class MaintenancePredictionHandler(BaseModuleHandler):
             }
             
             for k in self.required_fields:
-                prompt += f"• {field_descriptions[k]}\n"
+                prompt += f"- {field_descriptions[k]}\n"
             
             prompt += "\nOnce you drop a couple of these details on me, I'll whip up a maintenance prediction for you! 🚀"
             
@@ -2802,9 +2970,26 @@ def llm_detect_intent(conversation_history, user_message):
         return None
 
 # --- Explicit Intent Switch Detection ---
-def user_requests_intent_switch(user_message):
+def user_requests_intent_switch(user_message, current_intent=None):
     msg = user_message.lower()
-    print(f"[DEBUG] user_requests_intent_switch called with: '{user_message}'")
+    print(f"[DEBUG] user_requests_intent_switch called with: '{user_message}', current_intent: {current_intent}")
+    
+    # If we're in tenant screening and user is providing tenant data, don't switch
+    if current_intent == "tenant_screening":
+        # Check if this is clearly tenant screening data
+        tenant_data_patterns = [
+            r'\b\d+\s*credit', r'credit\s*\w*\s*\d+', r'score.*\d+',
+            r'income.*\d+', r'earning.*\d+', r'makes.*\d+', r'salary.*\d+',
+            r'rent.*\d+', r'paying.*\d+', r'\d+.*rent',
+            r'works?\s*at', r'employed\s*at', r'job\s*at',
+            r'no.*eviction', r'never.*evicted'
+        ]
+        
+        import re
+        for pattern in tenant_data_patterns:
+            if re.search(pattern, msg):
+                print(f"[DEBUG] Tenant data detected, not switching intent: {pattern}")
+                return False
     
     # Explicit switch phrases
     explicit_switch_phrases = [
@@ -2884,21 +3069,25 @@ def user_requests_intent_switch(user_message):
         print(f"[DEBUG] Strong maintenance request detected")
         return True
     
-    # PRIORITY 2: Tenant information detected (high priority for screening)
-    if has_tenant_info:
-        print(f"[DEBUG] Tenant information patterns detected")
+    # PRIORITY 2: Check for explicit requests for NEW tenant screening (not providing data)
+    new_screening_patterns = [
+        "can you do tenant screening", "tenant screening", "screen tenant", "do tenant screening",
+        "check tenant", "screen this tenant", "new tenant"
+    ]
+    if any(pattern in msg for pattern in new_screening_patterns) and current_intent != "tenant_screening":
+        print(f"[DEBUG] New tenant screening request detected")
         return True
     
-    # PRIORITY 3: Employment + income information suggests tenant screening
+    # PRIORITY 3: Employment + income ONLY if not in tenant screening context
     has_employment = any(indicator in msg for indicator in employment_indicators)
     has_income = any(word in msg for word in ["earning", "makes", "income", "salary", "€", "£", "$"])
-    if has_employment and has_income:
+    if has_employment and has_income and current_intent != "tenant_screening":
         print(f"[DEBUG] Employment + income detected, likely tenant screening")
         return True
     
-    # PRIORITY 4: Multiple tenant screening keywords
+    # PRIORITY 4: Multiple tenant screening keywords (only if not already in tenant screening)
     tenant_keyword_count = sum(1 for keyword in tenant_keywords if keyword in msg)
-    if tenant_keyword_count >= 2:
+    if tenant_keyword_count >= 2 and current_intent != "tenant_screening":
         print(f"[DEBUG] Multiple tenant keywords detected: {tenant_keyword_count}")
         return True
     
@@ -2937,39 +3126,40 @@ def is_providing_information(user_message, current_intent):
         
     msg = user_message.lower()
     
-    # First, check for clear intent switching patterns that override any information detection
-    intent_switch_patterns = [
-        # Maintenance prediction requests
-        "maintenance", "maintice", "maintnance", "repair", "fix", "upkeep", "service", "broken", "issue",
-        "predict maintenance", "check maintenance", "need maintenance", "maintenance prediction",
-        # Rent prediction requests
-        "estimate rent", "predict rent", "rent prediction", "how much rent", "property value",
-        # Tenant screening requests (when coming from other intents)
-        "screen tenant", "tenant screening", "check tenant", "approve tenant"
-    ]
-    
-    # If message contains intent switching patterns, it's NOT providing info for current intent
-    if any(pattern in msg for pattern in intent_switch_patterns):
-        print(f"[DEBUG] Intent switch detected: '{user_message}' contains switching patterns")
-        return False
-    
     # More specific patterns based on intent
     if current_intent == "tenant_screening":
-        # Tenant screening specific information patterns
-        tenant_info_patterns = [
-            # Credit/Financial info
-            "credit score", "score is", "score of", "credit is",
-            "income is", "income of", "monthly income", "earns", "makes",
-            # Employment info  
-            "employed", "unemployed", "job", "work", "self-employed",
-            # Rent info (but only when not asking for rent estimation)
-            "rent is", "rent of", "paying", "monthly rent",
-            # Eviction info
-            "eviction", "evicted", "no eviction", "never evicted"
+        # Strong tenant screening data patterns - these are clearly providing data
+        tenant_data_patterns = [
+            r'\b\d+\s*credit', r'credit\s*\w*\s*\d+', r'score.*\d+',  # Credit score patterns
+            r'\b\d+\s*(month|year|annually|per\s*month|per\s*year)', # Income patterns  
+            r'income.*\d+', r'earning.*\d+', r'makes.*\d+', r'salary.*\d+',
+            r'rent.*\d+', r'paying.*\d+', r'\d+.*rent',  # Rent patterns
+            r'works?\s*at', r'employed\s*at', r'job\s*at',  # Employment patterns
+            r'no.*eviction', r'never.*evicted', r'eviction.*record.*false', # Eviction patterns
+            r'\b(he|she|they)\s+(works?|earn|make|has)', # Person reference patterns
         ]
         
-        # Check for tenant screening information patterns
-        return any(pattern in msg for pattern in tenant_info_patterns)
+        # Check for data patterns using regex
+        import re
+        for pattern in tenant_data_patterns:
+            if re.search(pattern, msg):
+                print(f"[DEBUG] Found tenant data pattern: {pattern} in '{user_message}'")
+                return True
+        
+        # Additional simple keyword patterns for tenant screening
+        tenant_keywords = [
+            "credit score", "score is", "score of", "credit is", "income is", "income of", 
+            "monthly income", "earns", "makes", "employed", "unemployed", "job", "work", 
+            "self-employed", "rent is", "rent of", "paying", "monthly rent", "eviction", 
+            "evicted", "no eviction", "never evicted", "tenant name", "applicant"
+        ]
+        
+        if any(keyword in msg for keyword in tenant_keywords):
+            # Check if it's NOT a new request for different service
+            new_service_patterns = ["estimate rent", "predict rent", "maintenance", "repair", "fix"]
+            if not any(pattern in msg for pattern in new_service_patterns):
+                print(f"[DEBUG] Found tenant info keywords in '{user_message}'")
+                return True
                 
     elif current_intent == "rent_prediction":
         # Rent prediction specific information patterns
@@ -2980,8 +3170,8 @@ def is_providing_information(user_message, current_intent):
         ]
         
         if any(pattern in msg for pattern in rent_info_patterns):
+            # Check if it's NOT a request for different service
             new_request_patterns = [
-                "can you", "could you", "i want", "i need", "help me",
                 "screen tenant", "tenant screening", "check tenant",
                 "maintenance", "repair"
             ]
@@ -3204,20 +3394,11 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
         print(f"Average cost per call: ${summary['avg_cost_per_call']:.6f}")
     
     # If user requests to switch/cancel, re-detect intent and reset fields
-    intent_switch_detected = user_requests_intent_switch(user_message)
+    intent_switch_detected = user_requests_intent_switch(user_message, last_intent)
     print(f"[DEBUG] Intent switch detected: {intent_switch_detected}")
     
-    if intent_switch_detected:
-        detected_intent = llm_detect_intent(conversation_history, user_message)
-        print(f"[DEBUG] After intent switch, detected intent: {detected_intent}")
-        if isinstance(detected_intent, dict):
-            intent = detected_intent.get('primary_intent')
-        else:
-            intent = detected_intent
-        intent_completed = False
-        # Clear fields when switching intents
-        last_candidate_fields = {}
-    elif last_intent and not intent_completed:
+    # Context-aware intent handling - check if user is continuing current conversation
+    if last_intent and not intent_completed and not intent_switch_detected:
         # Check if user is providing information for current intent
         if is_providing_information(user_message, last_intent):
             # Continue with the current intent
@@ -3230,13 +3411,23 @@ def conversational_engine(conversation_history, user_message, last_candidate_fie
             else:
                 new_intent = detected_intent
             
-            # If it's the same intent, continue; if different, switch
-            if new_intent == last_intent:
-                intent = last_intent
-            else:
+            # Only switch if the detected intent is different and has high confidence
+            if new_intent != last_intent:
                 intent = new_intent
                 intent_completed = False
                 last_candidate_fields = {}
+            else:
+                intent = last_intent
+    elif intent_switch_detected:
+        detected_intent = llm_detect_intent(conversation_history, user_message)
+        print(f"[DEBUG] After intent switch, detected intent: {detected_intent}")
+        if isinstance(detected_intent, dict):
+            intent = detected_intent.get('primary_intent')
+        else:
+            intent = detected_intent
+        intent_completed = False
+        # Clear fields when switching intents
+        last_candidate_fields = {}
     else:
         # No active intent or just completed, detect new intent
         detected_intent = llm_detect_intent(conversation_history, user_message)
