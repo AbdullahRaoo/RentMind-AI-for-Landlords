@@ -878,7 +878,7 @@ class RentPredictionHandler(BaseModuleHandler):
         return potential_areas[:2] if len(potential_areas) >= 2 else potential_areas
 
     def search_rent_data_by_area(self, area_name):
-        """Search rent data for properties in a specific area with fuzzy matching"""
+        """Search rent data for properties in a specific area with strict matching"""
         import pandas as pd
         import json
         import os
@@ -890,52 +890,122 @@ class RentPredictionHandler(BaseModuleHandler):
             with open(address_map_path, 'r') as f:
                 address_map = json.load(f)
             
-            # Find addresses containing the area name with fuzzy matching
+            # Find addresses containing the area name with strict matching
             matching_addresses = {}
             area_lower = area_name.lower().strip()
             
-            # Direct matches first
-            for address, address_id in address_map.items():
-                if area_lower in address.lower():
-                    matching_addresses[address_id] = address
+            print(f"[DEBUG] Searching for area: '{area_name}' (normalized: '{area_lower}')")
             
-            # If no direct matches, try fuzzy matching
-            if not matching_addresses:
-                # Get all unique area names from addresses
-                all_areas = set()
-                for address in address_map.keys():
-                    # Extract area names (words that are likely area names)
-                    parts = address.lower().replace(',', ' ').split()
-                    for part in parts:
-                        if len(part) > 2 and not part.isdigit():
-                            all_areas.add(part)
-                
-                # Find closest matches using fuzzy string matching
-                close_matches = difflib.get_close_matches(area_lower, all_areas, n=3, cutoff=0.6)
-                
-                if close_matches:
-                    print(f"[DEBUG] No exact match for '{area_name}', using fuzzy matches: {close_matches}")
-                    for address, address_id in address_map.items():
-                        for match in close_matches:
-                            if match in address.lower():
-                                matching_addresses[address_id] = address
-                                break
+            # Known international cities that should never match UK data
+            international_cities = {
+                'islamabad', 'karachi', 'lahore', 'bahawalpur', 'multan', 'faisalabad',
+                'washington dc', 'new york', 'los angeles', 'chicago', 'houston', 'philadelphia',
+                'mumbai', 'delhi', 'bangalore', 'kolkata', 'chennai', 'hyderabad',
+                'tokyo', 'osaka', 'kyoto', 'paris', 'madrid', 'rome', 'berlin',
+                'sydney', 'melbourne', 'toronto', 'vancouver', 'montreal'
+            }
             
-            # If still no matches, try partial matching with individual words
-            if not matching_addresses:
-                area_words = area_lower.split()
-                for address, address_id in address_map.items():
-                    address_lower = address.lower()
-                    if any(word in address_lower for word in area_words if len(word) > 2):
-                        matching_addresses[address_id] = address
-            
-            if not matching_addresses:
-                print(f"[DEBUG] No matches found for area: {area_name}")
+            # If the area is clearly an international city, return None immediately
+            if area_lower in international_cities:
+                print(f"[DEBUG] '{area_name}' is a known international city, not searching UK data")
                 return None
             
-            print(f"[DEBUG] Found {len(matching_addresses)} matching addresses for '{area_name}'")
+            # Also check for common variations
+            for international_city in international_cities:
+                if (area_lower.startswith(international_city) or 
+                    international_city.startswith(area_lower) and len(area_lower) > 4):
+                    print(f"[DEBUG] '{area_name}' appears to be international city '{international_city}', not searching UK data")
+                    return None
             
-            # Load rent data
+            # First pass: Look for exact area name matches in addresses
+            exact_matches = {}
+            for address, address_id in address_map.items():
+                address_lower = address.lower()
+                # Check if the area name appears as a distinct word/area in the address
+                if (f" {area_lower} " in f" {address_lower} " or 
+                    f" {area_lower}," in f" {address_lower}," or
+                    address_lower.startswith(f"{area_lower} ") or
+                    address_lower.startswith(f"{area_lower},") or
+                    address_lower.endswith(f" {area_lower}") or
+                    address_lower == area_lower):
+                    exact_matches[address_id] = address
+            
+            # If we have exact matches, use only those
+            if exact_matches:
+                matching_addresses = exact_matches
+                print(f"[DEBUG] Found {len(exact_matches)} exact matches for '{area_name}'")
+            else:
+                # Second pass: Try fuzzy matching only for known UK areas with balanced criteria
+                # Get all unique area/location words from our database addresses
+                known_areas = set()
+                for address in address_map.keys():
+                    # Extract potential area names (filter out obvious non-area words)
+                    parts = address.lower().replace(',', ' ').replace('.', ' ').split()
+                    for part in parts:
+                        if (len(part) > 3 and not part.isdigit() and  # Keep minimum length at 3 for better matching
+                            part not in ['street', 'road', 'avenue', 'lane', 'close', 'way', 'drive', 'place', 'court', 'gardens', 'house', 'flat', 'apartment', 'the', 'and', 'of', 'in', 'on', 'at']):
+                            known_areas.add(part)
+                
+                # Try fuzzy matching with more balanced cutoff for legitimate misspellings
+                close_matches = difflib.get_close_matches(area_lower, known_areas, n=3, cutoff=0.75)  # Lowered from 0.9 to 0.75
+                
+                if close_matches:
+                    # Additional validation: check for reasonable similarity
+                    valid_matches = []
+                    for match in close_matches:
+                        # Calculate similarity ratio using SequenceMatcher for better accuracy
+                        import difflib
+                        similarity = difflib.SequenceMatcher(None, area_lower, match).ratio()
+                        
+                        # Be more lenient for common UK area name patterns
+                        min_similarity = 0.6  # Lowered from 0.7 to 0.6
+                        
+                        # Special handling for common misspellings
+                        common_patterns = [
+                            (area_lower, match),
+                            # Handle common letter swaps/additions/deletions
+                            (area_lower.replace('tt', 't'), match),  # battarsea -> batarsea
+                            (area_lower.replace('lp', 'l'), match),   # calpham -> calham
+                            (area_lower + 'a', match),               # clapham -> claphama
+                            (area_lower[:-1], match),                # remove last letter
+                        ]
+                        
+                        # Check if this looks like a reasonable misspelling
+                        for pattern_input, pattern_match in common_patterns:
+                            pattern_similarity = difflib.SequenceMatcher(None, pattern_input, pattern_match).ratio()
+                            if pattern_similarity >= min_similarity:
+                                valid_matches.append(match)
+                                break
+                        
+                        # Also include if direct similarity is good enough
+                        if similarity >= min_similarity and match not in valid_matches:
+                            valid_matches.append(match)
+                    
+                    if valid_matches:
+                        print(f"[DEBUG] Found valid fuzzy matches for '{area_name}': {valid_matches}")
+                        for address, address_id in address_map.items():
+                            address_lower = address.lower()
+                            for match in valid_matches:
+                                if (f" {match} " in f" {address_lower} " or 
+                                    f" {match}," in f" {address_lower}," or
+                                    address_lower.startswith(f"{match} ") or
+                                    address_lower.startswith(f"{match},") or
+                                    address_lower.endswith(f" {match}")):
+                                    matching_addresses[address_id] = address
+                                    break
+                    else:
+                        print(f"[DEBUG] No valid fuzzy matches found for '{area_name}' (insufficient similarity)")
+                else:
+                    print(f"[DEBUG] No fuzzy matches found for '{area_name}' in known areas")
+            
+            # If still no matches, the area doesn't exist in our database
+            if not matching_addresses:
+                print(f"[DEBUG] Area '{area_name}' not found in our database")
+                return None
+            
+            print(f"[DEBUG] Found {len(matching_addresses)} total matching addresses for '{area_name}'")
+            
+            # Load rent data and verify we have actual data
             rent_data_path = os.path.join(os.path.dirname(__file__), "../Rent Pricing AI/data/cleaned_rent_data.csv")
             df = pd.read_csv(rent_data_path)
             
@@ -943,10 +1013,12 @@ class RentPredictionHandler(BaseModuleHandler):
             area_data = df[df['address'].isin(matching_addresses.keys())]
             
             if area_data.empty:
-                print(f"[DEBUG] No rent data found for matching addresses")
+                print(f"[DEBUG] No actual rent data found for area '{area_name}'")
                 return None
             
-            # Calculate statistics
+            print(f"[DEBUG] Found {len(area_data)} rental properties for '{area_name}'")
+            
+            # Calculate statistics only from real data
             stats = {
                 'area_name': area_name,
                 'property_count': len(area_data),
@@ -974,7 +1046,7 @@ class RentPredictionHandler(BaseModuleHandler):
             return stats
             
         except Exception as e:
-            print(f"Error searching rent data: {e}")
+            print(f"[DEBUG] Error searching rent data for '{area_name}': {e}")
             return None
 
     def handle_area_comparison(self, user_message):
