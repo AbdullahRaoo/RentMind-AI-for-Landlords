@@ -566,27 +566,30 @@ export default function Chatbot() {
               </form>
 
               {/* Intent Buttons Below Input */}
-              <div className="flex justify-center gap-4 mt-4 mb-2">
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mt-4 mb-2">
                 <Button
                   variant={selectedIntent === "rent_prediction" ? "default" : "secondary"}
-                  className={`rounded-full px-6 py-2 shadow-md hover:scale-105 transition-all ${selectedIntent === "rent_prediction" ? "ring-2 ring-blue-500" : ""}`}
+                  className={`rounded-full px-3 py-2 sm:px-6 text-sm sm:text-base shadow-md hover:scale-105 transition-all flex-shrink-0 ${selectedIntent === "rent_prediction" ? "ring-2 ring-blue-500" : ""}`}
                   onClick={() => handleIntent("rent")}
                 >
-                  🏠 Rent Estimation
+                  <span className="hidden sm:inline">🏠 Rent Estimation</span>
+                  <span className="sm:hidden">🏠 Rent</span>
                 </Button>
                 <Button
                   variant={selectedIntent === "tenant_screening" ? "default" : "secondary"}
-                  className={`rounded-full px-6 py-2 shadow-md hover:scale-105 transition-all ${selectedIntent === "tenant_screening" ? "ring-2 ring-purple-500" : ""}`}
+                  className={`rounded-full px-3 py-2 sm:px-6 text-sm sm:text-base shadow-md hover:scale-105 transition-all flex-shrink-0 ${selectedIntent === "tenant_screening" ? "ring-2 ring-purple-500" : ""}`}
                   onClick={() => handleIntent("tenant")}
                 >
-                  👤 Tenant Screening
+                  <span className="hidden sm:inline">👤 Tenant Screening</span>
+                  <span className="sm:hidden">👤 Tenant</span>
                 </Button>
                 <Button
                   variant={selectedIntent === "maintenance_prediction" ? "default" : "secondary"}
-                  className={`rounded-full px-6 py-2 shadow-md hover:scale-105 transition-all ${selectedIntent === "maintenance_prediction" ? "ring-2 ring-green-500" : ""}`}
+                  className={`rounded-full px-3 py-2 sm:px-6 text-sm sm:text-base shadow-md hover:scale-105 transition-all flex-shrink-0 ${selectedIntent === "maintenance_prediction" ? "ring-2 ring-green-500" : ""}`}
                   onClick={() => handleIntent("maintenance")}
                 >
-                  🛠️ Maintenance Prediction
+                  <span className="hidden sm:inline">🛠️ Maintenance Prediction</span>
+                  <span className="sm:hidden">🛠️ Maint.</span>
                 </Button>
               </div>
             </div>
