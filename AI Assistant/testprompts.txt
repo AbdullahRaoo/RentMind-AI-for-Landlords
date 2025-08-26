@@ -18,6 +18,8 @@ located at Holland Road and it's age is 50 years old and it's been 5 years since
 cd .\backend\ 
 daphne backend.asgi:application
 
+source ./airlords/bin/activate && cd backend && daphne backend.asgi:application
+
 https://linangdata.com/pdf-generator/
 
 

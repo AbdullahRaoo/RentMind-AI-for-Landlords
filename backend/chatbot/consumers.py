@@ -17,6 +17,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.conversation_history = []  # Store conversation as a list of {role, content}
         self.candidate_fields = {}      # Persist candidate fields across turns
         self.last_rent_prediction = None  # Store last rent prediction per session
+        self.last_intent = None         # Track last intent
+        self.intent_completed = False   # Track if intent is completed
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -96,18 +98,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     if extracted:
                         self.candidate_fields.update(extracted)
                     break
-        # Call the conversational engine with candidate fields and intent
-        result = chatbot_integration.conversational_engine(
+        # Call the enhanced conversational engine with candidate fields and intent
+        result = chatbot_integration.handle_conversation(
             self.conversation_history,
             user_message,
             last_candidate_fields=self.candidate_fields,
-            last_intent=user_intent,  # <-- Pass user intent if provided
-            intent_completed=False
+            last_intent=getattr(self, 'last_intent', None),  # Track last intent in session
+            intent_completed=getattr(self, 'intent_completed', False)
         )
         print("[DEBUG] LLM result:", result)
         # If the model just returned new fields (e.g., after prediction), update candidate_fields
         if result.get('fields'):
             self.candidate_fields.update(result['fields'])
+            
+        # Track intent state in session
+        if 'last_intent' in result:
+            self.last_intent = result['last_intent']
+        if 'intent_completed' in result:
+            self.intent_completed = result['intent_completed']
         # If this is a rent prediction, store the prediction for follow-up
         if result.get('action') in ['screen_tenant', 'rent_prediction'] and result.get('fields'):
             self.last_rent_prediction = dict(result['fields'])

@@ -7,6 +7,7 @@ import numpy as np
 import xgboost as xgb
 import joblib
 import time
+import random
 from datetime import datetime
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -268,7 +269,7 @@ class RentPredictionHandler(BaseModuleHandler):
             response += f"**Range: {rent_range}**\n"
             response += f"**Confidence: {confidence}%**\n\n"
             
-            # response += "If you'd like a more precise estimation, just let me know the missing details! "
+            response += "If you'd like a more precise estimation, just let me know the missing details! "
             
             # Ask for missing information
             missing_original = [f for f in self.required_fields if f not in provided_fields or provided_fields[f] in (None, '', 0, 0.0)]
@@ -289,7 +290,7 @@ class RentPredictionHandler(BaseModuleHandler):
                         missing_friendly.append('postcode')
                 
                 if missing_friendly:
-                    response += f"If you'd like a more precise estimation, just let me know the missing details! I'd particularly love to know the {', '.join(missing_friendly[:-1])}"
+                    response += f"I'd particularly love to know the {', '.join(missing_friendly[:-1])}"
                     if len(missing_friendly) > 1:
                         response += f" and {missing_friendly[-1]}"
                     else:
@@ -436,7 +437,7 @@ class RentPredictionHandler(BaseModuleHandler):
         # Summarize in markdown with a professional heading
         summary = "**Property Information for Rent Estimation:**\n\n"
         for k, v in fields.items():
-            summary += f"- • **{k}**: {v}\n"
+            summary += f"- **{k}**: {v}\n"
         summary += "\nIs this information correct? Please confirm to proceed with the rent estimation."
         return summary
 
@@ -500,9 +501,9 @@ class RentPredictionHandler(BaseModuleHandler):
         confidence = max(0, 1 - (rmse / predicted_rent))
         confidence_percentage = round(confidence * 100, 2)
         summary = (
-            f"- • **Estimated Monthly Rent:** £{int(predicted_rent)}\n"
-            f"- • **Suggested Range:** £{int(lower_rent)}–£{int(upper_rent)}\n"
-            f"- • **Confidence Level:** {round(float(confidence_percentage), 2)}%\n"
+            f"- **Estimated Monthly Rent:** £{int(predicted_rent)}\n"
+            f"- **Suggested Range:** £{int(lower_rent)}–£{int(upper_rent)}\n"
+            f"- **Confidence Level:** {round(float(confidence_percentage), 2)}%\n"
         )
         one_liner = "\n_This estimate is based on your property's size, features, and location._\n"
         explanation = ("\n**How this was calculated:**\n"
@@ -826,7 +827,204 @@ class RentPredictionHandler(BaseModuleHandler):
         ]
         return any(kw in last_assistant["content"].lower() for kw in confirmation_keywords)
 
+    def is_area_comparison_request(self, user_message):
+        """Check if user is asking for area comparison"""
+        msg = user_message.lower()
+        comparison_indicators = [
+            'which area', 'which location', 'compare', 'comparison', 'higher rent', 'more rent', 
+            'better area', 'expensive area', 'cheaper area', 'vs', 'versus', 'between',
+            'or', 'have more rent', 'have higher rent'
+        ]
+        return any(indicator in msg for indicator in comparison_indicators)
+
+    def extract_areas_from_query(self, user_message):
+        """Extract area names from comparison query"""
+        import re
+        
+        # Pattern 1: "area1 or area2"
+        or_pattern = r'(\w+(?:\s+\w+)*)\s+or\s+(\w+(?:\s+\w+)*)'
+        or_match = re.search(or_pattern, user_message, re.IGNORECASE)
+        if or_match:
+            return [or_match.group(1).strip(), or_match.group(2).strip()]
+        
+        # Pattern 2: "between area1 and area2"
+        between_pattern = r'between\s+(\w+(?:\s+\w+)*)\s+and\s+(\w+(?:\s+\w+)*)'
+        between_match = re.search(between_pattern, user_message, re.IGNORECASE)
+        if between_match:
+            return [between_match.group(1).strip(), between_match.group(2).strip()]
+        
+        # Pattern 3: "area1 vs area2" or "area1 versus area2"
+        vs_pattern = r'(\w+(?:\s+\w+)*)\s+(?:vs|versus)\s+(\w+(?:\s+\w+)*)'
+        vs_match = re.search(vs_pattern, user_message, re.IGNORECASE)
+        if vs_match:
+            return [vs_match.group(1).strip(), vs_match.group(2).strip()]
+        
+        # Fallback: try to extract area names mentioned in the message
+        words = user_message.split()
+        potential_areas = []
+        for i, word in enumerate(words):
+            if word[0].isupper() and len(word) > 2:
+                # Check if next word is also capitalized (multi-word area)
+                if i + 1 < len(words) and words[i + 1][0].isupper():
+                    potential_areas.append(f"{word} {words[i + 1]}")
+                else:
+                    potential_areas.append(word)
+        
+        return potential_areas[:2] if len(potential_areas) >= 2 else potential_areas
+
+    def search_rent_data_by_area(self, area_name):
+        """Search rent data for properties in a specific area"""
+        import pandas as pd
+        import json
+        import os
+        
+        try:
+            # Load the address mapping
+            address_map_path = os.path.join(os.path.dirname(__file__), "../Rent Pricing AI/address_map_human.json")
+            with open(address_map_path, 'r') as f:
+                address_map = json.load(f)
+            
+            # Find addresses containing the area name
+            matching_addresses = {}
+            area_lower = area_name.lower()
+            
+            for address, address_id in address_map.items():
+                if area_lower in address.lower():
+                    matching_addresses[address_id] = address
+            
+            if not matching_addresses:
+                return None
+            
+            # Load rent data
+            rent_data_path = os.path.join(os.path.dirname(__file__), "../Rent Pricing AI/data/cleaned_rent_data.csv")
+            df = pd.read_csv(rent_data_path)
+            
+            # Filter data for matching addresses
+            area_data = df[df['address'].isin(matching_addresses.keys())]
+            
+            if area_data.empty:
+                return None
+            
+            # Calculate statistics
+            stats = {
+                'area_name': area_name,
+                'property_count': len(area_data),
+                'average_rent': area_data['rent'].mean(),
+                'median_rent': area_data['rent'].median(),
+                'min_rent': area_data['rent'].min(),
+                'max_rent': area_data['rent'].max(),
+                'sample_properties': []
+            }
+            
+            # Add sample properties for context
+            sample_size = min(3, len(area_data))
+            samples = area_data.sample(n=sample_size) if len(area_data) > sample_size else area_data
+            
+            for _, row in samples.iterrows():
+                address_name = matching_addresses.get(row['address'], 'Address not found')
+                stats['sample_properties'].append({
+                    'address': address_name,
+                    'bedrooms': row['BEDROOMS'],
+                    'bathrooms': row['BATHROOMS'],
+                    'property_type': row['PROPERTY TYPE'],
+                    'rent': row['rent']
+                })
+            
+            return stats
+            
+        except Exception as e:
+            print(f"Error searching rent data: {e}")
+            return None
+
+    def handle_area_comparison(self, user_message):
+        """Handle area comparison requests"""
+        areas = self.extract_areas_from_query(user_message)
+        
+        if len(areas) < 2:
+            return {
+                'response': "I'd be happy to compare rental prices between areas! Could you please specify which two areas you'd like me to compare? For example: 'Which area has higher rent, Battersea or Clapham?'",
+                'action': 'ask_for_clarification',
+                'fields': {},
+                'last_intent': 'rent_prediction',
+                'intent_completed': False
+            }
+        
+        # Search data for both areas
+        area1_data = self.search_rent_data_by_area(areas[0])
+        area2_data = self.search_rent_data_by_area(areas[1])
+        
+        # Generate comparison response
+        response = self.format_area_comparison(areas[0], areas[1], area1_data, area2_data)
+        
+        return {
+            'response': response,
+            'action': 'area_comparison',
+            'fields': {},
+            'last_intent': 'rent_prediction',
+            'intent_completed': True
+        }
+
+    def format_area_comparison(self, area1, area2, area1_data, area2_data):
+        """Format the area comparison response"""
+        if not area1_data and not area2_data:
+            return f"I couldn't find specific rental data for **{area1}** or **{area2}** in our database. This might be because these areas are outside our current data coverage or the names don't match exactly. Try using more specific area names or postcodes (e.g., 'SW11' for Battersea)."
+        
+        if not area1_data:
+            return f"I found rental data for **{area2}** but couldn't find specific data for **{area1}**. **{area2}** has an average rent of **£{area2_data['average_rent']:.0f}** per month based on {area2_data['property_count']} properties."
+        
+        if not area2_data:
+            return f"I found rental data for **{area1}** but couldn't find specific data for **{area2}**. **{area1}** has an average rent of **£{area1_data['average_rent']:.0f}** per month based on {area1_data['property_count']} properties."
+        
+        # Both areas have data - provide detailed comparison
+        area1_avg = area1_data['average_rent']
+        area2_avg = area2_data['average_rent']
+        
+        higher_area = area1 if area1_avg > area2_avg else area2
+        lower_area = area2 if area1_avg > area2_avg else area1
+        higher_avg = max(area1_avg, area2_avg)
+        lower_avg = min(area1_avg, area2_avg)
+        
+        difference = higher_avg - lower_avg
+        percentage_diff = (difference / lower_avg) * 100
+        
+        response = f"## 🏘️ **Area Rental Comparison**\n\n"
+        response += f"**{higher_area}** has higher average rent than **{lower_area}**\n\n"
+        response += f"### 📊 **Key Statistics:**\n\n"
+        response += f"**{area1}:**\n"
+        response += f"• Average rent: **£{area1_avg:.0f}**/month\n"
+        response += f"• Properties analyzed: {area1_data['property_count']}\n"
+        response += f"• Rent range: £{area1_data['min_rent']:.0f} - £{area1_data['max_rent']:.0f}\n\n"
+        response += f"**{area2}:**\n"
+        response += f"• Average rent: **£{area2_avg:.0f}**/month\n"
+        response += f"• Properties analyzed: {area2_data['property_count']}\n"
+        response += f"• Rent range: £{area2_data['min_rent']:.0f} - £{area2_data['max_rent']:.0f}\n\n"
+        response += f"### 💰 **Difference:**\n"
+        response += f"**{higher_area}** is **£{difference:.0f}** ({percentage_diff:.1f}%) more expensive per month\n\n"
+        
+        # Add sample properties if available
+        if area1_data['sample_properties'] or area2_data['sample_properties']:
+            response += f"### 🏠 **Sample Properties:**\n\n"
+            
+            if area1_data['sample_properties']:
+                response += f"**{area1}:**\n"
+                for prop in area1_data['sample_properties'][:2]:
+                    response += f"• {prop['bedrooms']}bed, {prop['bathrooms']}bath - £{prop['rent']}\n"
+                response += "\n"
+            
+            if area2_data['sample_properties']:
+                response += f"**{area2}:**\n"
+                for prop in area2_data['sample_properties'][:2]:
+                    response += f"• {prop['bedrooms']}bed, {prop['bathrooms']}bath - £{prop['rent']}\n"
+        
+        response += f"\n*Data based on actual rental listings in our database*"
+        
+        return response
+
     def handle(self, conversation_history, user_message, last_candidate_fields=None):
+        # Check if user is asking for area comparison first
+        if self.is_area_comparison_request(user_message):
+            return self.handle_area_comparison(user_message)
+        
         candidate_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
         # Only keep rent fields
         rent_fields = {k: v for k, v in (last_candidate_fields or candidate_fields).items() if k in self.required_fields}
@@ -844,8 +1042,64 @@ class RentPredictionHandler(BaseModuleHandler):
                 missing = [f for f in self.required_fields if f not in fields or fields[f] in (None, '', 0, 0.0)]
                 return {"response": f"I need the following details to estimate rent: {', '.join(missing)}. Please provide them.", "action": "ask_for_info", "fields": fields}
         
+        # Enhanced single-value handling for rent prediction
+        if provided_count == 1:
+            # Acknowledge what we have and ask for one more key field
+            provided_info = {}
+            for field in self.required_fields:
+                value = rent_fields.get(field)
+                if value and value not in (None, '', 0, 0.0):
+                    provided_info[field] = value
+            
+            # Create acknowledgment based on what was provided
+            field_descriptions = {
+                "address": f"location in {provided_info.get('address', 'the specified area')}",
+                "BEDROOMS": f"{provided_info.get('BEDROOMS', '')} bedroom property",
+                "BATHROOMS": f"{provided_info.get('BATHROOMS', '')} bathroom setup",
+                "SIZE": f"{provided_info.get('SIZE', '')} sq ft property",
+                "PROPERTY TYPE": f"{provided_info.get('PROPERTY TYPE', '').lower()} property"
+            }
+            
+            provided_field = list(provided_info.keys())[0]
+            acknowledgment = field_descriptions.get(provided_field, f"{provided_field}: {provided_info[provided_field]}")
+            
+            # Suggest the most important missing field
+            priority_fields = ["address", "BEDROOMS", "PROPERTY TYPE", "SIZE", "BATHROOMS"]
+            next_field = None
+            for field in priority_fields:
+                if field not in provided_info:
+                    next_field = field
+                    break
+            
+            field_prompts = {
+                "address": "Where is the property located? (area/postcode)",
+                "BEDROOMS": "How many bedrooms does it have?",
+                "BATHROOMS": "How many bathrooms?",
+                "SIZE": "What's the property size in sq ft?",
+                "PROPERTY TYPE": "What type of property is it? (flat, house, etc.)"
+            }
+            
+            if next_field:
+                prompt = (
+                    f"✨ Perfect! I've got the {acknowledgment}.\n\n"
+                    f"Just need **one more key detail** and I can provide you with a rent estimate: "
+                    f"**{field_prompts.get(next_field, next_field.replace('_', ' '))}**\n\n"
+                    f"Once you share that, I'll have enough to give you a solid market-based estimate! 🏠"
+                )
+            else:
+                prompt = (
+                    f"✨ Great! I've got the {acknowledgment}.\n\n"
+                    f"Just need **one more detail** like the **location** or **property type** and I can start estimating! 🚀"
+                )
+            
+            return {
+                "response": prompt,
+                "action": "ask_for_one_more",
+                "fields": rent_fields
+            }
+
         # NEW FEATURE: Provide estimate with defaults if at least 2 fields are provided
-        if provided_count >= 2:
+        elif provided_count >= 2:
             try:
                 estimate_response, complete_fields = self.create_estimate_with_defaults(rent_fields)
                 return {"response": estimate_response, "action": "estimate_with_defaults", "fields": complete_fields}
@@ -935,7 +1189,7 @@ class TenantScreeningHandler(BaseModuleHandler):
         context_text = "Context: This is a tenant screening conversation. Extract tenant screening fields (credit_score, income, rent, employment_status, eviction_record).\n" + all_text
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record, and tenant_name if mentioned. DO NOT extract any other fields like address, property age, maintenance, etc. If a field is missing, use 0, empty string, or False. If a tenant name is mentioned, extract it. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("system", "You are an expert assistant for tenant screening ONLY. Extract ONLY tenant screening fields from the conversation: credit_score, income, rent, employment_status, eviction_record, and tenant_name if mentioned. IMPORTANT INCOME CONVERSION RULES: 1) If extracting annual salary/income (like €45000 per year), CONVERT to MONTHLY by dividing by 12. 2) If currency is EUR/€, convert to GBP using rate 0.86 (1 EUR = 0.86 GBP). 3) Always output income as monthly amount in GBP. 4) CALCULATE THE ACTUAL NUMBERS - do not output formulas like '(45000/12)*0.86', output the final calculated result like '3225.0'. CONTEXT AWARENESS: If the assistant just asked for a specific field (like 'monthly rent') and the user provides a number, that number refers to the requested field. For employment_status: if person works at a company or has a job, use 'employed'. DO NOT extract any other fields like address, property age, maintenance, etc. If a field is missing, use 0, empty string, or False. If a tenant name is mentioned, extract it. Output only the JSON object as specified by the schema: {format_instructions}"),
             ("user", "Tenant screening conversation:\n{conversation}\nCurrent message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
@@ -1142,7 +1396,7 @@ class TenantScreeningHandler(BaseModuleHandler):
         md += f"**🔍 Here's the breakdown:**\n\n"
         for line in result['explanation'].split('\n'):
             if line.strip():  # Only add non-empty lines
-                md += f"- • {line.strip()}\n\n"
+                md += f"• {line.strip()}\n"
         md += "\n"  # Add extra space after breakdown
         return md
 
@@ -1182,6 +1436,11 @@ class TenantScreeningHandler(BaseModuleHandler):
 
         # Track which fields were actually provided by the user vs. inferred/assumed
         user_provided = []
+        
+        # Check if this is a direct screening request (contains action words + data)
+        action_words = ["screen", "screening", "check", "evaluate", "assess", "analyze", "review"]
+        is_direct_request = any(word in user_message.lower() for word in action_words)
+        
         for k in self.required_fields:
             v = merged_fields.get(k, None)
             # Check if this field appears to be user-provided in current or previous messages
@@ -1200,8 +1459,28 @@ class TenantScreeningHandler(BaseModuleHandler):
                             recent_has_field = True
                             break
             
-            # Special handling for different field types
-            if k == "eviction_record":
+            # Enhanced detection for direct requests with numeric values
+            if k in ["income", "rent"] and v not in (None, '', 0, 0.0):
+                # If we extracted a numeric value, consider it provided (more permissive)
+                income_keywords = ["income", "earn", "salary", "wage", "pay", "€", "$", "£", "per year", "annually", "monthly"]
+                rent_keywords = ["rent", "monthly rent", "rental", "charge", "cost"]
+                
+                field_mentioned = False
+                if k == "income":
+                    field_mentioned = any(keyword in user_message.lower() for keyword in income_keywords)
+                elif k == "rent":
+                    field_mentioned = any(keyword in user_message.lower() for keyword in rent_keywords)
+                
+                # NEW: If we have conversation history and extracted a numeric value, it's likely user-provided
+                has_conversation_context = conversation_history and len(conversation_history) > 0
+                simple_numeric_response = user_message.strip().replace("it's", "").replace("its", "").replace("'", "").strip().replace("£", "").replace("$", "").replace("€", "").isdigit()
+                
+                if is_direct_request or current_has_field or recent_has_field or field_mentioned or (has_conversation_context and simple_numeric_response):
+                    user_provided.append(k)
+            elif k == "credit_score" and v not in (None, '', 0, 0.0):
+                if current_has_field or recent_has_field:
+                    user_provided.append(k)
+            elif k == "eviction_record":
                 # Check for eviction-related phrases in current message
                 eviction_mentions = ["eviction", "evicted", "prior eviction", "previous eviction", "eviction record", "eviction history"]
                 current_mentions_eviction = any(phrase in user_message.lower() for phrase in eviction_mentions)
@@ -1211,15 +1490,13 @@ class TenantScreeningHandler(BaseModuleHandler):
                 elif any(phrase in user_message_lower for phrase in eviction_phrases):
                     user_provided.append(k)
             elif k == "employment_status":
-                # Only consider provided if explicitly mentioned (not just inferred from income)
-                employment_mentions = ["employed", "unemployed", "job", "work", "employment", "self-employed", "occupation"]
+                # Enhanced employment detection - include company mentions and job-related terms
+                employment_mentions = ["employed", "unemployed", "job", "work", "employment", "self-employed", "occupation", 
+                                     "works at", "working at", "employed at", "company", "bank", "firm", "engineer", 
+                                     "manager", "salary", "earning", "income from", "employee"]
                 current_mentions_employment = any(phrase in user_message.lower() for phrase in employment_mentions)
                 
                 if current_mentions_employment or current_has_field or recent_has_field:
-                    user_provided.append(k)
-            else:
-                # For credit_score, income, rent - if value exists and was mentioned, consider it provided
-                if v not in (None, '', 0, 0.0, False) and (current_has_field or recent_has_field):
                     user_provided.append(k)
         
         print(f"[DEBUG] User provided fields: {user_provided}")
@@ -1238,8 +1515,71 @@ class TenantScreeningHandler(BaseModuleHandler):
                 if v in (None, '', 0, 0.0, False):
                     missing.append(k)
 
-        # If not enough info, ask for more with conversational flair
-        if len(user_provided) < 2:
+        # Enhanced single-value handling: acknowledge what we have and ask for just one more
+        if len(user_provided) == 1:
+            # Get the field that was provided
+            provided_field = user_provided[0]
+            provided_value = merged_fields.get(provided_field)
+            
+            # Create personalized acknowledgment
+            acknowledgments = {
+                "income": f"Great! I see {merged_fields.get('tenant_name', 'your applicant')} earns £{float(provided_value):,.0f} per month" if provided_value and str(provided_value).replace('.','').isdigit() else "I've got their income information",
+                "credit_score": f"Perfect! Credit score of {provided_value} noted" if provided_value else "I've got their credit score",
+                "rent": f"Excellent! Monthly rent of £{float(provided_value):,.0f} recorded" if provided_value and str(provided_value).replace('.','').isdigit() else "I've got the rent amount",
+                "employment_status": f"Good to know they're {provided_value}!" if provided_value else "I've got their employment status",
+                "eviction_record": "Thanks for clarifying their eviction history!" if provided_field == "eviction_record" else "I've noted their rental history"
+            }
+            
+            # Smart suggestion for the most important missing field
+            field_priorities = {
+                "income": "monthly income",
+                "rent": "monthly rent amount", 
+                "credit_score": "credit score",
+                "employment_status": "employment status",
+                "eviction_record": "eviction history"
+            }
+            
+            # Find the highest priority missing field
+            priority_order = ["income", "rent", "credit_score", "employment_status", "eviction_record"]
+            next_field = None
+            for field in priority_order:
+                if field not in user_provided and field in missing:
+                    next_field = field
+                    break
+            
+            acknowledgment = acknowledgments.get(provided_field, "I've got that information")
+            
+            if next_field:
+                field_prompts = {
+                    "income": "What's their monthly income?",
+                    "rent": "What's the monthly rent for this property?",
+                    "credit_score": "What's their credit score?", 
+                    "employment_status": "Are they employed, self-employed, or unemployed?",
+                    "eviction_record": "Any previous evictions? (yes/no)"
+                }
+                
+                prompt = (
+                    f"✨ {acknowledgment}\n\n"
+                    f"Perfect! Just need **one more key detail** and I can start the screening: "
+                    f"**{field_prompts.get(next_field, next_field.replace('_', ' ').title())}**\n\n"
+                    f"Once you share that, I'll have everything I need to give you a comprehensive tenant assessment! 🎯"
+                )
+            else:
+                prompt = (
+                    f"✨ {acknowledgment}\n\n"
+                    f"That's helpful! Just need **one more detail** from this list:\n\n"
+                    f"• **Monthly Income** or **Credit Score** or **Employment Status**\n\n"
+                    f"Any of these will let me start the screening process! 🚀"
+                )
+            
+            return {
+                "response": prompt,
+                "action": "ask_for_one_more",
+                "fields": merged_fields
+            }
+
+        # If not enough info (0 fields), ask for more with conversational flair
+        elif len(user_provided) < 1:
             conversation_starters = [
                 "Alright, let's get this tenant screening party started! 🎉",
                 "Time to put on my detective hat and screen this tenant! 🕵️",
@@ -1264,9 +1604,9 @@ class TenantScreeningHandler(BaseModuleHandler):
             }
             
             for k in self.required_fields:
-                prompt += f"- • {field_descriptions[k]}\n"
+                prompt += f"• {field_descriptions[k]}\n"
             
-            prompt += "\n\nOnce you drop a couple of these details on me, I'll whip up a preliminary screening for you! 🚀"
+            prompt += "\nOnce you drop a couple of these details on me, I'll whip up a preliminary screening for you! 🚀"
             
             return {
                 "response": prompt,
@@ -1396,6 +1736,7 @@ class TenantScreeningHandler(BaseModuleHandler):
         ]
         return any(kw in last_assistant["content"].lower() for kw in confirmation_keywords)
 
+
 class MaintenancePredictionHandler(BaseModuleHandler):
     def batch_alerts(self, as_json=False):
         """
@@ -1410,10 +1751,10 @@ class MaintenancePredictionHandler(BaseModuleHandler):
     ]
     
     FIELD_SYNONYMS = {
-        'address': ['address', 'property address', 'location'],
-        'age_years': ['age', 'property age', 'years old', 'age_years'],
-        'last_service_years_ago': ['last service', 'last serviced', 'last maintenance', 'last_service_years_ago', 'time since last service'],
-        'seasonality': ['seasonality', 'season', 'current season']
+        'address': ['address', 'property address', 'location', 'property', 'place', 'where'],
+        'age_years': ['age', 'property age', 'years old', 'age_years', 'old', 'built', 'constructed'],
+        'last_service_years_ago': ['last service', 'last serviced', 'last maintenance', 'last_service_years_ago', 'time since last service', 'years since', 'maintenance'],
+        'seasonality': ['seasonality', 'season', 'current season', 'winter', 'spring', 'summer', 'autumn', 'fall']
     }
     
     _model = None
@@ -1424,16 +1765,24 @@ class MaintenancePredictionHandler(BaseModuleHandler):
     def __init__(self):
         """Initialize maintenance prediction handler."""
         self.system_prompt = (
-            "You are LandlordBuddy, an expert and professional AI assistant for landlords. "
-            "You support rent pricing, tenant screening, and maintenance prediction. "
-            "For maintenance prediction, you ONLY need these 4 specific pieces of information: "
-            "1. Property address/location, 2. Property age in years, 3. Years since last maintenance/service, 4. Current season. "
-            "Do NOT ask for number of units, property type, existing conditions, or other details - the model doesn't use those. "
-            "You can provide estimates even with partial information using intelligent defaults. "
-            "Always be helpful and provide immediate value while being transparent about assumptions. "
-            "When any of the 4 required fields are missing, use contextual defaults and explain your assumptions clearly. "
-            "Keep the conversation natural and focused only on these 4 maintenance prediction inputs. "
-            "Never mention OpenAI or your own limitations. Always respond in markdown."
+            "You are LandlordBuddy, a friendly and knowledgeable AI companion for landlords! "
+            "Think of me as your trusted maintenance advisor who's here to help predict potential property issues before they become expensive problems. "
+            "When it comes to maintenance prediction, I'm like your crystal ball - I gather the essential clues (property location, age, last service date, and current season), "
+            "chat with you about what we've found, and then run our predictive analysis to spot potential maintenance needs. "
+            "Here's the thing - I never jump to my own conclusions or give you my personal take on things. That's not my style! "
+            "If our prediction can't run because we're missing some key pieces of the puzzle, I'll simply let you know: "
+            "'Looks like we're missing some crucial details to run a proper maintenance prediction. Mind filling in the gaps?' "
+            "When our analysis is complete, I'll present the findings in a clean, easy-to-read format and help clarify what it all means - "
+            "but I stick to explaining the results, not adding my own spin on things. "
+            "I keep things natural and conversational - no robotic 'processing' talk or mentions of scripts and models. "
+            "I'm your professional yet approachable partner in this! "
+            "I love being efficient and interactive, so I won't keep you waiting with unnecessary delays. "
+            "I always check with you before diving into the prediction - your confirmation is my green light! "
+            "I focus on what really matters - those four key areas I mentioned - and keep things streamlined. "
+            "When we start a new prediction, I'll lay out everything we need in one go, nice and organized. "
+            "No back-and-forth hunting for details one piece at a time - that's just inefficient! "
+            "If you can't provide all the details, don't worry! I can still give an estimate with at least 2 key details using smart defaults for the missing information. "
+            "The more information you provide, the more accurate the prediction will be. "
         )
         self.chat = ChatOpenAI(model="gpt-4", temperature=0.7, openai_api_key=openai_api_key)
 
@@ -1453,81 +1802,158 @@ class MaintenancePredictionHandler(BaseModuleHandler):
         return cls._address_map
 
     def get_smart_defaults(self, provided_fields):
-        """Generate contextually intelligent defaults based on provided information."""
-        import datetime
-        
+        """Generate contextual defaults based on provided fields and current season"""
         defaults = {}
-        assumptions = []
         
-        # Smart address default
-        if not provided_fields.get('address'):
-            address_map = self.get_address_map()
-            # Use first address as default, but this should ideally be region-based
-            defaults['address'] = next(iter(address_map.keys())) if address_map else "Unknown Location"
-            assumptions.append("assuming average location")
+        # Get current season from provided fields or default to current season
+        import datetime
+        month = datetime.datetime.now().month
+        if month in [12, 1, 2]:
+            current_season = "Winter"
+        elif month in [3, 4, 5]:
+            current_season = "Spring"
+        elif month in [6, 7, 8]:
+            current_season = "Summer"
+        else:
+            current_season = "Autumn"
         
-        # Smart age defaults based on context
+        # Default seasonality
+        if not provided_fields.get('seasonality'):
+            defaults['seasonality'] = current_season
+        
+        # Default property age (typical UK property age)
         if not provided_fields.get('age_years'):
-            # If we have service info, infer reasonable age
-            if provided_fields.get('last_service_years_ago'):
-                service_gap = provided_fields['last_service_years_ago']
-                if service_gap > 5:
-                    defaults['age_years'] = max(15, service_gap * 2)  # Older property
-                    assumptions.append(f"assuming {defaults['age_years']} year old property based on service history")
-                else:
-                    defaults['age_years'] = 10  # Moderate age
-                    assumptions.append("assuming 10 year old property based on recent service")
-            else:
-                defaults['age_years'] = 12  # Average residential property age
-                assumptions.append("assuming 12 year old property (average)")
+            defaults['age_years'] = 25  # Average age for UK properties
         
-        # Smart service history defaults
+        # Default last service based on property age
+        age = provided_fields.get('age_years', defaults.get('age_years', 25))
         if not provided_fields.get('last_service_years_ago'):
-            age = provided_fields.get('age_years', defaults.get('age_years', 12))
             if age < 5:
                 defaults['last_service_years_ago'] = 1  # New properties, recent service
-                assumptions.append("assuming 1 year since last service (newer property)")
             elif age < 15:
-                defaults['last_service_years_ago'] = 2  # Moderate age, regular service
-                assumptions.append("assuming 2 years since last service (moderate age)")
+                defaults['last_service_years_ago'] = 2  # Newer properties
             else:
-                defaults['last_service_years_ago'] = 3  # Older properties might have longer gaps
-                assumptions.append("assuming 3 years since last service (older property)")
+                defaults['last_service_years_ago'] = 3  # Older properties need more frequent service
         
-        # Smart seasonality default
-        if not provided_fields.get('seasonality'):
-            current_month = datetime.datetime.now().month
-            if current_month in [12, 1, 2]:
-                defaults['seasonality'] = 'Winter'
-            elif current_month in [3, 4, 5]:
-                defaults['seasonality'] = 'Spring'
-            elif current_month in [6, 7, 8]:
-                defaults['seasonality'] = 'Summer'
-            else:
-                defaults['seasonality'] = 'Autumn'
-            assumptions.append(f"assuming current season ({defaults['seasonality']})")
+        # Default address (use common London area as fallback)
+        if not provided_fields.get('address'):
+            defaults['address'] = 'London Area'
         
-        return defaults, assumptions
+        return defaults
 
-    def calculate_confidence_score(self, provided_fields, total_fields):
-        """Calculate confidence score based on provided vs estimated fields."""
-        provided_count = sum(1 for field in self.required_fields 
-                           if field in provided_fields and provided_fields[field] not in (None, '', 0, 0.0))
+    def create_estimate_with_defaults(self, provided_fields):
+        """Create a maintenance prediction using smart defaults and return a conversational response"""
+        defaults = self.get_smart_defaults(provided_fields)
         
-        base_confidence = (provided_count / len(self.required_fields)) * 100
+        # Merge provided fields with defaults
+        complete_fields = {}
+        for field in self.required_fields:
+            if field in provided_fields and provided_fields[field] not in (None, '', 0):
+                complete_fields[field] = provided_fields[field]
+            else:
+                complete_fields[field] = defaults[field]
         
-        # Adjust confidence based on field importance and reasonableness
-        if provided_fields.get('address') and provided_fields['address'] != "Unknown Location":
-            base_confidence += 5  # Address is important for location-specific factors
+        # Generate assumptions text
+        assumptions = []
+        for field, default_value in defaults.items():
+            if field == 'age_years':
+                assumptions.append(f"estimated the property to be around {default_value} years old")
+            elif field == 'last_service_years_ago':
+                assumptions.append(f"assumed it's been about {default_value} years since last maintenance")
+            elif field == 'seasonality':
+                assumptions.append(f"considering it's currently {default_value}")
+            elif field == 'address':
+                assumptions.append(f"using typical London area characteristics")
         
-        if provided_fields.get('age_years') and provided_fields.get('last_service_years_ago'):
-            # Check if the combination is reasonable
-            age = provided_fields['age_years']
-            service_gap = provided_fields['last_service_years_ago']
-            if service_gap <= age:  # Reasonable combination
-                base_confidence += 5
+        # Get the maintenance prediction
+        try:
+            result = self.run_model(complete_fields)
+            
+            # Extract risk score for conversational response
+            risk_match = re.search(r'Risk Score:\*\* (\d+\.?\d*)', result)
+            action_match = re.search(r'Recommended Action:\*\* (\w+)', result)
+            
+            risk_score = float(risk_match.group(1)) if risk_match else 0
+            action = action_match.group(1) if action_match else "Monitor"
+            
+            # Create conversational response
+            property_desc = self.create_property_description(provided_fields, complete_fields)
+            
+            response = f"Based on what you've told me, {property_desc}"
+            
+            if assumptions:
+                if len(assumptions) == 1:
+                    response += f" (I've {assumptions[0]})"
+                else:
+                    response += f" (I've {', '.join(assumptions[:-1])} and {assumptions[-1]})"
+            
+            # Add emoji based on risk level
+            if risk_score > 7:
+                emoji = "🚨"
+                urgency = "needs immediate attention"
+            elif risk_score > 4:
+                emoji = "⚠️" 
+                urgency = "should be monitored closely"
+            else:
+                emoji = "✅"
+                urgency = "is in good shape"
+            
+            response += f"\n\n{emoji} **Your property {urgency}!**\n\n"
+            response += result
+            response += "\n\nIf you'd like a more precise prediction, just let me know the missing details! "
+            
+            # Ask for missing information
+            missing_original = [f for f in self.required_fields if f not in provided_fields or provided_fields[f] in (None, '', 0)]
+            if missing_original:
+                field_names = {
+                    "age_years": "**property age**",
+                    "last_service_years_ago": "**last maintenance date**",
+                    "seasonality": "**current season**",
+                    "address": "**exact location**"
+                }
+                missing_names = [field_names.get(f, f.replace('_', ' ')) for f in missing_original]
+                if len(missing_names) == 1:
+                    response += f"I'd particularly love to know the {missing_names[0]} for a more accurate prediction."
+                else:
+                    response += f"I'd particularly love to know the {', '.join(missing_names[:-1])} and {missing_names[-1]} for a more accurate prediction."
+            
+            return response, complete_fields
+            
+        except Exception as e:
+            return f"I ran into a snag while predicting maintenance needs: {e}. Let me know if you'd like to try again!", complete_fields
+
+    def create_property_description(self, provided_fields, complete_fields):
+        """Create a natural description of the property"""
+        age = provided_fields.get('age_years') or complete_fields.get('age_years', 0)
+        address = provided_fields.get('address') or complete_fields.get('address', 'your property')
         
-        return min(95, max(25, int(base_confidence)))  # Cap between 25-95%
+        try:
+            age = int(age)
+        except:
+            age = 0
+            
+        if age < 5:
+            age_desc = "a relatively new property"
+        elif age < 15:
+            age_desc = "a modern property"
+        elif age < 30:
+            age_desc = "a well-established property"
+        else:
+            age_desc = "a mature property"
+        
+        if address and address != 'London Area' and address != 'your property':
+            return f"{age_desc} at {address}"
+        else:
+            return age_desc
+
+    def count_provided_fields(self, fields):
+        """Count how many meaningful fields are provided"""
+        meaningful_fields = 0
+        for field in self.required_fields:
+            value = fields.get(field)
+            if value and value not in (None, '', 0):
+                meaningful_fields += 1
+        return meaningful_fields
 
     def encode_fields_for_model(self, fields):
         # Map user-friendly address to coded address using address_map
@@ -1549,109 +1975,231 @@ class MaintenancePredictionHandler(BaseModuleHandler):
         return encoded
 
     def extract_fields(self, user_message, conversation_history, last_candidate_fields=None):
-        # Use LLM/PydanticOutputParser for robust extraction (like rent/tenant handlers), with improved fallback
+        # Use LangChain's PydanticOutputParser for robust extraction
         from langchain.output_parsers import PydanticOutputParser
         from pydantic import BaseModel, Field, ValidationError
         from langchain_core.prompts import ChatPromptTemplate
         import re
         
-        class MaintFields(BaseModel):
-            address: str = Field('', description="The property address or location")
+        class MaintenanceFields(BaseModel):
+            address: str = Field("", description="The property address or location")
             age_years: int = Field(0, description="Property age in years")
-            last_service_years_ago: int = Field(0, description="Years since last service")
-            seasonality: str = Field('', description="Current season (Winter, Spring, Summer, Autumn)")
+            last_service_years_ago: int = Field(0, description="Years since last maintenance service")
+            seasonality: str = Field("", description="Current season (Winter, Spring, Summer, Autumn)")
 
-        all_text = "\n".join([m["content"] for m in conversation_history if m["role"] in ("user", "assistant")])
-        all_text += "\n" + user_message
-
-        # 1. Try LLM/Pydantic extraction
-        parser = PydanticOutputParser(pydantic_object=MaintFields)
+        parser = PydanticOutputParser(pydantic_object=MaintenanceFields)
+        
+        # Filter conversation to only maintenance prediction related messages (last 6 messages max)
+        maintenance_messages = []
+        recent_messages = conversation_history[-6:] if len(conversation_history) > 6 else conversation_history
+        
+        for msg in recent_messages:
+            content_lower = msg["content"].lower()
+            if any(keyword in content_lower for keyword in ["maintenance", "property", "address", "age", "service", "season", "winter", "spring", "summer", "autumn", "years", "old"]):
+                maintenance_messages.append(msg)
+        
+        # Add current message
+        filtered_text = "\n".join([f"{m['role']}: {m['content']}" for m in maintenance_messages])
+        filtered_text += f"\nuser: {user_message}"
+        
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are an expert assistant for landlords. Extract the following fields from the conversation and user message. If a field is missing, use an empty string or 0. Output only the JSON object as specified by the schema: {format_instructions}"),
-            ("user", "Conversation so far:\n{conversation}\nUser message:\n{user_message}")
+            ("system", "You are an expert assistant for maintenance prediction ONLY. Extract ONLY maintenance prediction fields from the conversation: address, age_years, last_service_years_ago, seasonality. DO NOT extract any other fields like credit score, income, rent, bedrooms, etc. If a field is missing, use an empty string or 0. Output only the JSON object as specified by the schema: {format_instructions}"),
+            ("user", "Maintenance prediction conversation:\n{conversation}\nCurrent message:\n{user_message}")
         ])
         format_instructions = parser.get_format_instructions()
         prompt_value = prompt.format_prompt(
-            conversation=all_text,
+            conversation=filtered_text,
             user_message=user_message,
             format_instructions=format_instructions
         )
+        response = invoke_with_tracking(
+            self.chat,
+            [HumanMessage(content=prompt_value.to_string())],
+            "Maintenance Prediction - Field Extraction"
+        )
+        content = response.content.strip()
         try:
-            response = invoke_with_tracking(
-                self.chat,
-                [HumanMessage(content=prompt_value.to_string())],
-                "Maintenance Prediction - Field Extraction"
-            )
-            content = response.content.strip()
             parsed = parser.parse(content)
             fields = parsed.dict()
-        except Exception:
+        except (ValidationError, Exception) as e:
+            print(f"[DEBUG] Pydantic parsing failed for maintenance fields: {e}. Using fallback extraction.")
+            # Fallback: try regex extraction as before
             fields = dict(last_candidate_fields) if last_candidate_fields else {}
+            all_text = filtered_text
+            
+            # Enhanced regex patterns for maintenance-specific extraction
+            
+            # Address: look for location indicators
+            if not fields.get('address'):
+                addr_patterns = [
+                    r"(?:property (?:at|on|in)|located (?:at|on|in)|address (?:is|at)?)\s*([A-Za-z0-9,\-\s]+?)(?:,| and| that| which| \d+|\.|$)",
+                    r"at ([A-Za-z0-9,\-\s]+?)(?:,| and| that| which| \d+|\.|$)"
+                ]
+                for pattern in addr_patterns:
+                    addr_match = re.search(pattern, all_text, re.IGNORECASE)
+                    if addr_match:
+                        fields['address'] = addr_match.group(1).strip()
+                        break
 
-        # 2. Fallback: regex/natural language extraction for robust field parsing
-        # Address: look for 'property at|property on|property in|property' ... up to 'constructed' or 'built' or 'last service' or ','
-        if not fields.get('address'):
-            addr_match = re.search(r"property (?:at|on|in)?\s*([A-Za-z0-9,\- ]+?)(?:,| constructed| built| last service| last serviced|\.|$)", user_message, re.IGNORECASE)
-            if addr_match:
-                fields['address'] = addr_match.group(1).strip()
+            # Age: look for age indicators
+            if not fields.get('age_years'):
+                age_patterns = [
+                    r"(?:property|building|house|flat|apartment).*?(?:is|was|age|aged|built|constructed).*?(\d{1,3})\s*years?\s*old",
+                    r"(\d{1,3})\s*years?\s*old",
+                    r"built.*?(\d{1,3})\s*years?\s*ago",
+                    r"constructed.*?(\d{1,3})\s*years?\s*ago",
+                    r"age.*?(\d{1,3})",
+                    r"it.s\s*(\d{1,3})\s*years"
+                ]
+                for pattern in age_patterns:
+                    age_match = re.search(pattern, all_text, re.IGNORECASE)
+                    if age_match:
+                        try:
+                            fields['age_years'] = int(age_match.group(1))
+                            break
+                        except Exception:
+                            pass
+
+            # Last service: look for maintenance indicators
+            if not fields.get('last_service_years_ago'):
+                service_patterns = [
+                    r"last\s*(?:service|serviced|maintenance|maintained).*?(\d{1,2})\s*years?\s*ago",
+                    r"(?:service|maintenance).*?(\d{1,2})\s*years?\s*ago",
+                    r"been\s*(\d{1,2})\s*years?\s*since.*?(?:service|maintenance)",
+                    r"(\d{1,2})\s*years?\s*since.*?(?:service|maintenance)"
+                ]
+                for pattern in service_patterns:
+                    svc_match = re.search(pattern, all_text, re.IGNORECASE)
+                    if svc_match:
+                        try:
+                            fields['last_service_years_ago'] = int(svc_match.group(1))
+                            break
+                        except Exception:
+                            pass
+
+            # Seasonality: look for season indicators
+            if not fields.get('seasonality'):
+                season_patterns = [
+                    r"(?:it.s|this|current|now)\s*(winter|spring|summer|autumn|fall)",
+                    r"(winter|spring|summer|autumn|fall)\s*(?:now|season|time)",
+                    r"in\s*(winter|spring|summer|autumn|fall)"
+                ]
+                for pattern in season_patterns:
+                    season_match = re.search(pattern, all_text, re.IGNORECASE)
+                    if season_match:
+                        season = season_match.group(1).capitalize()
+                        if season == "Fall":
+                            season = "Autumn"
+                        fields['seasonality'] = season
+                        break
+
+        # Only keep required fields and ensure correct types
+        clean_fields = {}
+        for k in self.required_fields:
+            v = fields.get(k, 0 if k in ["age_years", "last_service_years_ago"] else "")
+            # Ensure correct types
+            if k in ["age_years", "last_service_years_ago"]:
+                try:
+                    v = int(float(v)) if v not in (None, '', 0) else 0
+                except Exception:
+                    v = 0
             else:
-                # Try to grab first location-like phrase
-                addr_match2 = re.search(r"at ([A-Za-z0-9,\- ]+?)(?:,| constructed| built| last service| last serviced|\.|$)", user_message, re.IGNORECASE)
-                if addr_match2:
-                    fields['address'] = addr_match2.group(1).strip()
-
-        # Age: "constructed X years ago" or "built X years ago"
-        if not fields.get('age_years'):
-            age_match = re.search(r"(?:constructed|built)\s*(\d{1,3})\s*years? ago", user_message, re.IGNORECASE)
-            if age_match:
-                try:
-                    fields['age_years'] = int(age_match.group(1))
-                except Exception:
-                    fields['age_years'] = 0
-
-        # Last service: "last service Y years ago" or "last serviced Y years ago"
-        if not fields.get('last_service_years_ago'):
-            svc_match = re.search(r"last (?:service|serviced|maintenance)[^\d]*(\d{1,3})\s*years? ago", user_message, re.IGNORECASE)
-            if svc_match:
-                try:
-                    fields['last_service_years_ago'] = int(svc_match.group(1))
-                except Exception:
-                    fields['last_service_years_ago'] = 0
-
-        # Seasonality: "this winter", "this summer", etc.
-        if not fields.get('seasonality'):
-            season_match = re.search(r"this (winter|spring|summer|autumn|fall)", user_message, re.IGNORECASE)
-            if season_match:
-                fields['seasonality'] = season_match.group(1).capitalize()
-
-        # Only keep required fields, with correct types/defaults
-        clean_fields = {
-            'address': str(fields.get('address', '')),
-            'age_years': int(fields.get('age_years', 0) or 0),
-            'last_service_years_ago': int(fields.get('last_service_years_ago', 0) or 0),
-            'seasonality': str(fields.get('seasonality', '')),
-        }
+                v = str(v) if v is not None else ""
+            clean_fields[k] = v
         return clean_fields
 
-    def run_model_with_smart_defaults(self, provided_fields):
-        """Run model with smart defaults for missing fields."""
-        # Get smart defaults for missing fields
-        defaults, assumptions = self.get_smart_defaults(provided_fields)
+    def summarize_fields(self, fields, user_provided=None, show_result=False):
+        """
+        Summarize fields for display with more conversational language
+        user_provided: list of fields actually provided by user (not assumed)
+        show_result: if True, don't add confirmation text (we're showing final result)
+        """
+        if user_provided is None:
+            user_provided = []
+        assumed_fields = [k for k in self.required_fields if k not in user_provided]
         
-        # Merge provided fields with defaults
-        complete_fields = {}
-        for field in self.required_fields:
-            if field in provided_fields and provided_fields[field] not in (None, '', 0, 0.0):
-                complete_fields[field] = provided_fields[field]
+        if show_result:
+            summary = "**Here's what we're working with for the maintenance prediction:**\n\n"
+        elif assumed_fields:
+            summary = "**Here's the picture so far (I've filled in some gaps with typical values):**\n\n"
+        else:
+            summary = "**Perfect! Here's everything we've got:**\n\n"
+        
+        # Format each field with more conversational language
+        for k in self.required_fields:
+            v = fields.get(k, None)
+            assumed = k in assumed_fields
+            if k == "address":
+                if v and v not in (None, '', 'London Area'):
+                    if assumed and not show_result:
+                        summary += f"- **Property Location:** {v} _(using typical area characteristics)_\n"
+                    else:
+                        summary += f"- **Property Location:** {v}\n"
+                else:
+                    summary += f"- **Property Location:** _(we'll need this one)_\n"
+            elif k == "age_years":
+                if v not in (None, '', 0):
+                    if assumed and not show_result:
+                        summary += f"- **Property Age:** {v} years old _(estimated typical age)_\n"
+                    else:
+                        summary += f"- **Property Age:** {v} years old\n"
+                else:
+                    summary += f"- **Property Age:** _(still need this detail)_\n"
+            elif k == "last_service_years_ago":
+                if v not in (None, '', 0):
+                    if assumed and not show_result:
+                        summary += f"- **Last Maintenance:** {v} years ago _(my best guess based on property age)_\n"
+                    else:
+                        summary += f"- **Last Maintenance:** {v} years ago\n"
+                else:
+                    summary += f"- **Last Maintenance:** _(missing this piece)_\n"
+            elif k == "seasonality":
+                if v not in (None, '', False, 'unknown', ''):
+                    if assumed and not show_result:
+                        summary += f"- **Current Season:** {v} _(assuming current season)_\n"
+                    else:
+                        summary += f"- **Current Season:** {v}\n"
+                else:
+                    summary += f"- **Current Season:** _(would love to know this)_\n"
+        
+        # More conversational confirmation text
+        if not show_result:
+            missing_to_show = [k for k in self.required_fields if k not in user_provided]
+            if missing_to_show:
+                summary += "\n💡 _Want a spot-on prediction? Just share these missing bits with me:_ "
+                field_names = {
+                    "address": "**exact location**",
+                    "age_years": "**property age**", 
+                    "last_service_years_ago": "**last maintenance date**",
+                    "seasonality": "**current season**"
+                }
+                summary += ", ".join([f"_{field_names.get(k, k.replace('_', ' ').title())}_" for k in missing_to_show])
+                summary += "\n\n_Or we can roll with what we have - just give me the thumbs up!_ 👍"
             else:
-                complete_fields[field] = defaults.get(field, '')
+                summary += "\n\nLooks good to me! Ready to dive into the maintenance prediction? Just say the word! 🚀"
         
-        # Calculate confidence score
-        confidence = self.calculate_confidence_score(provided_fields, complete_fields)
-        
-        # Run the model
+        return summary
+
+    def needs_confirmation(self, user_message):
+        confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
+        return user_message.strip().lower() in confirmation_phrases
+
+    def should_run_model(self, conversation_history, candidate_fields):
+        if not candidate_fields or not all(f in candidate_fields and candidate_fields[f] not in (None, '', 0, 0.0) for f in self.required_fields):
+            return False
+        if not conversation_history:
+            return False
+        last_assistant = next((m for m in reversed(conversation_history) if m["role"] == "assistant"), None)
+        if not last_assistant:
+            return False
+        confirmation_keywords = [
+            "please confirm", "is this information correct", "is this correct", "can you confirm", "are these details correct"
+        ]
+        return any(kw in last_assistant["content"].lower() for kw in confirmation_keywords)
+
+    def run_model(self, fields):
         model = self.get_model()
-        encoded_fields = self.encode_fields_for_model(complete_fields)
+        encoded_fields = self.encode_fields_for_model(fields)
         input_df = pd.DataFrame([{
             'address': encoded_fields['address'],
             'age_years': encoded_fields['age_years'],
@@ -1660,25 +2208,20 @@ class MaintenancePredictionHandler(BaseModuleHandler):
         }])
         risk_score = model.predict(input_df)[0]
         
-        # Determine missing fields for user feedback
-        missing_fields = [field for field in self.required_fields 
-                         if field not in provided_fields or provided_fields[field] in (None, '', 0, 0.0)]
-        
-        return risk_score, confidence, assumptions, missing_fields, complete_fields
-
-    def format_prediction_result(self, risk_score, confidence, assumptions, missing_fields, complete_fields):
-        """Format the prediction result with assumptions and confidence."""
-        
-        # Map risk score to recommended action with specific recommendations
+        # More engaging and conversational result summaries
+        property_desc = self.create_property_description(fields, encoded_fields)
+        summary = ""
         if risk_score > 7:
+            summary = f"🚨 **Urgent attention needed!** {property_desc} is showing some serious red flags:"
             action = 'Immediate Action'
             recommendations = [
                 "Schedule emergency maintenance inspection within 1-2 days",
-                "Check HVAC, plumbing, and electrical systems immediately",
+                "Check HVAC, plumbing, and electrical systems immediately", 
                 "Consider temporary tenant relocation if safety concerns arise",
                 "Contact professional maintenance contractors urgently"
             ]
         elif risk_score > 4:
+            summary = f"⚠️ **Keep a close eye on this one...** {property_desc} has some maintenance concerns brewing:"
             action = 'Monitor'
             recommendations = [
                 "Schedule comprehensive maintenance inspection within 2-4 weeks",
@@ -1687,101 +2230,397 @@ class MaintenancePredictionHandler(BaseModuleHandler):
                 "Plan budget for potential repairs in the next 3-6 months"
             ]
         else:
+            summary = f"✅ **Looking good!** {property_desc} seems to be in solid shape:"
             action = 'Routine'
             recommendations = [
                 "Continue with regular maintenance schedule",
-                "Perform annual safety checks and inspections",
+                "Perform annual safety checks and inspections", 
                 "Keep maintenance reserves for unexpected issues",
                 "Monitor seasonal maintenance needs (heating/cooling systems)"
             ]
         
-        # Create the main result
-        result = f"## 🏠 Maintenance Risk Assessment\n\n"
+        md = f"{summary}\n\n**🔧 Maintenance Prediction Results:**\n\n"
+        md += f"**📊 Risk Score:** {risk_score:.1f}/10\n\n"
+        md += f"**🎯 Action Needed:** {action}\n\n"
+        md += f"**📋 Here's what you should do:**\n\n"
         
-        # Show what was used for prediction
-        result += "**Property Details Used:**\n"
-        for field, value in complete_fields.items():
-            field_name = field.replace('_', ' ').title()
-            result += f"- **{field_name}:** {value}\n"
-        
-        if assumptions:
-            result += f"\n*Assumptions made: {', '.join(assumptions)}*\n"
-        
-        result += f"\n**Maintenance Risk Score:** {risk_score:.1f}/10\n"
-        result += f"**Recommended Action:** {action}\n"
-        result += f"**Confidence Level:** {confidence}%\n\n"
-        
-        result += "**Recommended Actions:**\n"
         for i, rec in enumerate(recommendations, 1):
-            result += f"{i}. {rec}\n"
+            md += f"{i}. {rec}\n"
         
-        # Add missing fields request at the end if any
-        if missing_fields:
-            missing_friendly = []
-            for field in missing_fields:
-                if field == 'age_years':
-                    missing_friendly.append('property age')
-                elif field == 'last_service_years_ago':
-                    missing_friendly.append('years since last maintenance')
-                else:
-                    missing_friendly.append(field.replace('_', ' '))
-            
-            result += f"\n---\n*For a more precise prediction, please provide: {', '.join(missing_friendly)}*"
+        md += f"\n**🔍 The breakdown:**\n"
+        md += f"• Property age: {fields.get('age_years', 0)} years\n"
+        md += f"• Last maintenance: {fields.get('last_service_years_ago', 0)} years ago\n"
+        md += f"• Current season: {fields.get('seasonality', 'Unknown')}\n"
+        md += f"• Location factors: {fields.get('address', 'Generic area')}\n\n"
         
-        return result
-
-    def summarize_fields(self, fields):
-        summary = "**Property Information for Maintenance Prediction:**\n\n"
-        for k, v in fields.items():
-            summary += f"- **{k}**: {v}\n"
-        summary += "\nIs this information correct? Please confirm to proceed with the maintenance risk assessment."
-        return summary
-
-    def needs_confirmation(self, user_message):
-        confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
-        return user_message.strip().lower() in confirmation_phrases
+        explanation = (
+            "**How this was calculated:**\n"
+            "The risk score considers property age, time since last service, seasonal factors, and location-specific maintenance patterns. "
+            "Higher scores indicate more urgent maintenance needs based on predictive analysis of similar properties.\n"
+        )
+        
+        return md + explanation
 
     def handle(self, conversation_history, user_message, last_candidate_fields=None):
+        print(f"[DEBUG] MaintenancePredictionHandler.handle called with: {user_message}")
+        print(f"[DEBUG] Last candidate fields: {last_candidate_fields}")
+        
         # Extract fields from the current message
-        candidate_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
+        new_fields = self.extract_fields(user_message, conversation_history, last_candidate_fields)
+        print(f"[DEBUG] Extracted new fields: {new_fields}")
         
-        # Merge with last candidate fields to preserve previously collected info
-        merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
-        for k, v in candidate_fields.items():
-            if v not in (None, '', 0, 0.0):  # Only update if we have a meaningful value
-                merged_fields[k] = v
+        # Merge with last candidate fields to preserve previously collected info, only keep meaningful values
+        merged_fields = {k: v for k, v in (last_candidate_fields or {}).items() if k in self.required_fields and v not in (None, '', 0)}
+        for k in self.required_fields:
+            v = new_fields.get(k, None)
+            if k in ["age_years", "last_service_years_ago"]:
+                if v not in (None, '', 0):
+                    merged_fields[k] = v
+            else:  # address, seasonality
+                if v not in (None, '', False, 'unknown', ''):
+                    merged_fields[k] = v
         
-        # If user has provided ANY information related to maintenance prediction, run the model
-        if any(merged_fields.get(field) not in (None, '', 0, 0.0) for field in self.required_fields):
-            # Run model with smart defaults
-            risk_score, confidence, assumptions, missing_fields, complete_fields = self.run_model_with_smart_defaults(merged_fields)
-            result = self.format_prediction_result(risk_score, confidence, assumptions, missing_fields, complete_fields)
-            return {"response": result, "action": "maintenance_prediction", "fields": merged_fields}
+        print(f"[DEBUG] Merged fields: {merged_fields}")
+
+        # Detect if this is a DIRECT REQUEST for maintenance assessment (like ChatGPT would understand)
+        direct_request_patterns = [
+            # Question patterns
+            "see if", "check if", "do we need", "should we", "is it time", "do i need",
+            # Command patterns  
+            "check this", "assess this", "analyze this", "predict", "evaluate",
+            # Natural language patterns
+            "need to check", "time to check", "maintenance needed", "check for maintenance",
+            "flat for maintenance", "property for maintenance", "house for maintenance"
+        ]
         
-        # If no relevant information provided, use LLM to handle the conversation
+        action_context_patterns = [
+            "maintenance", "maintice", "maintnance", "service", "inspect", "repair", "upkeep"
+        ]
+        
+        is_direct_request = (
+            any(pattern in user_message.lower() for pattern in direct_request_patterns) or
+            (any(pattern in user_message.lower() for pattern in action_context_patterns) and
+             any(word in user_message.lower() for word in ["this", "the", "property", "flat", "house", "building"]))
+        )
+        
+        print(f"[DEBUG] Is direct request: {is_direct_request}")
+
+        # Track which fields were actually provided by the user vs. inferred/assumed
+        user_provided = []
+        
+        # Enhanced logic: if we have meaningful field values, check if they were mentioned
+        for k in self.required_fields:
+            v = merged_fields.get(k, None)
+            # Check if this field appears to be user-provided in current or previous messages
+            field_keywords = self.FIELD_SYNONYMS.get(k, [k])
+            
+            # Check current message for field mentions
+            current_has_field = any(keyword.lower() in user_message.lower() for keyword in field_keywords)
+            
+            # Check recent conversation for field mentions (last 3 user messages)
+            recent_has_field = False
+            if conversation_history:
+                recent_user_messages = [msg for msg in conversation_history[-6:] if msg["role"] == "user"][-3:]
+                for msg in recent_user_messages:
+                    if any(keyword.lower() in msg["content"].lower() for keyword in field_keywords):
+                        recent_has_field = True
+                        break
+            
+            # Enhanced detection for direct requests
+            if k == "address" and v not in (None, '', False, 'unknown', ''):
+                # Check for location mentions like "Battersea", "in", "located"
+                location_phrases = ["battersea", "london", "in ", "located", "property", "flat", "house"]
+                mentions_location = any(phrase in user_message.lower() for phrase in location_phrases)
+                
+                if mentions_location or current_has_field or recent_has_field:
+                    user_provided.append(k)
+                    
+            elif k == "last_service_years_ago" and v not in (None, '', 0):
+                # Check for maintenance timing phrases (be more inclusive)
+                timing_phrases = ["last", "ago", "since", "years", "months", "serviced", "maintained", "maintenance", "maintice", "done", "was done"]
+                mentions_timing = any(phrase in user_message.lower() for phrase in timing_phrases)
+                
+                if mentions_timing or current_has_field or recent_has_field:
+                    user_provided.append(k)
+                    
+            elif k == "age_years" and v not in (None, '', 0):
+                # Check for age-related phrases
+                age_phrases = ["old", "age", "built", "years", "new", "vintage", "constructed"]
+                mentions_age = any(phrase in user_message.lower() for phrase in age_phrases)
+                
+                if mentions_age or current_has_field or recent_has_field:
+                    user_provided.append(k)
+                    
+            elif k == "seasonality" and v not in (None, '', False, 'unknown', ''):
+                # Check for season-related phrases in current message
+                season_mentions = ["winter", "spring", "summer", "autumn", "fall", "season"]
+                current_mentions_season = any(phrase in user_message.lower() for phrase in season_mentions)
+                
+                if current_mentions_season or current_has_field or recent_has_field:
+                    user_provided.append(k)
+        
+        print(f"[DEBUG] User provided fields: {user_provided}")
+
+        # IMPORTANT: If this is a direct request with ANY meaningful data, provide immediate results
+        if is_direct_request and len(user_provided) >= 1:
+            # Use smart defaults to fill in missing information
+            avg_defaults = {
+                "address": "London Area",
+                "age_years": 25,
+                "last_service_years_ago": 3,
+                "seasonality": "Winter"  # Will be auto-detected in get_smart_defaults
+            }
+            estimate_fields = dict(merged_fields)
+            
+            # Use smart defaults that consider provided context
+            smart_defaults = self.get_smart_defaults(merged_fields)
+            for k in self.required_fields:
+                if k not in estimate_fields or estimate_fields[k] in (None, '', 0):
+                    estimate_fields[k] = smart_defaults.get(k, avg_defaults[k])
+
+            # Show immediate prediction result (like ChatGPT would do)
+            result_md = self.run_model(estimate_fields)
+            
+            # Find missing fields for optional enhancement offer
+            missing_to_show = [k for k in self.required_fields if k not in user_provided]
+            
+            response = result_md
+            
+            if missing_to_show:
+                response += "\n\n---\n\n"
+                response += "💭 **Want an even sharper analysis?** Drop me these details and I'll give you the full picture: "
+                field_names = {
+                    "address": "**exact location**",
+                    "age_years": "**property age**", 
+                    "last_service_years_ago": "**last maintenance date**",
+                    "seasonality": "**current season**"
+                }
+                response += ", ".join([f"{field_names.get(k, k.replace('_', ' '))}" for k in missing_to_show])
+                response += " and I'll re-run everything! 🎯"
+            
+            return {
+                "response": response,
+                "action": "show_estimate_with_result",
+                "fields": estimate_fields
+            }
+
+        # Find missing fields
+        missing = []
+        for k in self.required_fields:
+            v = merged_fields.get(k, None)
+            if k in ["age_years", "last_service_years_ago"]:
+                if v in (None, '', 0):
+                    missing.append(k)
+            else:  # address, seasonality
+                if v in (None, '', False, 'unknown', ''):
+                    missing.append(k)
+
+        # Enhanced single-value handling for maintenance prediction
+        if len(user_provided) == 1:
+            # Get the field that was provided
+            provided_field = user_provided[0]
+            provided_value = merged_fields.get(provided_field)
+            
+            # Create personalized acknowledgment
+            acknowledgments = {
+                "address": f"Perfect! I've got the property location: {provided_value}",
+                "age_years": f"Great! Property age of {provided_value} years noted",
+                "last_service_years_ago": f"Excellent! Last maintenance was {provided_value} years ago",
+                "seasonality": f"Good to know it's {provided_value}!"
+            }
+            
+            # Smart suggestion for the most important missing field
+            priority_order = ["age_years", "last_service_years_ago", "address", "seasonality"]
+            next_field = None
+            for field in priority_order:
+                if field not in user_provided and field in missing:
+                    next_field = field
+                    break
+            
+            acknowledgment = acknowledgments.get(provided_field, f"I've got the {provided_field.replace('_', ' ')}")
+            
+            if next_field:
+                field_prompts = {
+                    "address": "Where is the property located?",
+                    "age_years": "How old is the property (in years)?",
+                    "last_service_years_ago": "When was it last maintained (years ago)?",
+                    "seasonality": "What season are we in right now?"
+                }
+                
+                prompt = (
+                    f"✨ {acknowledgment}\n\n"
+                    f"Perfect! Just need **one more key detail** and I can predict maintenance needs: "
+                    f"**{field_prompts.get(next_field, next_field.replace('_', ' ').title())}**\n\n"
+                    f"Once you share that, I'll have everything I need to assess potential maintenance issues! 🔧"
+                )
+            else:
+                prompt = (
+                    f"✨ {acknowledgment}\n\n"
+                    f"That's helpful! Just need **one more detail** like **property age** or **last maintenance date** and I can start predicting! 🚀"
+                )
+            
+            return {
+                "response": prompt,
+                "action": "ask_for_one_more",
+                "fields": merged_fields
+            }
+
+        # If not enough info and not a direct request, ask for more with conversational flair
+        elif len(user_provided) < 1:
+            conversation_starters = [
+                "Alright, let's get this maintenance prediction party started! 🔧",
+                "Time to put on my detective hat and predict maintenance needs! 🕵️‍♂️",
+                "Let's dive into some maintenance prediction magic! ✨",
+                "Ready to uncover potential property issues before they become expensive problems? 🔍"
+            ]
+            import random
+            starter = random.choice(conversation_starters)
+            
+            prompt = (
+                f"{starter}\n\n"
+                "I'll need some key details about your property to work my predictive magic. "
+                "Just share at least **two** of these with me and I can get started:\n\n"
+            )
+            
+            field_descriptions = {
+                "address": "**Property Location** - Where is this property located?",
+                "age_years": "**Property Age** - How old is the building (in years)?",
+                "last_service_years_ago": "**Last Maintenance** - When was it last serviced or maintained?",
+                "seasonality": "**Current Season** - What season are we in right now?"
+            }
+            
+            for k in self.required_fields:
+                prompt += f"• {field_descriptions[k]}\n"
+            
+            prompt += "\nOnce you drop a couple of these details on me, I'll whip up a maintenance prediction for you! 🚀"
+            
+            return {
+                "response": prompt,
+                "action": "ask_for_info",
+                "fields": merged_fields
+            }
+
+        # If we have at least 2 fields, show estimated prediction with results
+        if len(user_provided) >= 2:
+            # Fill in missing fields with defaults for estimation
+            avg_defaults = {
+                "address": "London Area",
+                "age_years": 25,
+                "last_service_years_ago": 3,
+                "seasonality": "Winter"  # Will be auto-detected in get_smart_defaults
+            }
+            estimate_fields = dict(merged_fields)
+            
+            # Use smart defaults that consider provided context
+            smart_defaults = self.get_smart_defaults(merged_fields)
+            for k in missing:
+                estimate_fields[k] = smart_defaults.get(k, avg_defaults[k])
+
+            # Show the prediction result with more personality
+            result_md = self.run_model(estimate_fields)
+            
+            # Add missing fields note at the bottom with conversational touch
+            missing_to_show = [k for k in missing]
+            
+            response = result_md
+            
+            if missing_to_show:
+                response += "\n\n---\n\n"
+                response += "💭 **Want an even sharper analysis?** Drop me these details and I'll give you the full picture: "
+                field_names = {
+                    "address": "**exact location**",
+                    "age_years": "**property age**", 
+                    "last_service_years_ago": "**last maintenance date**",
+                    "seasonality": "**current season**"
+                }
+                response += ", ".join([f"{field_names.get(k, k.replace('_', ' '))}" for k in missing_to_show])
+                response += " and I'll re-run everything! 🎯"
+            
+            return {
+                "response": response,
+                "action": "show_estimate_with_result",
+                "fields": estimate_fields
+            }
+
+        # Fallback to LLM conversation
         messages = [
             {"role": "system", "content": self.system_prompt}
         ]
         for msg in conversation_history:
             messages.append({"role": msg["role"], "content": msg["content"]})
         messages.append({"role": "user", "content": user_message})
-        
+
         response = invoke_with_tracking(
             self.chat,
             [HumanMessage(content=m["content"]) for m in messages],
             "Maintenance Prediction - Conversation"
         )
         reply = response.content.strip()
+
+        # Remove any problematic phrases and replace with more conversational alternatives
+        replacements = {
+            "please wait": "hang tight",
+            "processing": "working on it",
+            "hold on": "give me a sec",
+            "one moment": "just a moment",
+            "I'll process": "I'll work on",
+            "wait a moment": "bear with me",
+            "it's important to exercise caution": "worth being careful here",
+            "you may wish to consider": "you might want to think about",
+            "you may want to explore": "might be worth looking into",
+            "Based on the information provided": "From what you've told me",
+            "Summary:": "Here's the deal:"
+        }
         
+        for old_phrase, new_phrase in replacements.items():
+            reply = reply.replace(old_phrase, new_phrase)
+            reply = reply.replace(old_phrase.capitalize(), new_phrase.capitalize())
+
         return {"response": reply, "action": "chat", "fields": merged_fields}
+
+    def needs_confirmation(self, user_message):
+        confirmation_keywords = [
+            "yes", "correct", "confirm", "ok", "okay", "proceed", "continue", "that's right",
+            "sounds good", "let's go", "do it", "sure", "absolutely", "yep", "yeah", 
+            "thumbs up", "green light", "go ahead", "let's roll", "perfect"
+        ]
+        return any(kw in user_message.lower().strip() for kw in confirmation_keywords)
 
 # --- Enhanced Intent Detection and Entity Recognition ---
 def detect_intent(user_message, conversation_history=None):
     """
-    Enhanced intent detection with better context awareness and no context dropping.
+    Enhanced intent detection using the new conversation intelligence system.
+    Falls back to basic keyword matching if enhanced system is unavailable.
     """
+    # PRIORITY: Strong maintenance keyword detection FIRST (before any AI/LLM processing)
+    user_message_lower = user_message.lower()
+    maintenance_keywords = [
+        'maintenance', 'maintice', 'maintnance', 'maintnence', 'maintanence', 'maintiance', 'maintince', 
+        'maintnce', 'maintence', 'maintainance', 'repair', 'fix', 'upkeep', 'service', 'broken', 'issue'
+    ]
+    predict_keywords = ['predict', 'prediction', 'check', 'see if', 'need to check', 'should we check', 'do we need', 'time to check']
+    property_keywords = ['flat', 'property', 'house', 'apartment', 'building', 'unit', 'place']
+    
+    # Check for maintenance + prediction patterns
+    has_maintenance = any(keyword in user_message_lower for keyword in maintenance_keywords)
+    has_predict = any(keyword in user_message_lower for keyword in predict_keywords)
+    has_property = any(keyword in user_message_lower for keyword in property_keywords)
+    
+    # Strong maintenance patterns that should ALWAYS be maintenance_prediction
+    maintenance_phrases = [
+        'check this flat for maintenance', 'check for maintenance', 'maintenance needed',
+        'last maintenance', 'maintenance done', 'maintenance check', 'need maintenance',
+        'see if we need to check', 'predict maintenance', 'maintenance prediction'
+    ]
+    
+    strong_maintenance_signal = any(phrase in user_message_lower for phrase in maintenance_phrases)
+    
+    if has_maintenance or strong_maintenance_signal or (has_predict and has_property and any(kw in user_message_lower for kw in maintenance_keywords)):
+        print(f"[DEBUG] PRIORITY detect_intent: Strong maintenance detection - has_maintenance: {has_maintenance}, strong_signal: {strong_maintenance_signal}")
+        return "maintenance_prediction"
+    
     try:
-        # Use enhanced conversation intelligence if available
+        # Use enhanced conversation intelligence
         conversation_ai = get_conversation_intelligence()
         analysis = conversation_ai.analyze_message(user_message, conversation_history)
         
@@ -1798,593 +2637,693 @@ def detect_intent(user_message, conversation_history=None):
         return intent_map.get(analysis.primary_intent.type, "clarify_intent")
         
     except Exception as e:
-        print(f"[WARNING] Enhanced intent detection failed, using improved fallback: {e}")
-        return improved_fallback_intent_detection(user_message, conversation_history)
-
-def improved_fallback_intent_detection(user_message, conversation_history=None):
-    """
-    Improved fallback intent detection with better context awareness.
-    """
-    msg = user_message.lower().strip()
-    
-    # Strong greeting indicators
-    greeting_patterns = [
-        "hello", "hi", "hey", "good morning", "good afternoon", "good evening",
-        "thanks", "thank you", "appreciate", "great", "awesome", "perfect"
-    ]
-    
-    # Strong intent indicators with context
-    rent_patterns = [
-        "rent", "rental price", "how much", "estimate", "pricing", "cost", 
-        "market rate", "charge", "monthly", "price prediction", "valuation"
-    ]
-    
-    tenant_patterns = [
-        "tenant", "screen", "applicant", "background", "credit", "income",
-        "references", "application", "qualify", "approve", "reject"
-    ]
-    
-    maintenance_patterns = [
-        "maintenance", "repair", "fix", "upkeep", "service", "predict",
-        "when will", "how long", "age", "last service", "risk", "inspection"
-    ]
-    
-    # Check for explicit intent switches
-    switch_patterns = [
-        "instead", "actually", "wait", "no", "different", "other",
-        "rent prediction", "tenant screening", "maintenance prediction"
-    ]
-    
-    # Context-aware detection
-    if any(pattern in msg for pattern in greeting_patterns) and len(msg.split()) <= 5:
-        return "greeting"
-    elif any(pattern in msg for pattern in switch_patterns):
-        # User wants to change intent - detect new intent
-        if any(pattern in msg for pattern in rent_patterns):
-            return "rent_prediction"
-        elif any(pattern in msg for pattern in tenant_patterns):
-            return "tenant_screening"
-        elif any(pattern in msg for pattern in maintenance_patterns):
-            return "maintenance_prediction"
-    elif any(pattern in msg for pattern in rent_patterns):
-        return "rent_prediction"
-    elif any(pattern in msg for pattern in tenant_patterns):
-        return "tenant_screening"
-    elif any(pattern in msg for pattern in maintenance_patterns):
-        return "maintenance_prediction"
-    
-    # Context from conversation history
-    if conversation_history:
-        recent_context = " ".join([m.get('content', '') for m in conversation_history[-3:]])
-        recent_context = recent_context.lower()
+        print(f"[WARNING] Enhanced intent detection failed, using fallback: {e}")
+        # Fallback to basic keyword matching with improved maintenance detection
+        msg = user_message.lower()
         
-        if any(pattern in recent_context for pattern in rent_patterns):
-            return "rent_prediction"
-        elif any(pattern in recent_context for pattern in tenant_patterns):
-            return "tenant_screening"
-        elif any(pattern in recent_context for pattern in maintenance_patterns):
+        # Strong maintenance patterns first
+        maintenance_keywords = [
+            'maintenance', 'maintice', 'maintnance', 'maintnence', 'maintanence', 'maintiance', 'maintince', 
+            'maintnce', 'maintence', 'maintainance', 'maintain', 'repair', 'fix', 'upkeep', 'service'
+        ]
+        maintenance_phrases = [
+            'check this flat for maintenance', 'check for maintenance', 'maintenance needed',
+            'last maintenance', 'maintenance done', 'maintenance check', 'need maintenance',
+            'see if we need to check', 'predict maintenance', 'maintenance prediction'
+        ]
+        
+        # Check for maintenance first (highest priority for disambiguation)
+        if any(phrase in msg for phrase in maintenance_phrases) or any(word in msg for word in maintenance_keywords):
             return "maintenance_prediction"
-    
-    return None
+        
+        # Then check other intents
+        if any(word in msg for word in ["hello", "hi", "hey", "good morning", "good afternoon", "thanks", "thank you"]):
+            return "greeting"
+        elif any(word in msg for word in ["rent", "price", "how much", "estimate"]) and "maintenance" not in msg:
+            return "rent_prediction"
+        elif any(word in msg for word in ["tenant", "screen", "applicant", "background", "credit", "income"]) and "maintenance" not in msg:
+            return "tenant_screening"
+        
+        # If no intent is detected, return None
+        return None
 
-# --- Enhanced LLM-based Intent Detection with Full Context ---
+# --- Enhanced LLM-based Intent Detection with Entity Recognition ---
 def llm_detect_intent(conversation_history, user_message):
     """
-    Enhanced LLM-based intent detection with full conversation context preservation.
+    Enhanced LLM-based intent detection with entity recognition and multi-intent support.
     """
+    # PRIORITY: Strong maintenance keyword detection FIRST (before any AI/LLM processing)
+    user_message_lower = user_message.lower()
+    maintenance_keywords = [
+        'maintenance', 'maintice', 'maintnance', 'maintnence', 'maintanence', 'maintiance', 'maintince', 
+        'maintnce', 'maintence', 'maintainance', 'repair', 'fix', 'upkeep', 'service', 'broken', 'issue'
+    ]
+    predict_keywords = ['predict', 'prediction', 'check', 'see if', 'need to check', 'should we check', 'do we need', 'time to check']
+    property_keywords = ['flat', 'property', 'house', 'apartment', 'building', 'unit', 'place']
+    
+    # Check for maintenance + prediction patterns
+    has_maintenance = any(keyword in user_message_lower for keyword in maintenance_keywords)
+    has_predict = any(keyword in user_message_lower for keyword in predict_keywords)
+    has_property = any(keyword in user_message_lower for keyword in property_keywords)
+    
+    # Strong maintenance patterns that should ALWAYS be maintenance_prediction
+    maintenance_phrases = [
+        'check this flat for maintenance', 'check for maintenance', 'maintenance needed',
+        'last maintenance', 'maintenance done', 'maintenance check', 'need maintenance',
+        'see if we need to check', 'predict maintenance', 'maintenance prediction'
+    ]
+    
+    strong_maintenance_signal = any(phrase in user_message_lower for phrase in maintenance_phrases)
+    
+    if has_maintenance or strong_maintenance_signal or (has_predict and has_property and any(kw in user_message_lower for kw in maintenance_keywords)):
+        print(f"[DEBUG] PRIORITY: Strong maintenance detection - has_maintenance: {has_maintenance}, strong_signal: {strong_maintenance_signal}")
+        print(f"[DEBUG] Maintenance keywords found: {[kw for kw in maintenance_keywords if kw in user_message_lower]}")
+        print(f"[DEBUG] Strong phrases found: {[phrase for phrase in maintenance_phrases if phrase in user_message_lower]}")
+        return "maintenance_prediction"
+    
     try:
         # Use the enhanced conversation intelligence system
         conversation_ai = get_conversation_intelligence()
         analysis = conversation_ai.analyze_message(user_message, conversation_history)
         
-        # Return comprehensive analysis
+        print(f"[DEBUG] Enhanced intent detection - Primary intent: {analysis.primary_intent.type.value}, Confidence: {analysis.confidence}")
+        
+        # Return comprehensive analysis instead of just intent
         return {
             'primary_intent': analysis.primary_intent.type.value,
             'confidence': analysis.confidence,
             'all_intents': [intent.type.value for intent in analysis.intents],
             'entities': [{'label': e.label, 'text': e.text, 'confidence': e.confidence} for e in analysis.entities],
             'requires_clarification': analysis.requires_clarification,
-            'clarification_message': analysis.clarification_message,
-            'context_preserved': True
+            'clarification_message': analysis.clarification_message
         }
         
     except Exception as e:
-        print(f"[WARNING] Enhanced LLM intent detection failed, using improved fallback: {e}")
-        return improved_llm_fallback(conversation_history, user_message)
-
-def improved_llm_fallback(conversation_history, user_message):
-    """
-    Improved LLM fallback with better context handling and no dropping.
-    """
-    from langchain_openai import ChatOpenAI
-    
-    try:
-        chat = ChatOpenAI(model="gpt-4", temperature=0.1, openai_api_key=openai_api_key)
+        print(f"[WARNING] Enhanced LLM intent detection failed, using fallback: {e}")
+        # Fallback to basic LLM detection
+        from langchain_openai import ChatOpenAI
+        chat = ChatOpenAI(model="gpt-4", temperature=0, openai_api_key=openai_api_key)
         
-        # Preserve ALL conversation context - no dropping
-        full_context = ""
-        if conversation_history:
-            full_context = "\n".join([f"{m['role']}: {m['content']}" for m in conversation_history])
+        # First, do a quick keyword-based check for maintenance prediction
+        user_message_lower = user_message.lower()
+        maintenance_keywords = [
+            'maintenance', 'maintice', 'maintnance', 'maintnence', 'maintanence', 'maintiance', 'maintince', 
+            'maintnce', 'maintence', 'maintainance', 'repair', 'fix', 'upkeep', 'service', 'broken', 'issue'
+        ]
+        predict_keywords = ['predict', 'prediction', 'check', 'see if', 'need to check', 'should we check', 'do we need', 'time to check']
+        property_keywords = ['flat', 'property', 'house', 'apartment', 'building', 'unit', 'place']
         
-        # Enhanced prompt with better instructions
-        enhanced_prompt = f"""You are LandlordBuddy's intent detection system. Analyze the ENTIRE conversation context to understand what the user wants.
-
-AVAILABLE INTENTS:
-- rent_prediction: User wants rent estimates, pricing, market rates, property valuation
-- tenant_screening: User wants to screen applicants, check backgrounds, approve/reject tenants
-- maintenance_prediction: User wants maintenance forecasts, repair predictions, service scheduling
-- greeting: User is greeting, thanking, or making small talk
-- clarify_intent: User's intent is unclear or they want to switch tasks
-
-RULES:
-1. Consider the FULL conversation context, not just the latest message
-2. Look for intent switches: "actually", "instead", "wait", "no", "different"
-3. If user provides property details, they likely want predictions
-4. If user mentions specific people/applicants, they likely want screening
-5. If user asks about repairs/age/service, they likely want maintenance prediction
-
-Full Conversation Context:
-{full_context}
-
-Current User Message: {user_message}
-
-Based on the ENTIRE context above, what is the user's intent? Respond with ONLY the intent keyword (rent_prediction, tenant_screening, maintenance_prediction, greeting, or clarify_intent)."""
-
-        response = invoke_with_tracking(
-            chat,
-            [HumanMessage(content=enhanced_prompt)],
-            "Enhanced Intent Detection - LLM Fallback"
+        # Check for maintenance + prediction patterns
+        has_maintenance = any(keyword in user_message_lower for keyword in maintenance_keywords)
+        has_predict = any(keyword in user_message_lower for keyword in predict_keywords)
+        has_property = any(keyword in user_message_lower for keyword in property_keywords)
+        
+        # Strong maintenance patterns
+        maintenance_phrases = [
+            'check this flat for maintenance', 'check for maintenance', 'maintenance needed',
+            'last maintenance', 'maintenance done', 'maintenance check', 'need maintenance',
+            'see if we need to check', 'predict maintenance', 'maintenance prediction'
+        ]
+        
+        strong_maintenance_signal = any(phrase in user_message_lower for phrase in maintenance_phrases)
+        
+        if has_maintenance or strong_maintenance_signal or (has_predict and has_property and 'maintenance' in user_message_lower):
+            print(f"[DEBUG] Fallback: Strong maintenance detection - has_maintenance: {has_maintenance}, strong_signal: {strong_maintenance_signal}, predict+property+maintenance: {has_predict and has_property}")
+            print(f"[DEBUG] Maintenance keywords found: {[kw for kw in maintenance_keywords if kw in user_message_lower]}")
+            print(f"[DEBUG] Strong phrases found: {[phrase for phrase in maintenance_phrases if phrase in user_message_lower]}")
+            return "maintenance_prediction"
+        
+        # Use last 4-5 messages for context
+        history = conversation_history[-5:] if len(conversation_history) > 5 else conversation_history
+        context = "\n".join([f"{m['role']}: {m['content']}" for m in history])
+        
+        # More sophisticated prompt that considers conversation context
+        prompt = (
+            "You are an expert assistant for landlords. "
+            "Given the following conversation, determine the user's current intent. "
+            "Pay attention to the conversation flow - if the user is already in a tenant screening conversation and providing information like rent/income amounts, they are likely CONTINUING tenant screening, not starting rent prediction.\n"
+            "Similarly, if they're in a rent prediction conversation and providing property details, they're continuing rent prediction.\n\n"
+            "Available intents:\n"
+            "- 'tenant_screening': User wants to screen a tenant or is providing tenant information (credit score, income, employment, eviction history)\n"
+            "- 'rent_prediction': User wants to estimate rent for a property or is providing property details (address, bedrooms, bathrooms, size, property type)\n"
+            "- 'maintenance_prediction': User wants to predict maintenance needs, check if maintenance is needed, or asking about repairs/upkeep. Keywords include: maintenance, repair, fix, upkeep, service, broken, issue, predict maintenance, check maintenance, need maintenance, maintice, maintnance (misspellings). IMPORTANT: phrases like 'see if we need to check this flat for maintenance' or 'check for maintenance' are ALWAYS maintenance_prediction.\n"
+            "- 'greeting': User is greeting or starting conversation\n"
+            "- 'other': Anything else\n\n"
+            "CRITICAL RULES:\n"
+            "1. ANY message containing 'maintenance' (including misspellings like 'maintice') should be classified as 'maintenance_prediction'\n"
+            "2. Phrases like 'see if we need to check...for maintenance' are ALWAYS 'maintenance_prediction'\n"
+            "3. 'check this flat for maintenance' is ALWAYS 'maintenance_prediction'\n"
+            "4. If the conversation shows the user is already engaged in tenant screening and they provide rent/income information, classify as 'tenant_screening' (they're providing data for the screening).\n"
+            "5. Only classify as 'rent_prediction' if they explicitly ask for rent estimation or start providing property details for rent estimation.\n\n"
+            f"Conversation context:\n{context}\n\nCurrent user message: {user_message}\n\n"
+            "Based on the context and current message, what is the user's intent? Respond with only the intent keyword."
         )
         
+        response = invoke_with_tracking(
+            chat,
+            [HumanMessage(content=prompt)],
+            "Intent Detection - Fallback"
+        )
         intent = response.content.strip().lower()
         
-        # Map variations to standard intents
-        intent_mapping = {
-            'rent': 'rent_prediction',
-            'rental': 'rent_prediction',
-            'price': 'rent_prediction',
-            'pricing': 'rent_prediction',
-            'tenant': 'tenant_screening',
-            'screening': 'tenant_screening',
-            'applicant': 'tenant_screening',
-            'maintenance': 'maintenance_prediction',
-            'repair': 'maintenance_prediction',
-            'service': 'maintenance_prediction',
-            'hello': 'greeting',
-            'hi': 'greeting',
-            'thank': 'greeting'
-        }
+        print(f"[DEBUG] Fallback LLM intent response: '{intent}'")
         
-        # Check for partial matches
-        for key, mapped_intent in intent_mapping.items():
-            if key in intent:
-                return {
-                    'primary_intent': mapped_intent,
-                    'confidence': 0.85,
-                    'context_preserved': True,
-                    'method': 'llm_fallback'
-                }
+        # Map response to our intent system
+        if "greeting" in intent or "hello" in intent or "hi" in intent:
+            return "greeting"
+        elif "tenant_screening" in intent or "tenant" in intent or "screen" in intent:
+            return "tenant_screening"
+        elif "rent_prediction" in intent or "rent" in intent:
+            return "rent_prediction"  
+        elif "maintenance" in intent or "repair" in intent or "predict" in intent or "maintice" in intent or "maintnance" in intent:
+            return "maintenance_prediction"
         
-        # Direct intent matches
-        valid_intents = ['rent_prediction', 'tenant_screening', 'maintenance_prediction', 'greeting', 'clarify_intent']
-        if intent in valid_intents:
-            return {
-                'primary_intent': intent,
-                'confidence': 0.9,
-                'context_preserved': True,
-                'method': 'llm_fallback'
-            }
-        
-        return {
-            'primary_intent': 'clarify_intent',
-            'confidence': 0.6,
-            'context_preserved': True,
-            'method': 'llm_fallback_uncertain'
-        }
-        
-    except Exception as e:
-        print(f"[ERROR] LLM fallback failed: {e}")
-        # Last resort - keyword detection with context
-        return {
-            'primary_intent': improved_fallback_intent_detection(user_message, conversation_history) or 'clarify_intent',
-            'confidence': 0.7,
-            'context_preserved': True,
-            'method': 'keyword_fallback'
-        }
+        print(f"[DEBUG] No intent match found for: '{intent}', returning None")
+        return None
 
-# --- Enhanced Intent Switch Detection ---
-def user_requests_intent_switch(user_message, conversation_history=None):
-    """
-    Enhanced detection of intent switching with context awareness.
-    """
-    msg = user_message.lower().strip()
+# --- Explicit Intent Switch Detection ---
+def user_requests_intent_switch(user_message):
+    msg = user_message.lower()
+    print(f"[DEBUG] user_requests_intent_switch called with: '{user_message}'")
     
-    # Strong switch indicators
-    strong_switch_phrases = [
-        "forget it", "never mind", "actually", "instead", "wait", "no",
-        "different", "other", "wrong", "not what i meant", "change",
-        "switch to", "let's do", "i want to do"
+    # Explicit switch phrases
+    explicit_switch_phrases = [
+        "forget it", "let's do", "i want to do", "switch to", "change to", "do rent instead", 
+        "do tenant instead", "do maintenance instead", "not this", "wrong task", 
+        "that's not what i meant", "i want rent", "i want tenant", "i want maintenance"
     ]
     
-    # Explicit intent mentions
-    explicit_intents = [
-        "rent prediction", "tenant screening", "maintenance prediction",
-        "rent pricing", "tenant check", "maintenance forecast",
-        "do rent", "do tenant", "do maintenance",
-        "help with rent", "help with tenant", "help with maintenance"
+    # Action request phrases that indicate new intent
+    action_request_phrases = [
+        # Maintenance prediction action requests
+        "see if we need", "check if", "predict if", "do we need", "should we", 
+        "maintenance prediction", "predict maintenance", "check maintenance",
+        "need to check", "time to check", "maintenance check",
+        # Rent prediction action requests  
+        "estimate rent", "predict rent", "rent prediction", "how much rent", "property value",
+        "what's the rent", "rent estimate", "price estimate",
+        # Tenant screening action requests
+        "screen tenant", "tenant screening", "check tenant", "approve tenant",
+        "screen this tenant", "evaluate tenant", "assess tenant", "do tenant screening",
+        "can you screen", "screening for", "background check"
     ]
     
-    # Context-aware switching
-    has_switch_indicator = any(phrase in msg for phrase in strong_switch_phrases)
-    has_explicit_intent = any(intent in msg for intent in explicit_intents)
+    # Enhanced tenant information patterns - detect when someone is providing tenant details
+    tenant_info_patterns = [
+        # Personal info patterns
+        r'\b[A-Z][a-z]+\b.*\b(works? at|employed at|job at|earning|makes?|income|salary)',  # "Johnson works at..."
+        r'\b(he|she|they)\s+(works?|earn|make|has)\b',  # "she works", "he earns"
+        r'\b(earning|makes?|income|salary).*(\d+.*year|annually|per year)',  # Income patterns
+        r'\b(rented for|tenant for|living at).*\d+.*year',  # Rental history
+        r'\b(agreed to|consented to|willing to).*scan',  # Agreement to screening
+        # Employment patterns
+        r'\b(works? at|employed at|position at|job at)\s+[A-Z]',  # Works at [Company]
+        r'\b(bank|company|firm|corporation|ltd|limited|inc)\b',  # Company indicators
+        # Financial patterns
+        r'€\d+|£\d+|\$\d+.*\b(year|annual|month)',  # Currency with time period
+        r'\b\d+k?\s*(year|annual|month|per year|annually)',  # Salary patterns
+        # Address patterns
+        r'\b\d+\s+[A-Z][a-z]+\s+(Street|Road|Avenue|Lane|Place|Close),?\s*[A-Z]+\d+',  # Address with postcode
+    ]
     
-    # Check if user is providing new information that suggests different intent
-    if conversation_history:
-        last_assistant_msg = next((m for m in reversed(conversation_history) if m['role'] == 'assistant'), None)
-        if last_assistant_msg:
-            last_content = last_assistant_msg.get('content', '').lower()
-            
-            # If assistant was asking for rent info but user mentions tenant/maintenance
-            if 'rent' in last_content and ('tenant' in msg or 'applicant' in msg):
-                return True
-            elif 'tenant' in last_content and ('rent' in msg or 'price' in msg):
-                return True
-            elif 'maintenance' in last_content and ('rent' in msg or 'tenant' in msg):
-                return True
+    # Check for tenant information patterns
+    import re
+    has_tenant_info = any(re.search(pattern, user_message) for pattern in tenant_info_patterns)
     
-    return has_switch_indicator or has_explicit_intent
+    # Tenant screening keywords
+    tenant_keywords = [
+        "screen", "screening", "tenant", "applicant", "candidate", "renter",
+        "background", "credit", "income", "salary", "employment", "job", "work",
+        "eviction", "rental history", "reference", "check"
+    ]
+    
+    # Company/employment indicators
+    employment_indicators = [
+        "works at", "employed at", "job at", "position at", "bank", "company", 
+        "firm", "corporation", "ltd", "limited", "inc", "plc"
+    ]
+    
+    # Check for maintenance-specific patterns
+    maintenance_patterns = [
+        "maintenance", "maintice", "maintnance", "maintnence", "maintanence", "maintiance", "maintince", 
+        "maintnce", "maintence", "maintainance", "maintain", "repair", "fix", "upkeep", "service"
+    ]
+    action_words = ["see", "check", "predict", "do", "need", "should", "time", "assess", "evaluate"]
+    property_words = ["flat", "property", "house", "apartment", "building", "unit", "place"]
+    
+    # Strong maintenance request patterns
+    maintenance_request_patterns = [
+        "check this flat for maintenance", "check for maintenance", "maintenance needed",
+        "last maintenance", "maintenance done", "maintenance check", "need maintenance",
+        "see if we need to check", "predict maintenance", "maintenance prediction",
+        "do we need maintenance", "should we check", "time for maintenance"
+    ]
+    
+    # PRIORITY 1: Strong maintenance requests (highest priority)
+    if any(pattern in msg for pattern in maintenance_request_patterns):
+        print(f"[DEBUG] Strong maintenance request detected")
+        return True
+    
+    # PRIORITY 2: Tenant information detected (high priority for screening)
+    if has_tenant_info:
+        print(f"[DEBUG] Tenant information patterns detected")
+        return True
+    
+    # PRIORITY 3: Employment + income information suggests tenant screening
+    has_employment = any(indicator in msg for indicator in employment_indicators)
+    has_income = any(word in msg for word in ["earning", "makes", "income", "salary", "€", "£", "$"])
+    if has_employment and has_income:
+        print(f"[DEBUG] Employment + income detected, likely tenant screening")
+        return True
+    
+    # PRIORITY 4: Multiple tenant screening keywords
+    tenant_keyword_count = sum(1 for keyword in tenant_keywords if keyword in msg)
+    if tenant_keyword_count >= 2:
+        print(f"[DEBUG] Multiple tenant keywords detected: {tenant_keyword_count}")
+        return True
+    
+    # PRIORITY 5: Maintenance patterns
+    has_maintenance = any(pattern in msg for pattern in maintenance_patterns)
+    has_action = any(action in msg for action in action_words)
+    has_property = any(prop in msg for prop in property_words)
+    
+    if has_maintenance and has_action:
+        print(f"[DEBUG] Maintenance + action pattern detected")
+        return True
+    
+    # Special case: "see if we need to check" + property context is almost always maintenance
+    if ("see if" in msg and "check" in msg and has_property) or ("do we need" in msg and has_property):
+        print(f"[DEBUG] Special maintenance case detected: see if + check + property OR do we need + property")
+        return True
+    
+    # Check explicit and action request phrases
+    explicit_match = any(phrase in msg for phrase in explicit_switch_phrases)
+    action_match = any(phrase in msg for phrase in action_request_phrases)
+    
+    print(f"[DEBUG] Explicit match: {explicit_match}, Action match: {action_match}")
+    print(f"[DEBUG] Has maintenance: {has_maintenance}, Has action: {has_action}, Has property: {has_property}")
+    print(f"[DEBUG] Has tenant info: {has_tenant_info}, Has employment: {has_employment}, Has income: {has_income}")
+    
+    result = explicit_match or action_match
+    print(f"[DEBUG] user_requests_intent_switch returning: {result}")
+    return result
 
-# --- Context-Preserving Conversational Engine ---
+def is_providing_information(user_message, current_intent):
+    """
+    Check if the user is providing information for the current intent rather than switching
+    """
+    if not current_intent:
+        return False
+        
+    msg = user_message.lower()
+    
+    # First, check for clear intent switching patterns that override any information detection
+    intent_switch_patterns = [
+        # Maintenance prediction requests
+        "maintenance", "maintice", "maintnance", "repair", "fix", "upkeep", "service", "broken", "issue",
+        "predict maintenance", "check maintenance", "need maintenance", "maintenance prediction",
+        # Rent prediction requests
+        "estimate rent", "predict rent", "rent prediction", "how much rent", "property value",
+        # Tenant screening requests (when coming from other intents)
+        "screen tenant", "tenant screening", "check tenant", "approve tenant"
+    ]
+    
+    # If message contains intent switching patterns, it's NOT providing info for current intent
+    if any(pattern in msg for pattern in intent_switch_patterns):
+        print(f"[DEBUG] Intent switch detected: '{user_message}' contains switching patterns")
+        return False
+    
+    # More specific patterns based on intent
+    if current_intent == "tenant_screening":
+        # Tenant screening specific information patterns
+        tenant_info_patterns = [
+            # Credit/Financial info
+            "credit score", "score is", "score of", "credit is",
+            "income is", "income of", "monthly income", "earns", "makes",
+            # Employment info  
+            "employed", "unemployed", "job", "work", "self-employed",
+            # Rent info (but only when not asking for rent estimation)
+            "rent is", "rent of", "paying", "monthly rent",
+            # Eviction info
+            "eviction", "evicted", "no eviction", "never evicted"
+        ]
+        
+        # Check for tenant screening information patterns
+        return any(pattern in msg for pattern in tenant_info_patterns)
+                
+    elif current_intent == "rent_prediction":
+        # Rent prediction specific information patterns
+        rent_info_patterns = [
+            "bedroom", "bathroom", "size", "sq ft", "square feet",
+            "address is", "located", "postcode", "flat", "house", 
+            "apartment", "property type", "it's a"
+        ]
+        
+        if any(pattern in msg for pattern in rent_info_patterns):
+            new_request_patterns = [
+                "can you", "could you", "i want", "i need", "help me",
+                "screen tenant", "tenant screening", "check tenant",
+                "maintenance", "repair"
+            ]
+            if not any(pattern in msg for pattern in new_request_patterns):
+                return True
+    
+    return False
+
+# --- Enhanced Conversational Engine with Milvus and Advanced Intelligence ---
 def enhanced_conversational_engine(conversation_history, user_message, last_candidate_fields=None, 
                                  last_intent=None, intent_completed=False, session_id=None, user_id=None):
     """
-    Enhanced modular conversational engine with complete context preservation.
+    Enhanced modular conversational engine for LandlordBuddy.
+    Uses Milvus for memory and advanced NER/intent detection.
     """
     try:
-        # Initialize services with error handling
-        milvus_store = None
-        conversation_ai = None
+        # Initialize services
+        milvus_store = get_milvus_store()
+        conversation_ai = get_conversation_intelligence()
         
-        try:
-            milvus_store = get_milvus_store()
-            conversation_ai = get_conversation_intelligence()
-        except Exception as e:
-            print(f"[WARNING] Could not initialize advanced services: {e}")
+        # Store user message in Milvus
+        if session_id and user_id:
+            milvus_store.store_chat_message(
+                session_id=session_id,
+                user_id=user_id,
+                message_type="user",
+                content=user_message,
+                intent="",  # Will be filled after detection
+                entities={}
+            )
         
-        # Preserve full conversation history - NO DROPPING
-        full_history = conversation_history.copy() if conversation_history else []
-        
-        # Store user message in Milvus if available
-        if milvus_store and session_id and user_id:
-            try:
-                milvus_store.store_chat_message(
-                    session_id=session_id,
-                    user_id=user_id,
-                    message_type="user",
-                    content=user_message,
-                    intent="",  # Will be filled after detection
-                    entities={}
-                )
-            except Exception as e:
-                print(f"[WARNING] Could not store in Milvus: {e}")
-        
-        # Get relevant conversation memory without dropping current context
+        # Get relevant conversation memory
         relevant_memory = []
-        if milvus_store and session_id:
-            try:
-                relevant_memory = milvus_store.retrieve_chat_memory(
-                    session_id=session_id,
-                    query_text=user_message,
-                    limit=10  # Increased for better context
-                )
-            except Exception as e:
-                print(f"[WARNING] Could not retrieve from Milvus: {e}")
+        if session_id:
+            relevant_memory = milvus_store.retrieve_chat_memory(
+                session_id=session_id,
+                query_text=user_message,
+                limit=5
+            )
         
-        # Merge memory with current history (avoid duplicates but preserve order)
-        enhanced_history = full_history.copy()
-        for memory in reversed(relevant_memory):  # Add oldest first
-            memory_content = memory.get("content", "")
-            # Only add if not already in recent history
-            if not any(msg.get("content", "") == memory_content for msg in enhanced_history[-5:]):
+        # Enhance conversation history with memory
+        enhanced_history = conversation_history.copy() if conversation_history else []
+        for memory in relevant_memory:
+            if memory not in enhanced_history:  # Avoid duplicates
                 enhanced_history.insert(0, {
                     "role": memory["message_type"],
-                    "content": memory_content
+                    "content": memory["content"]
                 })
         
-        # Enhanced intent detection with full context
-        primary_intent = None
-        extracted_entities = {}
-        analysis_confidence = 0.8
+        # Analyze the message with advanced AI
+        analysis = conversation_ai.analyze_message(
+            user_message=user_message,
+            conversation_history=enhanced_history,
+            current_fields=last_candidate_fields,
+            session_id=session_id
+        )
         
-        if conversation_ai:
-            try:
-                analysis = conversation_ai.analyze_message(
-                    user_message=user_message,
-                    conversation_history=enhanced_history,
-                    current_fields=last_candidate_fields,
-                    session_id=session_id
-                )
-                primary_intent = analysis.primary_intent.type
-                extracted_entities = {entity.label: entity.normalized_value or entity.text 
-                                    for entity in analysis.entities}
-                analysis_confidence = analysis.confidence
-            except Exception as e:
-                print(f"[WARNING] AI analysis failed: {e}")
+        primary_intent = analysis.primary_intent.type
+        extracted_entities = {entity.label: entity.normalized_value or entity.text 
+                            for entity in analysis.entities}
         
-        # Fallback to enhanced LLM detection
-        if not primary_intent:
-            detection_result = llm_detect_intent(enhanced_history, user_message)
-            if isinstance(detection_result, dict):
-                primary_intent = detection_result.get('primary_intent')
-                analysis_confidence = detection_result.get('confidence', 0.8)
-            else:
-                primary_intent = detection_result
+        # Handle greeting intent
+        if primary_intent == IntentType.GREETING:
+            response = conversation_ai.handle_greeting()
+            result = {
+                "response": response,
+                "action": "greeting",
+                "fields": last_candidate_fields or {},
+                "last_intent": None,
+                "intent_completed": True
+            }
         
-        # Handle intent switching with full context awareness
-        if user_requests_intent_switch(user_message, enhanced_history):
-            # User wants to switch - detect new intent but preserve some context
-            new_intent_detection = llm_detect_intent(enhanced_history, user_message)
-            if isinstance(new_intent_detection, dict):
-                primary_intent = new_intent_detection.get('primary_intent')
-            else:
-                primary_intent = new_intent_detection
-            
-            # Reset fields when switching but preserve conversation history
-            last_candidate_fields = {}
-            intent_completed = False
-            last_intent = None
+        # Handle small talk intent
+        elif primary_intent == IntentType.SMALL_TALK:
+            response = conversation_ai.handle_small_talk(user_message)
+            result = {
+                "response": response,
+                "action": "small_talk",
+                "fields": last_candidate_fields or {},
+                "last_intent": None,
+                "intent_completed": True
+            }
         
-        # Continue with current intent if active and not switching
-        elif last_intent and not intent_completed and not user_requests_intent_switch(user_message, enhanced_history):
-            primary_intent = last_intent
+        # Handle clarification needed
+        elif analysis.requires_clarification:
+            result = {
+                "response": analysis.clarification_message,
+                "action": "clarify_intent",
+                "fields": last_candidate_fields or {},
+                "last_intent": None,
+                "intent_completed": True
+            }
         
-        # Handle different intents with enhanced context
-        result = None
+        # Handle multiple intents
+        elif len(analysis.intents) > 1 and all(i.confidence > 0.7 for i in analysis.intents[:2]):
+            # Multi-intent handling - ask user to choose
+            intent_names = [intent.type.value.replace('_', ' ').title() for intent in analysis.intents[:2]]
+            response = (f"I can see you're interested in multiple things: {' and '.join(intent_names)}. "
+                       f"Which would you like to start with first?")
+            result = {
+                "response": response,
+                "action": "clarify_intent",
+                "fields": last_candidate_fields or {},
+                "last_intent": None,
+                "intent_completed": True
+            }
         
-        if primary_intent == IntentType.GREETING or primary_intent == "greeting":
-            result = handle_enhanced_greeting(user_message, enhanced_history)
-        
-        elif primary_intent == IntentType.SMALL_TALK or primary_intent == "small_talk":
-            result = handle_enhanced_small_talk(user_message, enhanced_history)
-        
-        elif primary_intent == IntentType.RENT_PREDICTION or primary_intent == "rent_prediction":
+        # Handle specific intents
+        elif primary_intent == IntentType.RENT_PREDICTION:
             handler = RentPredictionHandler()
+            # Merge AI-extracted entities with existing fields
             merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
             merged_fields.update(extracted_entities)
             result = handler.handle(enhanced_history, user_message, merged_fields)
-            result["last_intent"] = "rent_prediction" if result.get("action") != "rent_prediction" else None
+            result["last_intent"] = "rent_prediction" if not result.get("action") == "rent_prediction" else None
             result["intent_completed"] = result.get("action") == "rent_prediction"
         
-        elif primary_intent == IntentType.TENANT_SCREENING or primary_intent == "tenant_screening":
+        elif primary_intent == IntentType.TENANT_SCREENING:
             handler = TenantScreeningHandler()
             merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
             merged_fields.update(extracted_entities)
             result = handler.handle(enhanced_history, user_message, merged_fields)
-            result["last_intent"] = "tenant_screening" if result.get("action") != "screen_tenant" else None
+            result["last_intent"] = "tenant_screening" if not result.get("action") == "screen_tenant" else None
             result["intent_completed"] = result.get("action") == "screen_tenant"
         
-        elif primary_intent == IntentType.MAINTENANCE_PREDICTION or primary_intent == "maintenance_prediction":
+        elif primary_intent == IntentType.MAINTENANCE_PREDICTION:
             handler = MaintenancePredictionHandler()
             merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
             merged_fields.update(extracted_entities)
             result = handler.handle(enhanced_history, user_message, merged_fields)
-            result["last_intent"] = "maintenance_prediction" if result.get("action") != "maintenance_prediction" else None
+            result["last_intent"] = "maintenance_prediction" if not result.get("action") == "maintenance_prediction" else None
             result["intent_completed"] = result.get("action") == "maintenance_prediction"
         
-        # Handle unclear or multiple intents
+        # Handle continuation of previous intent
+        elif last_intent and not intent_completed:
+            if last_intent == "rent_prediction":
+                handler = RentPredictionHandler()
+                merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+                merged_fields.update(extracted_entities)
+                result = handler.handle(enhanced_history, user_message, merged_fields)
+                result["last_intent"] = last_intent if not result.get("action") == "rent_prediction" else None
+                result["intent_completed"] = result.get("action") == "rent_prediction"
+            elif last_intent == "tenant_screening":
+                handler = TenantScreeningHandler()
+                merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+                merged_fields.update(extracted_entities)
+                result = handler.handle(enhanced_history, user_message, merged_fields)
+                result["last_intent"] = last_intent if not result.get("action") == "screen_tenant" else None
+                result["intent_completed"] = result.get("action") == "screen_tenant"
+            elif last_intent == "maintenance_prediction":
+                handler = MaintenancePredictionHandler()
+                merged_fields = dict(last_candidate_fields) if last_candidate_fields else {}
+                merged_fields.update(extracted_entities)
+                result = handler.handle(enhanced_history, user_message, merged_fields)
+                result["last_intent"] = last_intent if not result.get("action") == "maintenance_prediction" else None
+                result["intent_completed"] = result.get("action") == "maintenance_prediction"
+            else:
+                result = {
+                    "response": "I'm not sure how to continue. What would you like me to help you with?",
+                    "action": "clarify_intent",
+                    "fields": {},
+                    "last_intent": None,
+                    "intent_completed": True
+                }
+        
+        # Unknown or unsupported intent
         else:
-            result = handle_unclear_intent(user_message, enhanced_history, analysis_confidence)
+            result = {
+                "response": (
+                    "I'm sorry, I couldn't clearly understand your request. "
+                    "You may be using different wording or asking for something else.\n\n"
+                    "Here are the tasks I can help you with:\n"
+                    "- **Rent Prediction**: Estimate the rent for your property.\n"
+                    "- **Tenant Screening**: Assess a tenant's suitability.\n"
+                    "- **Maintenance Prediction**: Predict potential maintenance needs.\n\n"
+                    "Please specify which of these you'd like help with, and provide any relevant details."
+                ),
+                "action": "clarify_intent",
+                "fields": {},
+                "last_intent": None,
+                "intent_completed": True
+            }
         
-        # Store assistant response in Milvus if available
-        if milvus_store and session_id and user_id and result:
-            try:
-                milvus_store.store_chat_message(
-                    session_id=session_id,
-                    user_id=user_id,
-                    message_type="assistant",
-                    content=result.get("response", ""),
-                    intent=str(primary_intent) if primary_intent else "",
-                    entities=extracted_entities
-                )
-            except Exception as e:
-                print(f"[WARNING] Could not store assistant response: {e}")
+        # Store assistant response in Milvus
+        if session_id and user_id:
+            milvus_store.store_chat_message(
+                session_id=session_id,
+                user_id=user_id,
+                message_type="assistant",
+                content=result["response"],
+                intent=primary_intent.value if primary_intent else "",
+                entities=extracted_entities
+            )
         
-        # Add metadata about context preservation
-        if result:
-            result["context_preserved"] = True
-            result["history_length"] = len(enhanced_history)
-            result["confidence"] = analysis_confidence
-        
-        return result or handle_fallback_response()
+        return result
         
     except Exception as e:
-        print(f"[ERROR] Enhanced engine failed: {e}")
-        # Fallback to improved original engine
-        return improved_conversational_engine(conversation_history, user_message, last_candidate_fields, 
-                                            last_intent, intent_completed)
+        # Fallback to original engine if enhanced version fails
+        print(f"[WARNING] Enhanced engine failed, falling back to original: {e}")
+        return conversational_engine(conversation_history, user_message, last_candidate_fields, 
+                                   last_intent, intent_completed)
 
-def handle_enhanced_greeting(user_message, conversation_history):
-    """Enhanced greeting handler with context awareness."""
-    user_greeting = user_message.lower()
-    
-    # Check conversation context for personalization
-    context_info = ""
-    if conversation_history:
-        recent_topics = []
-        for msg in conversation_history[-5:]:
-            content = msg.get('content', '').lower()
-            if 'rent' in content:
-                recent_topics.append('rent')
-            elif 'tenant' in content:
-                recent_topics.append('tenant')
-            elif 'maintenance' in content:
-                recent_topics.append('maintenance')
-        
-        if recent_topics:
-            context_info = f" Ready to continue with {', '.join(set(recent_topics))} or explore something new?"
-
-    if "morning" in user_greeting:
-        response_text = f"🌅 Good morning! I'm LandlordBuddy, your AI property management assistant.{context_info}"
-    elif "evening" in user_greeting or "night" in user_greeting:
-        response_text = f"🌙 Good evening! LandlordBuddy here to help with your property needs.{context_info}"
-    elif any(word in user_greeting for word in ["thanks", "thank you", "appreciate"]):
-        response_text = "You're very welcome! 😊 Happy to help with your property management needs. What can I assist you with next?"
-    elif "hi" in user_greeting or "hello" in user_greeting:
-        response_text = f"👋 Hey there! I'm LandlordBuddy, your AI property partner.{context_info}"
-    else:
-        response_text = f"✨ Welcome! I'm LandlordBuddy, here to make property management easier.{context_info}"
-
-    return {
-        "response": response_text,
-        "action": "greeting",
-        "fields": {},
-        "last_intent": None,
-        "intent_completed": True
-    }
-
-def handle_enhanced_small_talk(user_message, conversation_history):
-    """Enhanced small talk handler."""
-    responses = [
-        "I appreciate the conversation! How can I help you with your property management today?",
-        "Thanks for sharing! What property task can I assist you with?",
-        "That's interesting! Let's see how I can help with your rental business.",
-        "I'm here to help with your property needs. What would you like to work on?"
-    ]
-    
-    import random
-    response = random.choice(responses)
-    
-    return {
-        "response": response,
-        "action": "small_talk",
-        "fields": {},
-        "last_intent": None,
-        "intent_completed": True
-    }
-
-def handle_unclear_intent(user_message, conversation_history, confidence):
-    """Handle unclear or low-confidence intents with context."""
-    
-    # Analyze context for hints
-    context_hints = []
-    if conversation_history:
-        recent_content = " ".join([m.get('content', '') for m in conversation_history[-3:]])
-        if 'rent' in recent_content.lower():
-            context_hints.append('rent prediction')
-        if 'tenant' in recent_content.lower():
-            context_hints.append('tenant screening')  
-        if 'maintenance' in recent_content.lower():
-            context_hints.append('maintenance prediction')
-    
-    base_message = "I want to help you, but I'm not quite sure what you're looking for. "
-    
-    if context_hints:
-        base_message += f"Based on our conversation, you might want help with {', '.join(context_hints)}. "
-    
-    base_message += (
-        "\n\n**Here's what I can help you with:**\n"
-        "🏠 **Rent Prediction** - Estimate market rent for your property\n"
-        "👥 **Tenant Screening** - Evaluate potential tenants\n" 
-        "🔧 **Maintenance Prediction** - Forecast maintenance needs\n\n"
-        "Just let me know which one interests you, or describe what you need help with!"
-    )
-    
-    return {
-        "response": base_message,
-        "action": "clarify_intent", 
-        "fields": {},
-        "last_intent": None,
-        "intent_completed": True
-    }
-
-def handle_fallback_response():
-    """Final fallback response."""
-    return {
-        "response": (
-            "I'm having trouble processing your request right now. "
-            "Could you please tell me specifically if you need help with:\n"
-            "- Rent pricing\n- Tenant screening\n- Maintenance predictions\n\n"
-            "I'm here to help once I understand what you're looking for!"
-        ),
-        "action": "error_fallback",
-        "fields": {},
-        "last_intent": None,
-        "intent_completed": True
-    }
-
-# --- Improved Original Engine (Enhanced Fallback) ---
-def improved_conversational_engine(conversation_history, user_message, last_candidate_fields=None, 
-                                 last_intent=None, intent_completed=False):
+# --- Original Conversational Engine (Fallback) ---
+def conversational_engine(conversation_history, user_message, last_candidate_fields=None, last_intent=None, intent_completed=False):
     """
-    Improved version of the original conversational engine with better context handling.
+    Modular conversational engine for LandlordBuddy.
+    Routes to the correct module handler based on detected intent.
     """
-    # Preserve full conversation history
-    full_history = conversation_history.copy() if conversation_history else []
+    # Add call counter for cost tracking
+    if not hasattr(conversational_engine, 'call_count'):
+        conversational_engine.call_count = 0
+    conversational_engine.call_count += 1
     
-    # Enhanced intent switching detection
-    if user_requests_intent_switch(user_message, full_history):
-        detected_intent = llm_detect_intent(full_history, user_message)
+    # Print cost summary every 10 calls
+    if conversational_engine.call_count % 10 == 0:
+        print(f"\n[COST SUMMARY] After {conversational_engine.call_count} calls:")
+        summary = get_session_summary()
+        print(f"Total API calls: {summary['total_calls']}")
+        print(f"Total cost: ${summary['total_cost']:.6f}")
+        print(f"Average cost per call: ${summary['avg_cost_per_call']:.6f}")
+    
+    # If user requests to switch/cancel, re-detect intent and reset fields
+    intent_switch_detected = user_requests_intent_switch(user_message)
+    print(f"[DEBUG] Intent switch detected: {intent_switch_detected}")
+    
+    if intent_switch_detected:
+        detected_intent = llm_detect_intent(conversation_history, user_message)
+        print(f"[DEBUG] After intent switch, detected intent: {detected_intent}")
         if isinstance(detected_intent, dict):
             intent = detected_intent.get('primary_intent')
         else:
             intent = detected_intent
         intent_completed = False
+        # Clear fields when switching intents
         last_candidate_fields = {}
     elif last_intent and not intent_completed:
-        intent = last_intent
+        # Check if user is providing information for current intent
+        if is_providing_information(user_message, last_intent):
+            # Continue with the current intent
+            intent = last_intent
+        else:
+            # User might be switching topics, re-detect intent
+            detected_intent = llm_detect_intent(conversation_history, user_message)
+            if isinstance(detected_intent, dict):
+                new_intent = detected_intent.get('primary_intent')
+            else:
+                new_intent = detected_intent
+            
+            # If it's the same intent, continue; if different, switch
+            if new_intent == last_intent:
+                intent = last_intent
+            else:
+                intent = new_intent
+                intent_completed = False
+                last_candidate_fields = {}
     else:
-        detected_intent = llm_detect_intent(full_history, user_message)
+        # No active intent or just completed, detect new intent
+        detected_intent = llm_detect_intent(conversation_history, user_message)
+        
+        # Handle case where llm_detect_intent returns a dict (enhanced) or string (fallback)
         if isinstance(detected_intent, dict):
             intent = detected_intent.get('primary_intent')
         else:
             intent = detected_intent
+            
         intent_completed = False
+        # Only clear fields when explicitly starting a completely new intent (not when continuing)
+        # If the detected intent is the same as last_intent, don't clear fields
         if intent != last_intent:
             last_candidate_fields = {}
 
-    # Handle intents with full context
+    confirmation_phrases = ["yes", "correct", "that's right", "yep", "confirmed", "go ahead", "proceed"]
+    is_confirmation = user_message.strip().lower() in confirmation_phrases
+
+    # Handle each intent
     if intent == "greeting":
-        return handle_enhanced_greeting(user_message, full_history)
-    
+        # Handle greeting with friendly response
+        return {
+            "response": (
+                "Hello! I'm LandlordBuddy, your AI assistant for property management. "
+                "I can help you with rent pricing, tenant screening, and maintenance predictions.\n\n"
+                "What would you like to do today?"
+            ),
+            "action": "greeting",
+            "fields": {},
+            "last_intent": None,
+            "intent_completed": True
+        }
     elif intent == "rent_prediction":
         handler = RentPredictionHandler()
+        # Filter fields to only rent prediction fields
         rent_fields = {}
         if last_candidate_fields:
             for field in handler.required_fields:
                 if field in last_candidate_fields:
                     rent_fields[field] = last_candidate_fields[field]
-        result = handler.handle(full_history, user_message, rent_fields)
-        if result.get("action") == "rent_prediction":
+        result = handler.handle(conversation_history, user_message, rent_fields)
+        # If model was run, mark intent as completed
+        if result.get("action") == "screen_tenant" or result.get("action") == "rent_prediction":
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
-    
     elif intent == "tenant_screening":
         handler = TenantScreeningHandler()
+        # Filter fields to only tenant screening fields
         tenant_fields = {}
         if last_candidate_fields:
             for field in handler.required_fields:
                 if field in last_candidate_fields:
                     tenant_fields[field] = last_candidate_fields[field]
-        result = handler.handle(full_history, user_message, tenant_fields)
+        result = handler.handle(conversation_history, user_message, tenant_fields)
         if result.get("action") == "screen_tenant":
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
-    
     elif intent == "maintenance_prediction":
         handler = MaintenancePredictionHandler()
+        # Filter fields to only maintenance prediction fields
         maintenance_fields = {}
         if last_candidate_fields:
             for field in handler.required_fields:
                 if field in last_candidate_fields:
                     maintenance_fields[field] = last_candidate_fields[field]
-        result = handler.handle(full_history, user_message, maintenance_fields)
-        if result.get("action") == "maintenance_prediction":
+        result = handler.handle(conversation_history, user_message, maintenance_fields)
+        if result.get("action") == "maintenance_prediction" or result.get("action") == "maintenance_alerts":
             intent_completed = True
         return {**result, "last_intent": intent if not intent_completed else None, "intent_completed": intent_completed}
-    
     else:
-        return handle_unclear_intent(user_message, full_history, 0.6)
-        
+        return {
+            "response": (
+                "I'm sorry, I couldn't clearly understand your request. "
+                "You may be using different wording or asking for something else.\n\n"
+                "Here are the tasks I can help you with:\n"
+                "- **Rent Prediction**: Estimate the rent for your property.\n"
+                "- **Tenant Screening**: Assess a tenant's suitability.\n"
+                "- **Maintenance Prediction**: Predict potential maintenance needs.\n\n"
+                "Please specify which of these you'd like help with, and provide any relevant details."
+            ),
+            "action": "clarify_intent",
+            "fields": {},
+            "last_intent": None,
+            "intent_completed": True
+        }
+
 def predict_rent(fields):
     """
     Simple wrapper for legacy compatibility: predicts rent given a dict of fields.
@@ -2527,8 +3466,8 @@ def handle_conversation(conversation_history, user_message, last_candidate_field
         )
     except Exception as e:
         print(f"[ERROR] Enhanced conversation handler failed: {e}")
-        # Fallback to improved original engine
-        return improved_conversational_engine(
+        # Fallback to original engine
+        return conversational_engine(
             conversation_history=conversation_history,
             user_message=user_message,
             last_candidate_fields=last_candidate_fields,
@@ -2569,7 +3508,7 @@ def test_enhanced_features():
             if analysis.entities:
                 print(f"📝 Extracted Entities:")
                 for entity in analysis.entities:
-                    print(f"   - • {entity.label}: {entity.text} (confidence: {entity.confidence:.2f})")
+                    print(f"   • {entity.label}: {entity.text} (confidence: {entity.confidence:.2f})")
             
             if len(analysis.intents) > 1:
                 other_intents = [f"{intent.type.value} ({intent.confidence:.2f})" 
@@ -2646,20 +3585,6 @@ def demo_greeting_intelligence():
         print(f"\n👤 User: {greeting}")
         result = handle_conversation([], greeting)
         print(f"🤖 Assistant: {result.get('response', 'No response')}")
-
-# --- Main Entry Point Function ---
-def conversational_engine(conversation_history, user_message, last_candidate_fields=None, last_intent=None, intent_completed=False):
-    """
-    Main entry point for the conversational engine - routes to the best available handler.
-    This is called by the Django consumer.
-    """
-    return handle_conversation(
-        conversation_history=conversation_history,
-        user_message=user_message,
-        last_candidate_fields=last_candidate_fields,
-        last_intent=last_intent,
-        intent_completed=intent_completed
-    )
 
 if __name__ == "__main__":
     test_enhanced_features()

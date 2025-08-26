@@ -1,0 +1,359 @@
+{
+  "search_metadata": {
+    "id": null,
+    "status": "success",
+    "created_at": "2023-05-20T06:37:48.000000Z",
+    "processed_at": "2023-05-20 06:40:10"
+  },
+  "search_parameters": {
+    "domain": "google.com",
+    "lang": "en",
+    "country": "US",
+    "location": "Abernathy,Texas,United States",
+    "q": "ChatGPT",
+    "device": "desktop",
+    "url": "https://www.google.com/search?q=ChatGPT&uule=w+CAIQICIdQWJlcm5hdGh5LFRleGFzLFVuaXRlZCBTdGF0ZXM=&hl=en&gl=US&num=20&ie=UTF-8&filter=0",
+    "page": "1",
+    "num": 20,
+    "ie": "UTF-8",
+    "filter": "0"
+  },
+  "results": {
+    "search_information": [
+      {
+        "total_results": "864,000,000",
+        "time_taken_displayed": "0.83"
+      }
+    ],
+    "organic": [
+      {
+        "position": 1,
+        "site_title": "OpenAI",
+        "title": "Introducing ChatGPT",
+        "link": "https://openai.com/blog/chatgpt",
+        "displayed_link": "https://openai.com › blog › chatgpt ",
+        "cached_page": "",
+        "snippet": "ChatGPT is a sibling model to InstructGPT, which is trained to follow an instruction in a prompt and provide a detailed response.",
+        "snippet_extension": [
+          "Nov 30, 2022"
+        ],
+        "sitelinks": {
+          "inline": [
+            {
+              "link": "https://openai.com/blog/chatgpt-plus",
+              "title": "ChatGPT Plus"
+            },
+            {
+              "link": "https://openai.com/blog/chatgpt-plugins",
+              "title": "ChatGPT plugins"
+            },
+            {
+              "link": "https://openai.com/blog/march-20-chatgpt-outage",
+              "title": "March 20 ChatGPT outage"
+            },
+            {
+              "link": "https://openai.com/search",
+              "title": "Search"
+            }
+          ]
+        }
+      },
+      {
+        "position": 2,
+        "site_title": "OpenAI",
+        "title": "OpenAI",
+        "link": "https://openai.com/",
+        "displayed_link": "https://openai.com",
+        "cached_page": "",
+        "snippet": "Introducing the ChatGPT app for iOS.",
+        "sitelinks": {
+          "inline": [
+            {
+              "link": "https://openai.com/about",
+              "title": "Company"
+            },
+            {
+              "link": "https://openai.com/research/overview",
+              "title": "Research"
+            },
+            {
+              "link": "https://openai.com/product",
+              "title": "Product"
+            },
+            {
+              "link": "https://platform.openai.com/overview",
+              "title": "Developers"
+            }
+          ]
+        }
+      },
+      {
+        "position": 3,
+        "site_title": "OpenAI",
+        "title": "GPT-4",
+        "link": "https://openai.com/product/gpt-4",
+        "displayed_link": "https://openai.com › product › gpt-4 ",
+        "cached_page": "",
+        "snippet": "GPT-4 surpasses ChatGPT in its advanced reasoning capabilities. ... GPT-4 outperforms ChatGPT by scoring in higher approximate percentiles ...",
+        "snippet_extension": [
+          "Mar 13, 2023"
+        ]
+      },
+      {
+        "position": 4,
+        "site_title": "Apple",
+        "title": "ChatGPT on the App Store - Apple",
+        "link": "https://apps.apple.com/us/app/chatgpt/id6448311069",
+        "displayed_link": "https://apps.apple.com › app › chatgpt ",
+        "cached_page": "",
+        "snippet": "The ChatGPT iOS App is an ingenious innovation that brings the power of AI right to your fingertips. It impeccably transforms the familiar user ...",
+        "snippet_extension": [
+          "1 day ago"
+        ],
+        "reviews": {
+          "rated": "719 reviews",
+          "rating": "Rating: 4.7"
+        }
+      },
+      {
+        "position": 5,
+        "site_title": "Wikipedia",
+        "title": "ChatGPT",
+        "link": "https://en.wikipedia.org/wiki/ChatGPT",
+        "displayed_link": "https://en.wikipedia.org › wiki › ChatGPT ",
+        "cached_page": "",
+        "snippet": "The \"Chat\" in the name is a reference to it being a chatbot, and the \"GPT\" stands for generative pre-trained transformer—a type of large language model (LLM)."
+      },
+      {
+        "position": 6,
+        "site_title": "OpenAI",
+        "title": "Chat OpenAI - ChatGPT",
+        "link": "https://chat.openai.com/auth/login",
+        "displayed_link": "https://chat.openai.com › auth › login ",
+        "cached_page": "",
+        "snippet": "No information is available for this page."
+      },
+      {
+        "position": 7,
+        "site_title": "ZDNet",
+        "title": "What is ChatGPT and why does it matter? Here's what you ...",
+        "link": "https://www.zdnet.com/article/what-is-chatgpt-and-why-does-it-matter-heres-everything-you-need-to-know/",
+        "displayed_link": "https://www.zdnet.com › ... › Artificial Intelligence ",
+        "cached_page": "",
+        "snippet": "ChatGPT is a natural language processing tool driven by AI technology that allows you to have human-like conversations and much more with the ...",
+        "snippet_extension": [
+          "Apr 18, 2023"
+        ]
+      },
+      {
+        "position": 8,
+        "site_title": "TechCrunch",
+        "title": "ChatGPT: Everything you need to know about the AI- ...",
+        "link": "https://techcrunch.com/2023/05/18/chatgpt-everything-you-need-to-know-about-the-ai-powered-chatbot/",
+        "displayed_link": "https://techcrunch.com › 2023/05/18 › chatgpt-everyt... ",
+        "cached_page": "",
+        "snippet": "ChatGPT is a general-purpose chatbot that uses artificial intelligence to generate text after a user enters a prompt, developed by tech startup ...",
+        "snippet_extension": [
+          "2 days ago"
+        ]
+      },
+      {
+        "position": 9,
+        "site_title": "The Verge",
+        "title": "OpenAI launches free ChatGPT app for iOS",
+        "link": "https://www.theverge.com/2023/5/18/23728703/openai-chatgpt-app-ios",
+        "displayed_link": "https://www.theverge.com › openai-chatgpt-app-ios ",
+        "cached_page": "",
+        "snippet": "OpenAI has launched an iOS app for ChatGPT, promising that an Android version is coming “soon.” The app is free to use, syncs chat history ...",
+        "snippet_extension": [
+          "2 days ago"
+        ]
+      },
+      {
+        "position": 10,
+        "site_title": "Digital Trends",
+        "title": "ChatGPT: How to use the AI tool that's changing everything",
+        "link": "https://www.digitaltrends.com/computing/how-to-use-openai-chatgpt-text-generation-chatbot/",
+        "displayed_link": "https://www.digitaltrends.com › Computing › Guides ",
+        "cached_page": "",
+        "snippet": "ChatGPT is a natural language AI chatbot. At its most basic level, that means you can ask it any question, and it will generate an answer.",
+        "snippet_extension": [
+          "11 hours ago"
+        ]
+      },
+      {
+        "position": 11,
+        "site_title": "OpenAI",
+        "title": "ChatGPT",
+        "link": "https://openai.com/product/chatgpt",
+        "displayed_link": "https://openai.com › product › chatgpt ",
+        "cached_page": "",
+        "snippet": "ChatGPT: get instant answers, find creative inspiration, and learn something new. Use ChatGPT for free today."
+      },
+      {
+        "position": 12,
+        "site_title": "OpenAI",
+        "title": "Introducing ChatGPT Plus",
+        "link": "https://openai.com/blog/chatgpt-plus",
+        "displayed_link": "https://openai.com › blog › chatgpt-plus ",
+        "cached_page": "",
+        "snippet": "Feb 1, 2023  —  We're launching a pilot subscription plan for ChatGPT, ...",
+        "snippet_extension": [
+          "Feb 1, 2023"
+        ]
+      },
+      {
+        "position": 13,
+        "site_title": "Washington Post",
+        "title": "ChatGPT has an official app now. You can even talk to it.",
+        "link": "https://www.washingtonpost.com/technology/2023/05/19/chatgpt-app-iphone-ipad/",
+        "displayed_link": "https://www.washingtonpost.com › 2023/05/19 › chat... ",
+        "cached_page": "",
+        "snippet": "What is ChatGPT? · ChatGPT has stunned users because it can generate fluid language, complete novels, computer code and poems. Chatbots are ...",
+        "snippet_extension": [
+          "8 hours ago"
+        ]
+      },
+      {
+        "position": 14,
+        "site_title": "Tom's Guide",
+        "title": "What is ChatGPT? Everything you need to know",
+        "link": "https://www.tomsguide.com/news/chatgpt",
+        "displayed_link": "https://www.tomsguide.com › News › Apps ",
+        "cached_page": "",
+        "snippet": "According to OpenAI, ChatGPT is, \"an artificial intelligence trained to assist with a variety of tasks.\" More specifically, though, it is a language model AI ..."
+      },
+      {
+        "position": 15,
+        "site_title": "The Atlantic",
+        "title": "ChatGPT Is Already Obsolete",
+        "link": "https://www.theatlantic.com/technology/archive/2023/05/ai-advancements-multimodal-models/674113/",
+        "displayed_link": "https://www.theatlantic.com › archive › 2023/05 › ai-a... ",
+        "cached_page": "",
+        "snippet": "ChatGPT is six months old, and it's already starting to look outdated. Enjoy a year of unlimited access to The Atlantic—including every story on ...",
+        "snippet_extension": [
+          "14 hours ago"
+        ]
+      },
+      {
+        "position": 16,
+        "site_title": "Wired",
+        "title": "I Finally Bought a ChatGPT Plus Subscription—and It's ...",
+        "link": "https://www.wired.com/story/chatgpt-plus-web-browsing-openai/",
+        "displayed_link": "https://www.wired.com › Gear › artificial intelligence ",
+        "cached_page": "",
+        "snippet": "Are you thinking about getting a ChatGPT Plus subscription to play with the web browsing beta? Here's how to enable the experimental feature and ...",
+        "snippet_extension": [
+          "20 hours ago"
+        ]
+      },
+      {
+        "position": 17,
+        "site_title": "The New York Times",
+        "title": "OpenAI Introduces ChatGPT App for the iPhone",
+        "link": "https://www.nytimes.com/2023/05/18/technology/openai-chatgpt-iphone.html",
+        "displayed_link": "https://www.nytimes.com › 2023/05/18 › technology › o... ",
+        "cached_page": "",
+        "snippet": "ChatGPT is the most prominent example of what is called generative A.I., technology that can generate text, images and other media based on ...",
+        "snippet_extension": [
+          "2 days ago"
+        ]
+      },
+      {
+        "position": 18,
+        "site_title": "OpenAI",
+        "title": "What is ChatGPT?",
+        "link": "https://help.openai.com/en/articles/6783457-what-is-chatgpt",
+        "displayed_link": "https://help.openai.com › 6783457-what-is-chatgpt ",
+        "cached_page": "",
+        "snippet": "ChatGPT is fine-tuned from GPT-3.5, a language model trained to produce text. ChatGPT was optimized for dialogue by using Reinforcement Learning with Human ..."
+      }
+    ],
+    "people_also_ask": [
+      {
+        "question": "Is ChatGPT available for free? ",
+        "answer": null
+      },
+      {
+        "question": "Is ChatGPT safe to use? ",
+        "answer": null
+      },
+      {
+        "question": "What is ChatGPT in simple terms? ",
+        "answer": null
+      },
+      {
+        "question": "Is ChatGPT available as an app? ",
+        "answer": null
+      },
+      {
+        "question": "What is ChatGPT? ",
+        "answer": null
+      },
+      {
+        "question": "How are people using ChatGPT? ",
+        "answer": null
+      }
+    ],
+    "knowledge_card": {
+      "title": "ChatGPT ",
+      "subtitle": "Software",
+      "image": "data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+      "description": "DescriptionChatGPT is an artificial intelligence chatbot developed by OpenAI and released in November 2022. The \"Chat\" in the name is a reference to it being a chatbot, and the \"GPT\" stands for generative pre-trained transformer—a type of large language model.   Wikipedia ",
+      "initial_release_date": "November 30, 2022",
+      "developers": "OpenAI",
+      "license": "Proprietary",
+      "stable_release": "May 12, 2023; 8 days ago",
+      "lab/title/Instructions": "Instructions how to chatgpt",
+      "lab/title/How it works": "How it works how chatgpt works",
+      "people_also_search": [
+        {
+          "position": 1,
+          "image": "data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+          "title": "GPT‑4"
+        },
+        {
+          "position": 2,
+          "image": "data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+          "title": "GPT‑3"
+        },
+        {
+          "position": 3,
+          "image": "data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+          "title": "Gmail"
+        },
+        {
+          "position": 4,
+          "image": "data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+          "title": "DALL‑E"
+        }
+      ]
+    },
+    "related_search": [
+      {
+        "title": "openai login",
+        "link": "https://www.google.com/search?num=20&hl=en&gl=US&q=OpenAI+login&sa=X&ved=2ahUKEwj2kpX3pIP_AhVxm2oFHaSoAGUQ1QJ6BAhqEAE"
+      },
+      {
+        "title": "chat openai",
+        "link": "https://www.google.com/search?num=20&hl=en&gl=US&q=Chat+OpenAI&sa=X&ved=2ahUKEwj2kpX3pIP_AhVxm2oFHaSoAGUQ1QJ6BAhrEAE"
+      },
+      {
+        "title": "chat.openai.com login",
+        "link": "https://www.google.com/search?num=20&hl=en&gl=US&q=chat.openai.com+login&sa=X&ved=2ahUKEwj2kpX3pIP_AhVxm2oFHaSoAGUQ1QJ6BAhsEAE"
+      },
+      {
+        "title": "openai free",
+        "link": "https://www.google.com/search?num=20&hl=en&gl=US&q=OpenAI+free&sa=X&ved=2ahUKEwj2kpX3pIP_AhVxm2oFHaSoAGUQ1QJ6BAhvEAE"
+      },
+      {
+        "title": "how to use chat gpt-4",
+        "link": "https://www.google.com/search?num=20&hl=en&gl=US&q=How+to+use+Chat+GPT-4&sa=X&ved=2ahUKEwj2kpX3pIP_AhVxm2oFHaSoAGUQ1QJ6BAhuEAE"
+      },
+      {
+        "title": "openai playground",
+        "link": "https://www.google.com/search?num=20&hl=en&gl=US&q=OpenAI+Playground&sa=X&ved=2ahUKEwj2kpX3pIP_AhVxm2oFHaSoAGUQ1QJ6BAhtEAE"
+      }
+    ]
+  }
+}

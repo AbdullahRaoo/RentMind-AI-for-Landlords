@@ -55,7 +55,7 @@ export default function Chatbot() {
     {
       sender: "bot",
       text: "Hi! I am your AI Assistant for Landlords. Ask me about rent esitmation, tenant screening, or check Property Maintaince Alerts!",
-      timestamp: undefined,
+      timestamp: null,
     },
   ])
   const [input, setInput] = useState("")

@@ -307,7 +307,7 @@ class MultiIntentDetector:
                 'screen', 'tenant', 'applicant', 'background', 'check', 'approve', 'credit'
             ],
             IntentType.MAINTENANCE_PREDICTION: [
-                'maintenance', 'repair', 'fix', 'upkeep', 'service', 'broken', 'issue'
+                'maintenance', 'maintice', 'maintnance', 'repair', 'fix', 'upkeep', 'service', 'broken', 'issue', 'predict', 'prediction', 'check'
             ],
             IntentType.GREETING: [
                 'hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'
@@ -472,6 +472,21 @@ class ContextAwareEntityLinker:
             'property_type': 6,
             'credit_score': 7,
             'income': 8
+        }
+        
+        # Field synonyms for entity linking
+        self.field_synonyms = {
+            'address': ['address', 'location', 'property address', 'where', 'place'],
+            'postcode': ['postcode', 'postal code', 'zip code', 'code', 'area code'],
+            'bedrooms': ['bedrooms', 'beds', 'bed', 'bedroom', 'br'],
+            'bathrooms': ['bathrooms', 'baths', 'bath', 'bathroom', 'washroom'],
+            'size': ['size', 'area', 'square feet', 'sq ft', 'sqft', 'footage'],
+            'property_type': ['type', 'property type', 'kind', 'category'],
+            'credit_score': ['credit score', 'score', 'credit rating', 'rating'],
+            'income': ['income', 'salary', 'earnings', 'monthly income', 'annual income'],
+            'rent': ['rent', 'rental', 'monthly rent', 'asking rent', 'price'],
+            'employment_status': ['employment', 'job', 'work', 'occupation', 'employed'],
+            'eviction_record': ['eviction', 'evicted', 'prior eviction', 'eviction history']
         }
     
     def link_entities(self, 
