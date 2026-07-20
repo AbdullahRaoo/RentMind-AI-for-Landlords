@@ -73,6 +73,18 @@ RentMind-AI-for-Landlords/
 
 ---
 
+## Architecture (high level)
+ 
+```
+User ──▶ Next.js UI ──WebSocket──▶ Django backend
+                                     │
+                        ┌────────────┼─────────────┐
+                        ▼            ▼             ▼
+                   spaCy intent  Milvus RAG    XGBoost models
+                        │            │             │
+                        └────────▶ GPT-4o response layer
+```
+
 ## 🛠️ Setup Instructions
 
 ### **Backend**
